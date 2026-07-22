@@ -15,6 +15,11 @@
   ul { margin: 0 0 14px; padding-left: 20px; }
   li { margin-bottom: 8px; }
   .alert { background: #fff8e1; border-radius: 8px; padding: 12px 16px; font-size: 15px; }
+  .tip { background: #f0f7f2; border-radius: 8px; padding: 14px 16px; font-size: 15px; }
+  .banner { background: #12341f; color: #fff; border-radius: 12px; padding: 20px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .banner .txt { font-size: 15px; line-height: 1.6; }
+  .banner .txt strong { font-size: 17px; display: block; margin-bottom: 2px; }
+  .banner a { background: #fff; color: #12341f; font-weight: 700; text-decoration: none; padding: 8px 18px; border-radius: 20px; font-size: 14px; white-space: nowrap; }
   a { color: #1a56db; }
   @media (max-width: 600px) { .card { padding: 20px 18px; } }
 </style>
@@ -22,29 +27,37 @@
 <body>
 
 <div class="card">
-  <div class="date">7월 22일 (수)</div>
+  <div class="date">7월 22일 (수) · 업데이트: 2026.07.22 22:42</div>
   <h2>🌤 오늘의 농업 날씨</h2>
-  <p>중부지방은 장맛비, 남부지방은 폭염이 이어지는 하루입니다. <strong>수도권·강원 내륙·산지·충청권·경북 북부</strong>에는 20~60mm(전북 5~40mm)의 비가 내리고, 시간당 20~30mm의 강한 비에 돌풍과 천둥·번개가 동반되는 곳이 있어 농경지 침수와 산사태 위험이 큽니다. 비가 소강상태인 남부지방과 제주는 낮 기온이 29~37도(포항 37도·대구 35도·제주 34도)까지 오르고 체감온도 33~35도의 무더위가 이어지겠습니다.</p>
-  <p><strong>강원 동해안·충청권·남부지방·제주</strong>에는 폭염특보가 발효 중이며, 밤사이 열대야가 나타나는 곳이 많아 온열질환과 가축 더위 피해에 각별한 주의가 필요합니다.</p>
+  <p>중부지방을 중심으로 강한 장맛비가 이어집니다. <strong>경기 남부·강원 남부·충청 북부</strong>에는 최대 80mm 이상, 그 밖의 중부지방에도 최대 60mm의 비가 예상되며, 이미 내린 비로 지반이 약해져 산사태와 농경지 침수 위험이 큽니다. 수도권을 제외한 전국 대부분 지역에는 폭염특보가 발효 중으로, 낮 기온이 강릉 33도·대구 35도까지 오르고 열대야가 이어지겠습니다.</p>
   <div class="subhead">농작업 포인트</div>
   <ul>
-    <li>호우 지역(중부·경북 북부)은 논·밭 배수로와 시설하우스 주변 물길을 정비하고, 비가 강하게 내리는 동안 경사지 농경지·하천변·산사태 우려 지역 접근을 금지하세요.</li>
-    <li>폭염 지역(남부·제주)은 한낮(12~17시) 야외 농작업을 중단하고 물·그늘·휴식 3요소를 지키세요. 나홀로 작업은 피하고 주변과 수시로 연락하세요.</li>
-    <li>축사는 송풍팬·안개분무 가동과 신선한 음용수 공급을 점검하고, 정전 대비 비상 발전기를 확인하세요. 지붕 차광·단열 도포도 더위 피해를 줄이는 데 효과적입니다.</li>
-    <li>고온다습한 날씨로 벼 도열병·잎집무늬마름병과 벼멸구·혹명나방 등 병해충 확산 위험이 커지고 있으니, 비가 갠 틈을 타 논 예찰과 적기 방제를 서두르세요.</li>
+    <li>비 오는 중부 지역은 논·밭 배수로를 미리 정비하고, 경사지 농경지와 하천변 접근은 자제하세요.</li>
+    <li>폭염 지역은 한낮(12~17시) 야외 작업을 중단하고 물·그늘·휴식을 충분히 확보하세요.</li>
+    <li>축사는 송풍·차광 시설을 점검해 가축 더위 피해를 예방하세요.</li>
+    <li>고온다습한 날씨로 벼멸구·혹명나방 등 비래해충과 탄저병 확산 위험이 커지고 있으니 논과 과수원 예찰을 서두르세요.</li>
   </ul>
-  <div class="alert">⚠️ <strong>오늘 특히 주의할 지역:</strong> <strong>수도권·충청권·경북 북부</strong>는 시간당 20~30mm의 집중호우로 농경지 침수·산사태 위험이 크고, <strong>포항·대구</strong> 등 영남 내륙은 37도 안팎의 폭염으로 온열질환·가축 폐사 위험이 매우 높습니다.</div>
+  <div class="alert">⚠️ <strong>오늘 특히 주의할 지역:</strong> <strong>경기 남부·강원 남부·충청 북부</strong>(호우 최대 80mm, 산사태·침수), <strong>경남 남해안</strong>(벼멸구·혹명나방 집중 예찰), <strong>대구·경북 내륙</strong>(폭염 35도, 온열질환·가축 피해)</div>
+</div>
+
+<div class="card">
+  <h2>🤖 오늘의 FARMILY-X 활용 팁</h2>
+  <div class="tip">고온다습한 날씨로 병해충 확산 위험이 높은 오늘, 방제는 미루기 어렵지만 한낮 폭염 속 작업은 위험합니다. 무인 방제 로봇 <strong>FARMILY-X</strong>라면 사람이 쉬는 한낮과 밤에도 온실 방제를 대신합니다. <a href="https://www.farmily.ai/farmilyxs" target="_blank" rel="noopener">FARMILY-X S시리즈 자세히 보기</a></div>
 </div>
 
 <div class="card">
   <h2>📰 오늘의 농업 뉴스</h2>
   <ul>
-    <li><a href="https://www.newsis.com/view/NISX20260720_0003715813" target="_blank" rel="noopener">집중호우·폭염에 농작물·가축 피해…정부 "수급 차질 없어"</a> — 뉴시스</li>
-    <li><a href="https://www.mt.co.kr/economy/2026/07/22/2026072215310020971" target="_blank" rel="noopener">폭염·호우가 가장 먼저 흔드는 밥상…상추·계란값 번갈아 뛰는 이유</a> — 머니투데이</li>
-    <li><strong>[전남 신안]</strong> <a href="https://www.ajunews.com/view/20260720104047391" target="_blank" rel="noopener">신안군, 벼 병해충 선제 대응 강화…8월 20일까지 중점 방제기간 운영</a> — 아주경제</li>
-    <li><strong>[경남]</strong> <a href="https://www.gnnews.co.kr/news/articleView.html?idxno=641027" target="_blank" rel="noopener">경남도, 폭염 대비 농업인 안전재해보험료 지원</a> — 경남일보</li>
-    <li><a href="https://www.etoday.co.kr/news/view/2606192" target="_blank" rel="noopener">농업도 AI 시대…정부, 위성·데이터 기반 농업혁신 추진</a> — 이투데이</li>
+    <li><a href="https://imnews.imbc.com/news/2026/econo/article/6836834_36932.html" target="_blank" rel="noopener">농식품부, 폭염 대책 추진‥농업인·가축·농작물 피해 최소화</a> — MBC</li>
+    <li><strong>[경남]</strong> <a href="https://www.munhwa.com/article/11603328" target="_blank" rel="noopener">중국서 날아온 벼멸구·혹명나방…남해안 벼농사 비상</a> — 문화일보</li>
+    <li><strong>[전남]</strong> <a href="https://www.sisadn.com/11472" target="_blank" rel="noopener">여수시, 벼 병해충 확산 방지 '기본 방제 기간' 운영</a> — 시사매일</li>
+    <li><a href="https://www.mt.co.kr/economy/2026/07/22/2026072215310020971" target="_blank" rel="noopener">폭염·호우가 가장 먼저 흔드는 밥상 물가는?</a> — 머니투데이</li>
   </ul>
+</div>
+
+<div class="banner">
+  <div class="txt"><strong>FARMILY-X</strong>Physical AI 기반 무인 방제 자동화 로봇 — 밤에도, 폭염에도 FARMILY는 쉬지 않습니다.</div>
+  <a href="https://www.farmily.ai/" target="_blank" rel="noopener">자세히 보기</a>
 </div>
 
 <script>
