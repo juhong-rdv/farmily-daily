@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>오늘의 농업 정보 요약 | FARMILY</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #222; line-height: 1.75; margin: 0; padding: 4px; background: transparent; }
+  .card { background: #f7f9f7; border: 1px solid #dfe8df; border-radius: 12px; padding: 28px 32px; }
+  .date { font-size: 15px; color: #888; margin-bottom: 6px; }
+  .card h2 { font-size: 20px; font-weight: 700; margin: 0 0 14px; }
+  .summary { list-style: none; padding-left: 0; margin: 0 0 18px; }
+  .summary li { margin-bottom: 8px; font-size: 16px; }
+  .more-btn { display: inline-block; background: #12341f; color: #fff; padding: 10px 24px; border-radius: 22px; text-decoration: none; font-weight: 700; font-size: 15px; }
+  .more-btn:hover { background: #1d4a2e; }
+  a { color: #1a56db; }
+  @media (max-width: 600px) { .card { padding: 20px 18px; } }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="date">7월 23일 (목) · 업데이트: 2026.07.23 09:11</div>
+  <h2>📌 오늘의 농업 정보</h2>
+  <ul class="summary">
+    <li>🌤 <strong>수도권·강원</strong> 시간당 50mm·최대 120mm 폭우, <strong>남부</strong>는 폭염특보 속 낮 37도 안팎 — 침수·온열질환 동시 주의</li>
+    <li>🐛 <strong>[경남 남해안]</strong> 5개 시군·<strong>[울산]</strong> 중국발 벼멸구·혹명나방 비래 — 벼 재배 농가 예찰·적기 방제 시급</li>
+    <li>📈 오이(백다다기) 50개 19,521원·토마토 10kg 10,642원·애호박 20개 13,459원 (7.22 가락시장 확정가)</li>
+    <li>📋 2026 농업인 안전365 캠페인 공모전 접수 중 (농촌진흥청, 9월 30일까지)</li>
+  </ul>
+  <a class="more-btn" href="https://farmily.ai/daily" target="_top">오늘의 농업 소식 자세히 보기 →</a>
+</div>
+
+<script>
+  function postHeight() {
+    if (window.parent !== window) {
+      window.parent.postMessage({ farmilySummaryHeight: document.body.scrollHeight }, '*');
+    }
+  }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+  setTimeout(postHeight, 500);
+</script>
+</body>
+</html>
