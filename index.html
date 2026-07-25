@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>오늘의 농업 소식 | FARMILY 파밀리 — 스마트팜 · 농업로봇 · 무인 방제</title>
-<meta name="description" content="전국 폭염 속 오후 소나기, 벼멸구 남부 급속 확산 지속. 오늘의 농업 날씨·병해충·농산물 시세·농업 뉴스를 매일 아침 전합니다.">
+<meta name="description" content="폭염 3일간 배추·상추 등 채소값 급등, 벼멸구 남부 확산. 오늘의 농업 날씨·병해충·농산물 시세·뉴스를 매일 아침 전합니다.">
 <meta name="keywords" content="스마트팜, 농업, 농업 뉴스, 농업로봇, 방제기, 방제 자동화, 무인방제기, 방제로봇, UV, UV로봇, UV 방제, 수확, 수확로봇, 자율주행, 로봇팔, AMR, 온실 자동화, 시설원예, 병해충 방제, 농산물 시세, 농업 날씨, FARMILY, 파밀리, 랑데뷰">
 <meta property="og:site_name" content="FARMILY 오늘의 농업 소식">
 <meta property="og:title" content="오늘의 농업 소식 (7월 25일) — 날씨 · 병해충 · 농산물 시세">
-<meta property="og:description" content="전국 폭염 속 오후 소나기, 벼멸구 남부 급속 확산 지속. FARMILY가 매일 아침 전하는 농업 정보.">
+<meta property="og:description" content="폭염 3일간 배추·상추 등 채소값 급등, 벼멸구 남부 확산. FARMILY가 매일 아침 전하는 농업 정보.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://juhong-rdv.github.io/farmily-daily/">
 <meta property="og:locale" content="ko_KR">
@@ -36,6 +36,14 @@
   .up { color: #d32f2f; }
   .down { color: #1a56db; }
   .src { font-size: 13px; color: #999; }
+  .chart { margin: 14px 0 6px; }
+  .chart-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .crow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 14px; }
+  .cname { width: 108px; flex-shrink: 0; text-align: right; color: #555; }
+  .cbar { height: 14px; border-radius: 4px; min-width: 2px; }
+  .cbar.up-bg { background: #ef5350; }
+  .cbar.down-bg { background: #42a5f5; }
+  .cval { flex-shrink: 0; font-weight: 700; }
   .footer-note { font-size: 14px; color: #777; padding: 4px 8px 12px; }
   a { color: #1a56db; }
   @media (max-width: 600px) { .card { padding: 20px 18px; } }
@@ -45,7 +53,7 @@
 
 <div class="page-head">
   <h1>오늘의 농업 소식 (7월 25일 토요일)</h1>
-  <div class="date">업데이트: 2026.07.25 09:00 · FARMILY 파밀리 제공</div>
+  <div class="date">업데이트: 2026.07.25 10:30 · FARMILY 파밀리 제공</div>
 </div>
 
 <div class="card">
@@ -74,18 +82,28 @@
 <div class="card">
   <h2>📈 오늘의 농산물 시세</h2>
   <table>
-    <tr><th>품목</th><th>단위</th><th>도매가격</th><th>등락</th></tr>
-    <tr><td>오이(백다다기)</td><td>100개</td><td>33,525원</td><td>-</td></tr>
-    <tr><td>토마토</td><td>10kg 상자</td><td>9,352원</td><td>-</td></tr>
-    <tr><td>방울토마토</td><td>5kg 상자</td><td>6,417원</td><td>-</td></tr>
-    <tr><td>파프리카(빨강)</td><td>5kg 상자</td><td>7,619원</td><td>-</td></tr>
-    <tr><td>애호박</td><td>20개</td><td>8,983원</td><td>-</td></tr>
-    <tr><td>풋고추(일반)</td><td>10kg 상자</td><td>14,748원</td><td>-</td></tr>
-    <tr><td>상추</td><td>4kg 상자</td><td>14,859원</td><td>-</td></tr>
-    <tr><td>배추</td><td>10kg 망대</td><td>6,934원</td><td>-</td></tr>
-    <tr><td>무</td><td>20kg 상자</td><td>6,888원</td><td>-</td></tr>
+    <tr><th>품목</th><th>단위</th><th>도매가격</th><th>등락(7/22 대비)</th></tr>
+    <tr><td>오이(백다다기)</td><td>100개</td><td>59,958원</td><td>-</td></tr>
+    <tr><td>토마토</td><td>10kg 상자</td><td>12,300원</td><td class="up">▲ 15.6%</td></tr>
+    <tr><td>방울토마토</td><td>5kg 상자</td><td>16,383원</td><td class="up">▲ 76.1%</td></tr>
+    <tr><td>파프리카(빨강)</td><td>5kg 상자</td><td>10,991원</td><td>-</td></tr>
+    <tr><td>애호박</td><td>20개</td><td>18,238원</td><td class="up">▲ 35.5%</td></tr>
+    <tr><td>풋고추(일반)</td><td>10kg 상자</td><td>37,408원</td><td class="up">▲ 30.2%</td></tr>
+    <tr><td>상추</td><td>4kg 상자</td><td>37,223원</td><td class="up">▲ 47.4%</td></tr>
+    <tr><td>배추</td><td>10kg 망대</td><td>10,887원</td><td class="up">▲ 200.2%</td></tr>
+    <tr><td>무</td><td>20kg 상자</td><td>10,522원</td><td class="up">▲ 45.0%</td></tr>
   </table>
-  <div class="src">2026.7.23 가락시장 경락가격(상품 기준) · 자료: 가락시장 시세정보 — 최근 확정가를 게재합니다. 매일 자동 실행이 같은 기준으로 시세를 누적하면 전일 대비 등락률과 가격 추이 그래프가 이 자리에 표시됩니다.</div>
+  <div class="chart">
+    <div class="chart-title">품목별 등락률 (7월 22일 대비)</div>
+    <div class="crow"><span class="cname">배추</span><div class="cbar up-bg" style="width:85.0%"></div><span class="cval up">▲ 200.2%</span></div>
+    <div class="crow"><span class="cname">방울토마토</span><div class="cbar up-bg" style="width:32.3%"></div><span class="cval up">▲ 76.1%</span></div>
+    <div class="crow"><span class="cname">상추</span><div class="cbar up-bg" style="width:20.1%"></div><span class="cval up">▲ 47.4%</span></div>
+    <div class="crow"><span class="cname">무</span><div class="cbar up-bg" style="width:19.1%"></div><span class="cval up">▲ 45.0%</span></div>
+    <div class="crow"><span class="cname">애호박</span><div class="cbar up-bg" style="width:15.1%"></div><span class="cval up">▲ 35.5%</span></div>
+    <div class="crow"><span class="cname">풋고추</span><div class="cbar up-bg" style="width:12.8%"></div><span class="cval up">▲ 30.2%</span></div>
+    <div class="crow"><span class="cname">토마토</span><div class="cbar up-bg" style="width:6.6%"></div><span class="cval up">▲ 15.6%</span></div>
+  </div>
+  <div class="src">2026.7.25 가락시장 경락가격(상품 등급) 기준 · 자료: 가락시장 시세정보. 등락은 같은 등급으로 비교 가능한 직전 확정일 <strong>7월 22일</strong> 대비이며(7/23~24는 동일 기준을 확보하지 못함), 3일간 이어진 폭염으로 채소류가 전반적으로 크게 올랐습니다. 오이·파프리카는 비교 기준(단위·등급)이 달라 이번엔 등락에서 제외했습니다. 매일 자동 실행이 같은 상품 등급으로 시세를 누적하면 전일 대비 등락과 가격 추이 그래프가 정확히 표시됩니다.</div>
 </div>
 <div class="card">
   <h2>📰 오늘의 농업 뉴스</h2>
