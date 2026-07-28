@@ -37,13 +37,21 @@
   .down { color: #1a56db; }
   .src { font-size: 13px; color: #999; }
   .chart { margin: 14px 0 6px; }
-  .chart-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
-  .crow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 14px; }
-  .cname { width: 108px; flex-shrink: 0; text-align: right; color: #555; }
-  .cbar { height: 14px; border-radius: 4px; min-width: 2px; }
-  .cbar.up-bg { background: #ef5350; }
-  .cbar.down-bg { background: #42a5f5; }
-  .cval { flex-shrink: 0; font-weight: 700; }
+  .chart-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .chart-axis-label { display: flex; align-items: center; font-size: 12px; color: #888; margin-bottom: 8px; }
+  .chart-axis-label .cname { color: #888; }
+  .chart-axis-label .cside.left { justify-content: flex-start; }
+  .chart-axis-label .cside.right { justify-content: flex-end; }
+  .crow { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
+  .cname { width: 76px; flex-shrink: 0; text-align: right; color: #555; padding-right: 8px; }
+  .cside { flex: 1 1 0; display: flex; align-items: center; min-width: 0; }
+  .cside.left { justify-content: flex-end; }
+  .cside.right { justify-content: flex-start; }
+  .caxis { width: 2px; height: 20px; background: #bbb; flex-shrink: 0; }
+  .cbar { height: 14px; min-width: 3px; display: block; }
+  .cbar.up-bg { background: #ef5350; border-radius: 0 4px 4px 0; }
+  .cbar.down-bg { background: #42a5f5; border-radius: 4px 0 0 4px; }
+  .cval { width: 62px; flex-shrink: 0; text-align: right; font-weight: 700; font-size: 13px; white-space: nowrap; }
   .trend { margin: 14px 0 6px; }
   .trow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; }
   .spark { flex: 1; height: 48px; background: #fafafa; border-radius: 6px; }
@@ -98,15 +106,16 @@
   </table>
   <div class="chart">
     <div class="chart-title">품목별 등락률 (직전 비교 가능일 7월 25일 대비)</div>
-    <div class="crow"><span class="cname">방울토마토</span><div class="cbar up-bg" style="width:85%"></div><span class="cval up">▲ 34.2%</span></div>
-    <div class="crow"><span class="cname">토마토</span><div class="cbar up-bg" style="width:37.8%"></div><span class="cval up">▲ 15.2%</span></div>
-    <div class="crow"><span class="cname">무</span><div class="cbar down-bg" style="width:37.8%"></div><span class="cval down">▼ 15.2%</span></div>
-    <div class="crow"><span class="cname">파프리카</span><div class="cbar down-bg" style="width:37.0%"></div><span class="cval down">▼ 14.9%</span></div>
-    <div class="crow"><span class="cname">배추</span><div class="cbar down-bg" style="width:33.1%"></div><span class="cval down">▼ 13.3%</span></div>
-    <div class="crow"><span class="cname">오이</span><div class="cbar down-bg" style="width:23.9%"></div><span class="cval down">▼ 9.6%</span></div>
-    <div class="crow"><span class="cname">풋고추</span><div class="cbar up-bg" style="width:19.6%"></div><span class="cval up">▲ 7.9%</span></div>
-    <div class="crow"><span class="cname">애호박</span><div class="cbar up-bg" style="width:1.0%"></div><span class="cval up">▲ 0.4%</span></div>
-    <div class="crow"><span class="cname">상추</span><div class="cbar up-bg" style="width:1.0%"></div><span class="cval up">▲ 0.4%</span></div>
+    <div class="chart-axis-label"><span class="cname"></span><span class="cside left">◀ 하락</span><span class="caxis" style="background:transparent"></span><span class="cside right">상승 ▶</span><span class="cval"></span></div>
+    <div class="crow"><span class="cname">방울토마토</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:92%"></span></span><span class="cval up">▲ 34.2%</span></div>
+    <div class="crow"><span class="cname">토마토</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:40.9%"></span></span><span class="cval up">▲ 15.2%</span></div>
+    <div class="crow"><span class="cname">무</span><span class="cside left"><span class="cbar down-bg" style="width:40.9%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 15.2%</span></div>
+    <div class="crow"><span class="cname">파프리카</span><span class="cside left"><span class="cbar down-bg" style="width:40.1%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 14.9%</span></div>
+    <div class="crow"><span class="cname">배추</span><span class="cside left"><span class="cbar down-bg" style="width:35.8%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 13.3%</span></div>
+    <div class="crow"><span class="cname">오이</span><span class="cside left"><span class="cbar down-bg" style="width:25.8%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 9.6%</span></div>
+    <div class="crow"><span class="cname">풋고추</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:21.3%"></span></span><span class="cval up">▲ 7.9%</span></div>
+    <div class="crow"><span class="cname">애호박</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:1.1%"></span></span><span class="cval up">▲ 0.4%</span></div>
+    <div class="crow"><span class="cname">상추</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:1.1%"></span></span><span class="cval up">▲ 0.4%</span></div>
   </div>
   <div class="src">가격 기준일 <strong>2026.7.27(월)</strong> 가락시장 경락가격(상품 등급). 화요일 오전은 당일 경락가 집계 전으로, 확인 가능한 최근 확정가를 게재합니다. 등락은 직전 비교 가능일 <strong>7월 25일 대비</strong>이며, 모든 품목이 같은 등급·단위(오이는 양일 모두 100개 기준)라 환산 없이 직접 비교했습니다. 파프리카(빨강)는 7월 25일 이력이 쌓이면서 이번 회차부터 등락이 표시됩니다. 지난주 급등했던 채소류가 이번 주 들어 조정을 받는 모습이며, 방울토마토·토마토는 상승세를 이어가고 있습니다. 가락시장 채소 경매는 <strong>7월 30일까지 진행 후 하계 휴장, 8월 2일 저녁 재개</strong> 예정이니 출하 일정을 확인하세요. 전체 품목 시세(28개)는 이력에 누적 중입니다.</div>
 </div>
