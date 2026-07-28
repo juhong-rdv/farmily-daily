@@ -52,9 +52,13 @@
   .cbar.up-bg { background: #ef5350; border-radius: 0 4px 4px 0; }
   .cbar.down-bg { background: #42a5f5; border-radius: 4px 0 0 4px; }
   .cval { width: 62px; flex-shrink: 0; text-align: right; font-weight: 700; font-size: 13px; white-space: nowrap; }
-  .trend { margin: 14px 0 6px; }
-  .trow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; }
-  .spark { flex: 1; height: 48px; background: #fafafa; border-radius: 6px; }
+  .trend { margin: 20px 0 6px; }
+  .trend svg { width: 100%; height: auto; display: block; }
+  .trend-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; font-size: 13px; color: #555; }
+  .tl-item { white-space: nowrap; }
+  .tl-item .chip { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; }
+  .tl-base { color: #999; font-size: 12px; }
+  .trend-note { font-size: 12px; color: #999; margin-top: 6px; line-height: 1.6; }
   .footer-note { font-size: 14px; color: #777; padding: 4px 8px 12px; }
   a { color: #1a56db; }
   @media (max-width: 600px) { .card { padding: 20px 18px; } }
@@ -116,6 +120,58 @@
     <div class="crow"><span class="cname">풋고추</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:21.3%"></span></span><span class="cval up">▲ 7.9%</span></div>
     <div class="crow"><span class="cname">애호박</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:1.1%"></span></span><span class="cval up">▲ 0.4%</span></div>
     <div class="crow"><span class="cname">상추</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:1.1%"></span></span><span class="cval up">▲ 0.4%</span></div>
+  </div>
+  <div class="trend">
+    <div class="chart-title">품목별 가격 추이 지수 (첫 집계일 = 100)</div>
+    <svg viewBox="0 0 640 292" role="img" aria-label="주요 온실작물 가격 추이 지수 그래프">
+      <line x1="64" y1="18.0" x2="616" y2="18.0" stroke="#ececec" stroke-width="1"/>
+      <text x="55" y="23.0" text-anchor="end" font-size="15" fill="#999">240</text>
+      <line x1="64" y1="78.0" x2="616" y2="78.0" stroke="#ececec" stroke-width="1"/>
+      <text x="55" y="83.0" text-anchor="end" font-size="15" fill="#999">200</text>
+      <line x1="64" y1="138.0" x2="616" y2="138.0" stroke="#ececec" stroke-width="1"/>
+      <text x="55" y="143.0" text-anchor="end" font-size="15" fill="#999">160</text>
+      <line x1="64" y1="198.0" x2="616" y2="198.0" stroke="#ececec" stroke-width="1"/>
+      <text x="55" y="203.0" text-anchor="end" font-size="15" fill="#999">120</text>
+      <line x1="64" y1="258.0" x2="616" y2="258.0" stroke="#ececec" stroke-width="1"/>
+      <text x="55" y="263.0" text-anchor="end" font-size="15" fill="#999">80</text>
+      <line x1="64" y1="228.0" x2="616" y2="228.0" stroke="#b5b4ad" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="55" y="233.0" text-anchor="end" font-size="15" font-weight="700" fill="#666">100</text>
+      <text x="64.0" y="284" text-anchor="middle" font-size="15" fill="#999">7/22</text>
+      <text x="395.2" y="284" text-anchor="middle" font-size="15" fill="#999">7/25</text>
+      <text x="616.0" y="284" text-anchor="middle" font-size="15" fill="#999">7/27</text>
+      <polyline points="64.0,228.0 395.2,147.6 616.0,169.8" fill="none" stroke="#2a78d6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="64.0,228.0 395.2,204.6 616.0,178.4" fill="none" stroke="#eb6834" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="64.0,228.0 395.2,113.8 616.0,23.4" fill="none" stroke="#1baf7a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="395.2,228.0 616.0,250.3" fill="none" stroke="#eda100" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="64.0,228.0 395.2,174.7 616.0,174.0" fill="none" stroke="#e87ba4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="64.0,228.0 395.2,182.7 616.0,167.2" fill="none" stroke="#008300" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="64.0" cy="228.0" r="4" fill="#2a78d6" stroke="#fff" stroke-width="2"/>
+      <circle cx="395.2" cy="147.6" r="4" fill="#2a78d6" stroke="#fff" stroke-width="2"/>
+      <circle cx="616.0" cy="169.8" r="4" fill="#2a78d6" stroke="#fff" stroke-width="2"/>
+      <circle cx="64.0" cy="228.0" r="4" fill="#eb6834" stroke="#fff" stroke-width="2"/>
+      <circle cx="395.2" cy="204.6" r="4" fill="#eb6834" stroke="#fff" stroke-width="2"/>
+      <circle cx="616.0" cy="178.4" r="4" fill="#eb6834" stroke="#fff" stroke-width="2"/>
+      <circle cx="64.0" cy="228.0" r="4" fill="#1baf7a" stroke="#fff" stroke-width="2"/>
+      <circle cx="395.2" cy="113.8" r="4" fill="#1baf7a" stroke="#fff" stroke-width="2"/>
+      <circle cx="616.0" cy="23.4" r="4" fill="#1baf7a" stroke="#fff" stroke-width="2"/>
+      <circle cx="395.2" cy="228.0" r="4" fill="#eda100" stroke="#fff" stroke-width="2"/>
+      <circle cx="616.0" cy="250.3" r="4" fill="#eda100" stroke="#fff" stroke-width="2"/>
+      <circle cx="64.0" cy="228.0" r="4" fill="#e87ba4" stroke="#fff" stroke-width="2"/>
+      <circle cx="395.2" cy="174.7" r="4" fill="#e87ba4" stroke="#fff" stroke-width="2"/>
+      <circle cx="616.0" cy="174.0" r="4" fill="#e87ba4" stroke="#fff" stroke-width="2"/>
+      <circle cx="64.0" cy="228.0" r="4" fill="#008300" stroke="#fff" stroke-width="2"/>
+      <circle cx="395.2" cy="182.7" r="4" fill="#008300" stroke="#fff" stroke-width="2"/>
+      <circle cx="616.0" cy="167.2" r="4" fill="#008300" stroke="#fff" stroke-width="2"/>
+    </svg>
+    <div class="trend-legend">
+      <span class="tl-item"><span class="chip" style="background:#2a78d6"></span>오이 <strong>139</strong></span>
+      <span class="tl-item"><span class="chip" style="background:#eb6834"></span>토마토 <strong>133</strong></span>
+      <span class="tl-item"><span class="chip" style="background:#1baf7a"></span>방울토마토 <strong>236</strong></span>
+      <span class="tl-item"><span class="chip" style="background:#eda100"></span>파프리카 <strong>85</strong> <span class="tl-base">(7/25=100)</span></span>
+      <span class="tl-item"><span class="chip" style="background:#e87ba4"></span>애호박 <strong>136</strong></span>
+      <span class="tl-item"><span class="chip" style="background:#008300"></span>풋고추 <strong>141</strong></span>
+    </div>
+    <div class="trend-note">각 품목의 첫 집계일 가격을 100으로 놓은 지수입니다. 100보다 높으면 그때보다 비싸졌다는 뜻입니다. 시세 이력은 7월 22일부터 매일 누적되어 그래프가 점점 길어집니다. (오이는 7/22 50개 가격을 100개 기준으로 환산해 연결)</div>
   </div>
   <div class="src">가격 기준일 <strong>2026.7.27(월)</strong> 가락시장 경락가격(상품 등급). 화요일 오전은 당일 경락가 집계 전으로, 확인 가능한 최근 확정가를 게재합니다. 등락은 직전 비교 가능일 <strong>7월 25일 대비</strong>이며, 모든 품목이 같은 등급·단위(오이는 양일 모두 100개 기준)라 환산 없이 직접 비교했습니다. 파프리카(빨강)는 7월 25일 이력이 쌓이면서 이번 회차부터 등락이 표시됩니다. 지난주 급등했던 채소류가 이번 주 들어 조정을 받는 모습이며, 방울토마토·토마토는 상승세를 이어가고 있습니다. 가락시장 채소 경매는 <strong>7월 30일까지 진행 후 하계 휴장, 8월 2일 저녁 재개</strong> 예정이니 출하 일정을 확인하세요. 전체 품목 시세(28개)는 이력에 누적 중입니다.</div>
 </div>
