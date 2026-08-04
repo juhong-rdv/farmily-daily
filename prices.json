@@ -92,6 +92,43 @@
         {"name": "사과", "unit": "10kg 상자", "price": 68517},
         {"name": "배(신고)", "unit": "15kg 상자", "price": 84407}
       ]
+    },
+    {
+      "date": "2026-08-03",
+      "source": "가락시장 경락가격(상품 등급)",
+      "items": [
+        {"name": "오이(백다다기)", "unit": "100개", "price": 40511},
+        {"name": "토마토", "unit": "10kg 상자", "price": 21377},
+        {"name": "방울토마토", "unit": "5kg 상자", "price": 13354},
+        {"name": "애호박", "unit": "20개", "price": 20511},
+        {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 59366},
+        {"name": "상추", "unit": "4kg 상자", "price": 33245},
+        {"name": "배추", "unit": "10kg 망대", "price": 9788},
+        {"name": "무", "unit": "20kg 상자", "price": 10231},
+        {"name": "시금치", "unit": "4kg 상자", "price": 46544},
+        {"name": "깻잎", "unit": "100속", "price": 21511},
+        {"name": "가지", "unit": "5kg 상자", "price": 7122},
+        {"name": "홍고추", "unit": "10kg 상자", "price": 44031},
+        {"name": "홍피망", "unit": "10kg 상자", "price": 70774},
+        {"name": "쪽파", "unit": "10kg 상자", "price": 59113},
+        {"name": "양배추", "unit": "8kg 망대", "price": 5240},
+        {"name": "양파", "unit": "1kg", "price": 1165},
+        {"name": "감자", "unit": "20kg 상자", "price": 29026},
+        {"name": "고구마", "unit": "10kg 상자", "price": 33401},
+        {"name": "미나리(일반)", "unit": "4kg", "price": 23881},
+        {"name": "수박(일반)", "unit": "6kg(개)", "price": 13926},
+        {"name": "참외(일반)", "unit": "10kg 상자", "price": 39011},
+        {"name": "대파(일반)", "unit": "1kg(단)", "price": 1515},
+        {"name": "얼갈이배추", "unit": "4kg 상자", "price": 10906},
+        {"name": "열무", "unit": "4kg 상자", "price": 18803},
+        {"name": "브로콜리", "unit": "6kg 상자", "price": 43423},
+        {"name": "청피망", "unit": "10kg 상자", "price": 22091},
+        {"name": "멜론(머스크)", "unit": "5kg 상자", "price": 15333},
+        {"name": "포도(캠벨얼리)", "unit": "2kg 상자", "price": 7291},
+        {"name": "포도(샤인머스캣)", "unit": "2kg 상자", "price": 13819},
+        {"name": "사과", "unit": "10kg 상자", "price": 59167},
+        {"name": "배(신고)", "unit": "15kg 상자", "price": 56172}
+      ]
     }
   ]
 }
