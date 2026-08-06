@@ -16,160 +16,866 @@
       "date": "2026-07-22",
       "source": "가락시장 경락가격(상품 등급)",
       "items": [
-        {"name": "오이(백다다기)", "unit": "50개", "price": 19521},
-        {"name": "토마토", "unit": "10kg 상자", "price": 10642},
-        {"name": "방울토마토", "unit": "5kg 상자", "price": 9302},
-        {"name": "애호박", "unit": "20개", "price": 13459},
-        {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 28728},
-        {"name": "상추", "unit": "4kg 상자", "price": 25251},
-        {"name": "배추", "unit": "10kg 망대", "price": 3627},
-        {"name": "무", "unit": "20kg 상자", "price": 7255}
+        {
+          "name": "오이(백다다기)",
+          "unit": "50개",
+          "price": 19521
+        },
+        {
+          "name": "토마토",
+          "unit": "10kg 상자",
+          "price": 10642
+        },
+        {
+          "name": "방울토마토",
+          "unit": "5kg 상자",
+          "price": 9302
+        },
+        {
+          "name": "애호박",
+          "unit": "20개",
+          "price": 13459
+        },
+        {
+          "name": "풋고추(일반)",
+          "unit": "10kg 상자",
+          "price": 28728
+        },
+        {
+          "name": "상추",
+          "unit": "4kg 상자",
+          "price": 25251
+        },
+        {
+          "name": "배추",
+          "unit": "10kg 망대",
+          "price": 3627
+        },
+        {
+          "name": "무",
+          "unit": "20kg 상자",
+          "price": 7255
+        }
       ]
     },
     {
       "date": "2026-07-25",
       "source": "가락시장 경락가격(상품 등급)",
       "items": [
-        {"name": "오이(백다다기)", "unit": "100개", "price": 59958},
-        {"name": "토마토", "unit": "10kg 상자", "price": 12300},
-        {"name": "방울토마토", "unit": "5kg 상자", "price": 16383},
-        {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 10991},
-        {"name": "홍피망", "unit": "10kg 상자", "price": 78667},
-        {"name": "애호박", "unit": "20개", "price": 18238},
-        {"name": "가지", "unit": "8kg 상자", "price": 29258},
-        {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 37408},
-        {"name": "홍고추", "unit": "10kg 상자", "price": 48230},
-        {"name": "상추", "unit": "4kg 상자", "price": 37223},
-        {"name": "깻잎", "unit": "100속", "price": 24160},
-        {"name": "시금치", "unit": "4kg 상자", "price": 46913},
-        {"name": "미나리(일반)", "unit": "8kg", "price": 44304},
-        {"name": "쪽파", "unit": "10kg 상자", "price": 50279},
-        {"name": "배추", "unit": "10kg 망대", "price": 10887},
-        {"name": "양배추", "unit": "8kg 망대", "price": 4879},
-        {"name": "무", "unit": "20kg 상자", "price": 10522},
-        {"name": "양파", "unit": "20kg", "price": 23696},
-        {"name": "감자", "unit": "20kg 상자", "price": 26560},
-        {"name": "고구마", "unit": "10kg 상자", "price": 30792},
-        {"name": "수박(일반)", "unit": "7kg(개)", "price": 22103},
-        {"name": "참외(일반)", "unit": "10kg 상자", "price": 28144},
-        {"name": "복숭아(황도)", "unit": "10kg 상자", "price": 31500},
-        {"name": "포도(캠벨얼리)", "unit": "3kg 상자", "price": 22519},
-        {"name": "포도(샤인머스캣)", "unit": "4kg 상자", "price": 32007},
-        {"name": "사과", "unit": "10kg 상자", "price": 50612},
-        {"name": "배(신고)", "unit": "15kg 상자", "price": 52277}
+        {
+          "name": "오이(백다다기)",
+          "unit": "100개",
+          "price": 59958
+        },
+        {
+          "name": "토마토",
+          "unit": "10kg 상자",
+          "price": 12300
+        },
+        {
+          "name": "방울토마토",
+          "unit": "5kg 상자",
+          "price": 16383
+        },
+        {
+          "name": "파프리카(빨강)",
+          "unit": "5kg 상자",
+          "price": 10991
+        },
+        {
+          "name": "홍피망",
+          "unit": "10kg 상자",
+          "price": 78667
+        },
+        {
+          "name": "애호박",
+          "unit": "20개",
+          "price": 18238
+        },
+        {
+          "name": "가지",
+          "unit": "8kg 상자",
+          "price": 29258
+        },
+        {
+          "name": "풋고추(일반)",
+          "unit": "10kg 상자",
+          "price": 37408
+        },
+        {
+          "name": "홍고추",
+          "unit": "10kg 상자",
+          "price": 48230
+        },
+        {
+          "name": "상추",
+          "unit": "4kg 상자",
+          "price": 37223
+        },
+        {
+          "name": "깻잎",
+          "unit": "100속",
+          "price": 24160
+        },
+        {
+          "name": "시금치",
+          "unit": "4kg 상자",
+          "price": 46913
+        },
+        {
+          "name": "미나리(일반)",
+          "unit": "8kg",
+          "price": 44304
+        },
+        {
+          "name": "쪽파",
+          "unit": "10kg 상자",
+          "price": 50279
+        },
+        {
+          "name": "배추",
+          "unit": "10kg 망대",
+          "price": 10887
+        },
+        {
+          "name": "양배추",
+          "unit": "8kg 망대",
+          "price": 4879
+        },
+        {
+          "name": "무",
+          "unit": "20kg 상자",
+          "price": 10522
+        },
+        {
+          "name": "양파",
+          "unit": "20kg",
+          "price": 23696
+        },
+        {
+          "name": "감자",
+          "unit": "20kg 상자",
+          "price": 26560
+        },
+        {
+          "name": "고구마",
+          "unit": "10kg 상자",
+          "price": 30792
+        },
+        {
+          "name": "수박(일반)",
+          "unit": "7kg(개)",
+          "price": 22103
+        },
+        {
+          "name": "참외(일반)",
+          "unit": "10kg 상자",
+          "price": 28144
+        },
+        {
+          "name": "복숭아(황도)",
+          "unit": "10kg 상자",
+          "price": 31500
+        },
+        {
+          "name": "포도(캠벨얼리)",
+          "unit": "3kg 상자",
+          "price": 22519
+        },
+        {
+          "name": "포도(샤인머스캣)",
+          "unit": "4kg 상자",
+          "price": 32007
+        },
+        {
+          "name": "사과",
+          "unit": "10kg 상자",
+          "price": 50612
+        },
+        {
+          "name": "배(신고)",
+          "unit": "15kg 상자",
+          "price": 52277
+        }
       ]
     },
     {
       "date": "2026-07-27",
       "source": "가락시장 경락가격(상품 등급)",
       "items": [
-        {"name": "오이(백다다기)", "unit": "100개", "price": 54195},
-        {"name": "토마토", "unit": "10kg 상자", "price": 14164},
-        {"name": "방울토마토", "unit": "5kg 상자", "price": 21992},
-        {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 9358},
-        {"name": "파프리카(노랑)", "unit": "5kg 상자", "price": 13616},
-        {"name": "홍피망", "unit": "10kg 상자", "price": 154333},
-        {"name": "애호박", "unit": "20개", "price": 18304},
-        {"name": "가지", "unit": "5kg 상자", "price": 7122},
-        {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 40366},
-        {"name": "홍고추", "unit": "10kg 상자", "price": 42720},
-        {"name": "상추", "unit": "4kg 상자", "price": 37374},
-        {"name": "깻잎", "unit": "100속", "price": 20498},
-        {"name": "시금치", "unit": "4kg 상자", "price": 53147},
-        {"name": "미나리(일반)", "unit": "8kg", "price": 54711},
-        {"name": "쪽파", "unit": "10kg 상자", "price": 44428},
-        {"name": "배추", "unit": "10kg 망대", "price": 9436},
-        {"name": "양배추", "unit": "8kg 망대", "price": 3571},
-        {"name": "무", "unit": "20kg 상자", "price": 8921},
-        {"name": "양파", "unit": "10kg", "price": 8995},
-        {"name": "감자", "unit": "20kg 상자", "price": 31659},
-        {"name": "고구마", "unit": "10kg 상자", "price": 29078},
-        {"name": "수박(일반)", "unit": "8kg(개)", "price": 26402},
-        {"name": "참외(일반)", "unit": "10kg 상자", "price": 31046},
-        {"name": "복숭아(대월)", "unit": "10kg 상자", "price": 36786},
-        {"name": "포도(캠벨얼리)", "unit": "3kg 상자", "price": 24343},
-        {"name": "포도(샤인머스캣)", "unit": "4kg 상자", "price": 30111},
-        {"name": "사과", "unit": "10kg 상자", "price": 68517},
-        {"name": "배(신고)", "unit": "15kg 상자", "price": 84407}
+        {
+          "name": "오이(백다다기)",
+          "unit": "100개",
+          "price": 54195
+        },
+        {
+          "name": "토마토",
+          "unit": "10kg 상자",
+          "price": 14164
+        },
+        {
+          "name": "방울토마토",
+          "unit": "5kg 상자",
+          "price": 21992
+        },
+        {
+          "name": "파프리카(빨강)",
+          "unit": "5kg 상자",
+          "price": 9358
+        },
+        {
+          "name": "파프리카(노랑)",
+          "unit": "5kg 상자",
+          "price": 13616
+        },
+        {
+          "name": "홍피망",
+          "unit": "10kg 상자",
+          "price": 154333
+        },
+        {
+          "name": "애호박",
+          "unit": "20개",
+          "price": 18304
+        },
+        {
+          "name": "가지",
+          "unit": "5kg 상자",
+          "price": 7122
+        },
+        {
+          "name": "풋고추(일반)",
+          "unit": "10kg 상자",
+          "price": 40366
+        },
+        {
+          "name": "홍고추",
+          "unit": "10kg 상자",
+          "price": 42720
+        },
+        {
+          "name": "상추",
+          "unit": "4kg 상자",
+          "price": 37374
+        },
+        {
+          "name": "깻잎",
+          "unit": "100속",
+          "price": 20498
+        },
+        {
+          "name": "시금치",
+          "unit": "4kg 상자",
+          "price": 53147
+        },
+        {
+          "name": "미나리(일반)",
+          "unit": "8kg",
+          "price": 54711
+        },
+        {
+          "name": "쪽파",
+          "unit": "10kg 상자",
+          "price": 44428
+        },
+        {
+          "name": "배추",
+          "unit": "10kg 망대",
+          "price": 9436
+        },
+        {
+          "name": "양배추",
+          "unit": "8kg 망대",
+          "price": 3571
+        },
+        {
+          "name": "무",
+          "unit": "20kg 상자",
+          "price": 8921
+        },
+        {
+          "name": "양파",
+          "unit": "10kg",
+          "price": 8995
+        },
+        {
+          "name": "감자",
+          "unit": "20kg 상자",
+          "price": 31659
+        },
+        {
+          "name": "고구마",
+          "unit": "10kg 상자",
+          "price": 29078
+        },
+        {
+          "name": "수박(일반)",
+          "unit": "8kg(개)",
+          "price": 26402
+        },
+        {
+          "name": "참외(일반)",
+          "unit": "10kg 상자",
+          "price": 31046
+        },
+        {
+          "name": "복숭아(대월)",
+          "unit": "10kg 상자",
+          "price": 36786
+        },
+        {
+          "name": "포도(캠벨얼리)",
+          "unit": "3kg 상자",
+          "price": 24343
+        },
+        {
+          "name": "포도(샤인머스캣)",
+          "unit": "4kg 상자",
+          "price": 30111
+        },
+        {
+          "name": "사과",
+          "unit": "10kg 상자",
+          "price": 68517
+        },
+        {
+          "name": "배(신고)",
+          "unit": "15kg 상자",
+          "price": 84407
+        }
       ]
     },
     {
       "date": "2026-08-03",
       "source": "가락시장 경락가격(상품 등급)",
       "items": [
-        {"name": "오이(백다다기)", "unit": "100개", "price": 40511},
-        {"name": "토마토", "unit": "10kg 상자", "price": 21377},
-        {"name": "방울토마토", "unit": "5kg 상자", "price": 13354},
-        {"name": "애호박", "unit": "20개", "price": 20511},
-        {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 59366},
-        {"name": "상추", "unit": "4kg 상자", "price": 33245},
-        {"name": "배추", "unit": "10kg 망대", "price": 9788},
-        {"name": "무", "unit": "20kg 상자", "price": 10231},
-        {"name": "시금치", "unit": "4kg 상자", "price": 46544},
-        {"name": "깻잎", "unit": "100속", "price": 21511},
-        {"name": "가지", "unit": "5kg 상자", "price": 7122},
-        {"name": "홍고추", "unit": "10kg 상자", "price": 44031},
-        {"name": "홍피망", "unit": "10kg 상자", "price": 70774},
-        {"name": "쪽파", "unit": "10kg 상자", "price": 59113},
-        {"name": "양배추", "unit": "8kg 망대", "price": 5240},
-        {"name": "양파", "unit": "1kg", "price": 1165},
-        {"name": "감자", "unit": "20kg 상자", "price": 29026},
-        {"name": "고구마", "unit": "10kg 상자", "price": 33401},
-        {"name": "미나리(일반)", "unit": "4kg", "price": 23881},
-        {"name": "수박(일반)", "unit": "6kg(개)", "price": 13926},
-        {"name": "참외(일반)", "unit": "10kg 상자", "price": 39011},
-        {"name": "대파(일반)", "unit": "1kg(단)", "price": 1515},
-        {"name": "얼갈이배추", "unit": "4kg 상자", "price": 10906},
-        {"name": "열무", "unit": "4kg 상자", "price": 18803},
-        {"name": "브로콜리", "unit": "6kg 상자", "price": 43423},
-        {"name": "청피망", "unit": "10kg 상자", "price": 22091},
-        {"name": "멜론(머스크)", "unit": "5kg 상자", "price": 15333},
-        {"name": "포도(캠벨얼리)", "unit": "2kg 상자", "price": 7291},
-        {"name": "포도(샤인머스캣)", "unit": "2kg 상자", "price": 13819},
-        {"name": "사과", "unit": "10kg 상자", "price": 59167},
-        {"name": "배(신고)", "unit": "15kg 상자", "price": 56172}
+        {
+          "name": "오이(백다다기)",
+          "unit": "100개",
+          "price": 40511
+        },
+        {
+          "name": "토마토",
+          "unit": "10kg 상자",
+          "price": 21377
+        },
+        {
+          "name": "방울토마토",
+          "unit": "5kg 상자",
+          "price": 13354
+        },
+        {
+          "name": "애호박",
+          "unit": "20개",
+          "price": 20511
+        },
+        {
+          "name": "풋고추(일반)",
+          "unit": "10kg 상자",
+          "price": 59366
+        },
+        {
+          "name": "상추",
+          "unit": "4kg 상자",
+          "price": 33245
+        },
+        {
+          "name": "배추",
+          "unit": "10kg 망대",
+          "price": 9788
+        },
+        {
+          "name": "무",
+          "unit": "20kg 상자",
+          "price": 10231
+        },
+        {
+          "name": "시금치",
+          "unit": "4kg 상자",
+          "price": 46544
+        },
+        {
+          "name": "깻잎",
+          "unit": "100속",
+          "price": 21511
+        },
+        {
+          "name": "가지",
+          "unit": "5kg 상자",
+          "price": 7122
+        },
+        {
+          "name": "홍고추",
+          "unit": "10kg 상자",
+          "price": 44031
+        },
+        {
+          "name": "홍피망",
+          "unit": "10kg 상자",
+          "price": 70774
+        },
+        {
+          "name": "쪽파",
+          "unit": "10kg 상자",
+          "price": 59113
+        },
+        {
+          "name": "양배추",
+          "unit": "8kg 망대",
+          "price": 5240
+        },
+        {
+          "name": "양파",
+          "unit": "1kg",
+          "price": 1165
+        },
+        {
+          "name": "감자",
+          "unit": "20kg 상자",
+          "price": 29026
+        },
+        {
+          "name": "고구마",
+          "unit": "10kg 상자",
+          "price": 33401
+        },
+        {
+          "name": "미나리(일반)",
+          "unit": "4kg",
+          "price": 23881
+        },
+        {
+          "name": "수박(일반)",
+          "unit": "6kg(개)",
+          "price": 13926
+        },
+        {
+          "name": "참외(일반)",
+          "unit": "10kg 상자",
+          "price": 39011
+        },
+        {
+          "name": "대파(일반)",
+          "unit": "1kg(단)",
+          "price": 1515
+        },
+        {
+          "name": "얼갈이배추",
+          "unit": "4kg 상자",
+          "price": 10906
+        },
+        {
+          "name": "열무",
+          "unit": "4kg 상자",
+          "price": 18803
+        },
+        {
+          "name": "브로콜리",
+          "unit": "6kg 상자",
+          "price": 43423
+        },
+        {
+          "name": "청피망",
+          "unit": "10kg 상자",
+          "price": 22091
+        },
+        {
+          "name": "멜론(머스크)",
+          "unit": "5kg 상자",
+          "price": 15333
+        },
+        {
+          "name": "포도(캠벨얼리)",
+          "unit": "2kg 상자",
+          "price": 7291
+        },
+        {
+          "name": "포도(샤인머스캣)",
+          "unit": "2kg 상자",
+          "price": 13819
+        },
+        {
+          "name": "사과",
+          "unit": "10kg 상자",
+          "price": 59167
+        },
+        {
+          "name": "배(신고)",
+          "unit": "15kg 상자",
+          "price": 56172
+        }
       ]
     },
     {
       "date": "2026-08-04",
       "source": "가락시장 경락가격(상품 등급)",
       "items": [
-        {"name": "오이(백다다기)", "unit": "100개", "price": 36573},
-        {"name": "토마토", "unit": "10kg 상자", "price": 20547},
-        {"name": "방울토마토", "unit": "5kg 상자", "price": 10483},
-        {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 8550},
-        {"name": "파프리카(노랑)", "unit": "5kg 상자", "price": 15280},
-        {"name": "홍피망", "unit": "10kg 상자", "price": 59000},
-        {"name": "청피망", "unit": "10kg 상자", "price": 22698},
-        {"name": "애호박", "unit": "20개", "price": 20964},
-        {"name": "가지", "unit": "5kg 상자", "price": 7122},
-        {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 57582},
-        {"name": "청양고추", "unit": "10kg 상자", "price": 25176},
-        {"name": "홍고추", "unit": "10kg 상자", "price": 41727},
-        {"name": "상추", "unit": "4kg 상자", "price": 31676},
-        {"name": "깻잎", "unit": "100속", "price": 24663},
-        {"name": "시금치", "unit": "4kg 상자", "price": 44966},
-        {"name": "미나리(일반)", "unit": "8kg", "price": 58544},
-        {"name": "쪽파", "unit": "10kg 상자", "price": 72938},
-        {"name": "대파(일반)", "unit": "1kg(단)", "price": 1527},
-        {"name": "배추", "unit": "10kg 망대", "price": 8146},
-        {"name": "얼갈이배추", "unit": "4kg 상자", "price": 7943},
-        {"name": "열무", "unit": "4kg 상자", "price": 16142},
-        {"name": "양배추", "unit": "8kg 망대", "price": 3958},
-        {"name": "무", "unit": "20kg 상자", "price": 10158},
-        {"name": "양파", "unit": "1kg", "price": 1136},
-        {"name": "감자", "unit": "20kg 상자", "price": 30806},
-        {"name": "고구마", "unit": "10kg 상자", "price": 34992},
-        {"name": "당근", "unit": "20kg 상자", "price": 33352},
-        {"name": "브로콜리", "unit": "6kg 상자", "price": 40286},
-        {"name": "수박(일반)", "unit": "6kg(개)", "price": 15416},
-        {"name": "참외(일반)", "unit": "10kg 상자", "price": 38355},
-        {"name": "멜론(머스크)", "unit": "5kg 상자", "price": 15333},
-        {"name": "복숭아(황도)", "unit": "10kg 상자", "price": 31500},
-        {"name": "포도(캠벨얼리)", "unit": "2kg 상자", "price": 7291},
-        {"name": "포도(샤인머스캣)", "unit": "2kg 상자", "price": 13709},
-        {"name": "사과", "unit": "10kg 상자", "price": 72103},
-        {"name": "배(신고)", "unit": "15kg 상자", "price": 56172}
+        {
+          "name": "오이(백다다기)",
+          "unit": "100개",
+          "price": 36573
+        },
+        {
+          "name": "토마토",
+          "unit": "10kg 상자",
+          "price": 20547
+        },
+        {
+          "name": "방울토마토",
+          "unit": "5kg 상자",
+          "price": 10483
+        },
+        {
+          "name": "파프리카(빨강)",
+          "unit": "5kg 상자",
+          "price": 8550
+        },
+        {
+          "name": "파프리카(노랑)",
+          "unit": "5kg 상자",
+          "price": 15280
+        },
+        {
+          "name": "홍피망",
+          "unit": "10kg 상자",
+          "price": 59000
+        },
+        {
+          "name": "청피망",
+          "unit": "10kg 상자",
+          "price": 22698
+        },
+        {
+          "name": "애호박",
+          "unit": "20개",
+          "price": 20964
+        },
+        {
+          "name": "가지",
+          "unit": "5kg 상자",
+          "price": 7122
+        },
+        {
+          "name": "풋고추(일반)",
+          "unit": "10kg 상자",
+          "price": 57582
+        },
+        {
+          "name": "청양고추",
+          "unit": "10kg 상자",
+          "price": 25176
+        },
+        {
+          "name": "홍고추",
+          "unit": "10kg 상자",
+          "price": 41727
+        },
+        {
+          "name": "상추",
+          "unit": "4kg 상자",
+          "price": 31676
+        },
+        {
+          "name": "깻잎",
+          "unit": "100속",
+          "price": 24663
+        },
+        {
+          "name": "시금치",
+          "unit": "4kg 상자",
+          "price": 44966
+        },
+        {
+          "name": "미나리(일반)",
+          "unit": "8kg",
+          "price": 58544
+        },
+        {
+          "name": "쪽파",
+          "unit": "10kg 상자",
+          "price": 72938
+        },
+        {
+          "name": "대파(일반)",
+          "unit": "1kg(단)",
+          "price": 1527
+        },
+        {
+          "name": "배추",
+          "unit": "10kg 망대",
+          "price": 8146
+        },
+        {
+          "name": "얼갈이배추",
+          "unit": "4kg 상자",
+          "price": 7943
+        },
+        {
+          "name": "열무",
+          "unit": "4kg 상자",
+          "price": 16142
+        },
+        {
+          "name": "양배추",
+          "unit": "8kg 망대",
+          "price": 3958
+        },
+        {
+          "name": "무",
+          "unit": "20kg 상자",
+          "price": 10158
+        },
+        {
+          "name": "양파",
+          "unit": "1kg",
+          "price": 1136
+        },
+        {
+          "name": "감자",
+          "unit": "20kg 상자",
+          "price": 30806
+        },
+        {
+          "name": "고구마",
+          "unit": "10kg 상자",
+          "price": 34992
+        },
+        {
+          "name": "당근",
+          "unit": "20kg 상자",
+          "price": 33352
+        },
+        {
+          "name": "브로콜리",
+          "unit": "6kg 상자",
+          "price": 40286
+        },
+        {
+          "name": "수박(일반)",
+          "unit": "6kg(개)",
+          "price": 15416
+        },
+        {
+          "name": "참외(일반)",
+          "unit": "10kg 상자",
+          "price": 38355
+        },
+        {
+          "name": "멜론(머스크)",
+          "unit": "5kg 상자",
+          "price": 15333
+        },
+        {
+          "name": "복숭아(황도)",
+          "unit": "10kg 상자",
+          "price": 31500
+        },
+        {
+          "name": "포도(캠벨얼리)",
+          "unit": "2kg 상자",
+          "price": 7291
+        },
+        {
+          "name": "포도(샤인머스캣)",
+          "unit": "2kg 상자",
+          "price": 13709
+        },
+        {
+          "name": "사과",
+          "unit": "10kg 상자",
+          "price": 72103
+        },
+        {
+          "name": "배(신고)",
+          "unit": "15kg 상자",
+          "price": 56172
+        }
+      ]
+    },
+    {
+      "date": "2026-08-05",
+      "source": "가락시장 경락가격(상품 등급)",
+      "items": [
+        {
+          "name": "오이(백다다기)",
+          "unit": "100개",
+          "price": 37468
+        },
+        {
+          "name": "토마토",
+          "unit": "10kg 상자",
+          "price": 19684
+        },
+        {
+          "name": "방울토마토",
+          "unit": "5kg 상자",
+          "price": 13156
+        },
+        {
+          "name": "파프리카(빨강)",
+          "unit": "5kg 상자",
+          "price": 8986
+        },
+        {
+          "name": "파프리카(노랑)",
+          "unit": "5kg 상자",
+          "price": 15092
+        },
+        {
+          "name": "홍피망",
+          "unit": "10kg 상자",
+          "price": 39718
+        },
+        {
+          "name": "청피망",
+          "unit": "10kg 상자",
+          "price": 12810
+        },
+        {
+          "name": "애호박",
+          "unit": "20개",
+          "price": 20126
+        },
+        {
+          "name": "가지",
+          "unit": "5kg 상자",
+          "price": 7122
+        },
+        {
+          "name": "풋고추(일반)",
+          "unit": "10kg 상자",
+          "price": 62579
+        },
+        {
+          "name": "청양고추",
+          "unit": "10kg 상자",
+          "price": 22479
+        },
+        {
+          "name": "홍고추",
+          "unit": "10kg 상자",
+          "price": 41054
+        },
+        {
+          "name": "상추",
+          "unit": "4kg 상자",
+          "price": 25656
+        },
+        {
+          "name": "깻잎",
+          "unit": "100속",
+          "price": 26139
+        },
+        {
+          "name": "시금치",
+          "unit": "4kg 상자",
+          "price": 45389
+        },
+        {
+          "name": "미나리(일반)",
+          "unit": "8kg",
+          "price": 78000
+        },
+        {
+          "name": "쪽파",
+          "unit": "10kg 상자",
+          "price": 69824
+        },
+        {
+          "name": "대파(일반)",
+          "unit": "1kg(단)",
+          "price": 1448
+        },
+        {
+          "name": "배추",
+          "unit": "10kg 망대",
+          "price": 8137
+        },
+        {
+          "name": "얼갈이배추",
+          "unit": "4kg 상자",
+          "price": 7089
+        },
+        {
+          "name": "열무",
+          "unit": "4kg 상자",
+          "price": 15546
+        },
+        {
+          "name": "양배추",
+          "unit": "8kg 망대",
+          "price": 3657
+        },
+        {
+          "name": "무",
+          "unit": "20kg 상자",
+          "price": 10285
+        },
+        {
+          "name": "양파",
+          "unit": "1kg",
+          "price": 1136
+        },
+        {
+          "name": "감자",
+          "unit": "20kg 상자",
+          "price": 27876
+        },
+        {
+          "name": "고구마",
+          "unit": "10kg 상자",
+          "price": 33136
+        },
+        {
+          "name": "당근",
+          "unit": "20kg 상자",
+          "price": 33054
+        },
+        {
+          "name": "브로콜리",
+          "unit": "6kg 상자",
+          "price": 40189
+        },
+        {
+          "name": "수박(일반)",
+          "unit": "6kg(개)",
+          "price": 15814
+        },
+        {
+          "name": "참외(일반)",
+          "unit": "10kg 상자",
+          "price": 37958
+        },
+        {
+          "name": "멜론(머스크)",
+          "unit": "5kg 상자",
+          "price": 15333
+        },
+        {
+          "name": "복숭아(황도)",
+          "unit": "10kg 상자",
+          "price": 31500
+        },
+        {
+          "name": "포도(캠벨얼리)",
+          "unit": "2kg 상자",
+          "price": 7202
+        },
+        {
+          "name": "포도(샤인머스캣)",
+          "unit": "2kg 상자",
+          "price": 13173
+        },
+        {
+          "name": "사과",
+          "unit": "10kg 상자",
+          "price": 31591
+        },
+        {
+          "name": "배(신고)",
+          "unit": "15kg 상자",
+          "price": 53401
+        }
       ]
     }
   ]
