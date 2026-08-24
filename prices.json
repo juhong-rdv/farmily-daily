@@ -1,16 +1,384 @@
 {
- "note": "FARMILY 오늘의 농업 정보 - 농산물 시세 이력. 데이터 수집은 가락시장에서 확인 가능한 모든 품목을 저장하고(향후 분석·활용용), 웹 표(index.html)에는 온실 작물 우선 주요 5~10개만 표시합니다. 모든 값은 가락시장 경락 '상품(상)' 등급 기준으로 통일합니다. 등락은 품목명·단위·등급이 일치하는 가장 최근 이전 날짜와 비교하고 그 비교 날짜를 페이지에 표기합니다. 각 날짜의 weather에는 그 가격 기준일의 전국 날씨 요약을, factors에는 그날 시세에 영향을 줄 만한 요인(휴장·연휴, 기상재해, 단위 변경 등)을 기록합니다.",
- "priority_display": ["오이(백다다기)", "토마토", "방울토마토", "파프리카(빨강)", "애호박", "풋고추(일반)", "상추", "배추", "무"],
+ "note": "FARMILY 오늘의 농업 정보 - 농산물 시세 이력(주요 품목). 모든 값은 가락시장 경락가격 '상품(상)' 등급 기준입니다. 파일이 너무 커져 전송 중 잘리는 문제가 있어, 2026-08-24부터 이 파일에는 priority_display 품목만 저장하고 그날 수집한 전체 품목은 archive-prices/YYYY-MM-DD.json 에 하루 한 파일로 따로 보관합니다. 2026-08-24 이전의 전체 품목 데이터는 git 커밋 20360e35 의 prices.json 에 남아 있습니다.",
+ "priority_display": [
+  "오이(백다다기)",
+  "토마토",
+  "방울토마토",
+  "파프리카(빨강)",
+  "애호박",
+  "풋고추(일반)",
+  "상추",
+  "배추",
+  "무"
+ ],
  "history": [
-  {"date":"2026-07-22","source":"가락시장 경락가격(상품 등급)","weather":"중부 강한 장맛비(수도권·강원 30~80mm, 시간당 최대 30mm), 충청 20~60mm, 남부는 폭염","factors":["중부 집중호우로 농경지 침수·출하 차질 우려"],"items":[{"name":"오이(백다다기)","unit":"50개","price":19521},{"name":"토마토","unit":"10kg 상자","price":10642},{"name":"방울토마토","unit":"5kg 상자","price":9302},{"name":"애호박","unit":"20개","price":13459},{"name":"풋고추(일반)","unit":"10kg 상자","price":28728},{"name":"상추","unit":"4kg 상자","price":25251},{"name":"배추","unit":"10kg 망대","price":3627},{"name":"무","unit":"20kg 상자","price":7255}]},
-  {"date":"2026-07-25","source":"가락시장 경락가격(상품 등급)","weather":"전국 폭염, 남부지방·동해안 폭염특보, 오후 내륙·산지 소나기","factors":[],"items":[{"name":"오이(백다다기)","unit":"100개","price":59958},{"name":"토마토","unit":"10kg 상자","price":12300},{"name":"방울토마토","unit":"5kg 상자","price":16383},{"name":"파프리카(빨강)","unit":"5kg 상자","price":10991},{"name":"홍피망","unit":"10kg 상자","price":78667},{"name":"애호박","unit":"20개","price":18238},{"name":"가지","unit":"8kg 상자","price":29258},{"name":"풋고추(일반)","unit":"10kg 상자","price":37408},{"name":"홍고추","unit":"10kg 상자","price":48230},{"name":"상추","unit":"4kg 상자","price":37223},{"name":"깻잎","unit":"100속","price":24160},{"name":"시금치","unit":"4kg 상자","price":46913},{"name":"미나리(일반)","unit":"8kg","price":44304},{"name":"쪽파","unit":"10kg 상자","price":50279},{"name":"배추","unit":"10kg 망대","price":10887},{"name":"양배추","unit":"8kg 망대","price":4879},{"name":"무","unit":"20kg 상자","price":10522},{"name":"양파","unit":"20kg","price":23696},{"name":"감자","unit":"20kg 상자","price":26560},{"name":"고구마","unit":"10kg 상자","price":30792},{"name":"수박(일반)","unit":"7kg(개)","price":22103},{"name":"참외(일반)","unit":"10kg 상자","price":28144},{"name":"복숭아(황도)","unit":"10kg 상자","price":31500},{"name":"포도(캠벨얼리)","unit":"3kg 상자","price":22519},{"name":"포도(샤인머스캣)","unit":"4kg 상자","price":32007},{"name":"사과","unit":"10kg 상자","price":50612},{"name":"배(신고)","unit":"15kg 상자","price":52277}]},
-  {"date":"2026-07-27","source":"가락시장 경락가격(상품 등급)","weather":"장마 종료 후 전국 대부분 폭염특보, 낮 최고 33~37도, 전남 남동부·경상권 체감 38도, 열대야","factors":["가락시장 채소 경매 7월 30일까지 진행 후 하계 휴장 예정"],"items":[{"name":"오이(백다다기)","unit":"100개","price":54195},{"name":"토마토","unit":"10kg 상자","price":14164},{"name":"방울토마토","unit":"5kg 상자","price":21992},{"name":"파프리카(빨강)","unit":"5kg 상자","price":9358},{"name":"파프리카(노랑)","unit":"5kg 상자","price":13616},{"name":"홍피망","unit":"10kg 상자","price":154333},{"name":"애호박","unit":"20개","price":18304},{"name":"가지","unit":"5kg 상자","price":7122},{"name":"풋고추(일반)","unit":"10kg 상자","price":40366},{"name":"홍고추","unit":"10kg 상자","price":42720},{"name":"상추","unit":"4kg 상자","price":37374},{"name":"깻잎","unit":"100속","price":20498},{"name":"시금치","unit":"4kg 상자","price":53147},{"name":"미나리(일반)","unit":"8kg","price":54711},{"name":"쪽파","unit":"10kg 상자","price":44428},{"name":"배추","unit":"10kg 망대","price":9436},{"name":"양배추","unit":"8kg 망대","price":3571},{"name":"무","unit":"20kg 상자","price":8921},{"name":"양파","unit":"10kg","price":8995},{"name":"감자","unit":"20kg 상자","price":31659},{"name":"고구마","unit":"10kg 상자","price":29078},{"name":"수박(일반)","unit":"8kg(개)","price":26402},{"name":"참외(일반)","unit":"10kg 상자","price":31046},{"name":"복숭아(대월)","unit":"10kg 상자","price":36786},{"name":"포도(캠벨얼리)","unit":"3kg 상자","price":24343},{"name":"포도(샤인머스캣)","unit":"4kg 상자","price":30111},{"name":"사과","unit":"10kg 상자","price":68517},{"name":"배(신고)","unit":"15kg 상자","price":84407}]},
-  {"date":"2026-08-03","source":"가락시장 경락가격(상품 등급)","weather":"전국 폭염특보, 낮 최고 39도, 전남·경상 내륙 극한 폭염, 강릉·속초 등 동해안 초열대야, 강원·충북 소나기","factors":["가락시장 채소 경매 하계 휴장(7/30~8/2) 후 8월 2일 저녁 재개"],"items":[{"name":"오이(백다다기)","unit":"100개","price":40511},{"name":"토마토","unit":"10kg 상자","price":21377},{"name":"방울토마토","unit":"5kg 상자","price":13354},{"name":"애호박","unit":"20개","price":20511},{"name":"풋고추(일반)","unit":"10kg 상자","price":59366},{"name":"상추","unit":"4kg 상자","price":33245},{"name":"배추","unit":"10kg 망대","price":9788},{"name":"무","unit":"20kg 상자","price":10231},{"name":"시금치","unit":"4kg 상자","price":46544},{"name":"깻잎","unit":"100속","price":21511},{"name":"가지","unit":"5kg 상자","price":7122},{"name":"홍고추","unit":"10kg 상자","price":44031},{"name":"홍피망","unit":"10kg 상자","price":70774},{"name":"쪽파","unit":"10kg 상자","price":59113},{"name":"양배추","unit":"8kg 망대","price":5240},{"name":"양파","unit":"1kg","price":1165},{"name":"감자","unit":"20kg 상자","price":29026},{"name":"고구마","unit":"10kg 상자","price":33401},{"name":"미나리(일반)","unit":"4kg","price":23881},{"name":"수박(일반)","unit":"6kg(개)","price":13926},{"name":"참외(일반)","unit":"10kg 상자","price":39011},{"name":"대파(일반)","unit":"1kg(단)","price":1515},{"name":"얼갈이배추","unit":"4kg 상자","price":10906},{"name":"열무","unit":"4kg 상자","price":18803},{"name":"브로콜리","unit":"6kg 상자","price":43423},{"name":"청피망","unit":"10kg 상자","price":22091},{"name":"멜론(머스크)","unit":"5kg 상자","price":15333},{"name":"포도(캠벨얼리)","unit":"2kg 상자","price":7291},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":13819},{"name":"사과","unit":"10kg 상자","price":59167},{"name":"배(신고)","unit":"15kg 상자","price":56172}]},
-  {"date":"2026-08-04","source":"가락시장 경락가격(상품 등급)","weather":"전국 대부분 폭염특보, 서울·경기 폭염 중대경보 첫 발령, 낮 최고 38도 안팎(일부 39도), 경기 남부 등 서쪽 소나기","factors":[],"items":[{"name":"오이(백다다기)","unit":"100개","price":36573},{"name":"토마토","unit":"10kg 상자","price":20547},{"name":"방울토마토","unit":"5kg 상자","price":10483},{"name":"파프리카(빨강)","unit":"5kg 상자","price":8550},{"name":"파프리카(노랑)","unit":"5kg 상자","price":15280},{"name":"홍피망","unit":"10kg 상자","price":59000},{"name":"청피망","unit":"10kg 상자","price":22698},{"name":"애호박","unit":"20개","price":20964},{"name":"가지","unit":"5kg 상자","price":7122},{"name":"풋고추(일반)","unit":"10kg 상자","price":57582},{"name":"청양고추","unit":"10kg 상자","price":25176},{"name":"홍고추","unit":"10kg 상자","price":41727},{"name":"상추","unit":"4kg 상자","price":31676},{"name":"깻잎","unit":"100속","price":24663},{"name":"시금치","unit":"4kg 상자","price":44966},{"name":"미나리(일반)","unit":"8kg","price":58544},{"name":"쪽파","unit":"10kg 상자","price":72938},{"name":"대파(일반)","unit":"1kg(단)","price":1527},{"name":"배추","unit":"10kg 망대","price":8146},{"name":"얼갈이배추","unit":"4kg 상자","price":7943},{"name":"열무","unit":"4kg 상자","price":16142},{"name":"양배추","unit":"8kg 망대","price":3958},{"name":"무","unit":"20kg 상자","price":10158},{"name":"양파","unit":"1kg","price":1136},{"name":"감자","unit":"20kg 상자","price":30806},{"name":"고구마","unit":"10kg 상자","price":34992},{"name":"당근","unit":"20kg 상자","price":33352},{"name":"브로콜리","unit":"6kg 상자","price":40286},{"name":"수박(일반)","unit":"6kg(개)","price":15416},{"name":"참외(일반)","unit":"10kg 상자","price":38355},{"name":"멜론(머스크)","unit":"5kg 상자","price":15333},{"name":"복숭아(황도)","unit":"10kg 상자","price":31500},{"name":"포도(캠벨얼리)","unit":"2kg 상자","price":7291},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":13709},{"name":"사과","unit":"10kg 상자","price":72103},{"name":"배(신고)","unit":"15kg 상자","price":56172}]},
-  {"date":"2026-08-05","source":"가락시장 경락가격(상품 등급)","weather":"전국 대부분 폭염특보, 서울 38도·부산 36도, 열대야, 경기·충남 등 서쪽 천둥번개 동반 소나기","factors":[],"items":[{"name":"오이(백다다기)","unit":"100개","price":37468},{"name":"토마토","unit":"10kg 상자","price":19684},{"name":"방울토마토","unit":"5kg 상자","price":13156},{"name":"파프리카(빨강)","unit":"5kg 상자","price":8986},{"name":"파프리카(노랑)","unit":"5kg 상자","price":15092},{"name":"홍피망","unit":"10kg 상자","price":39718},{"name":"청피망","unit":"10kg 상자","price":12810},{"name":"애호박","unit":"20개","price":20126},{"name":"가지","unit":"5kg 상자","price":7122},{"name":"풋고추(일반)","unit":"10kg 상자","price":62579},{"name":"청양고추","unit":"10kg 상자","price":22479},{"name":"홍고추","unit":"10kg 상자","price":41054},{"name":"상추","unit":"4kg 상자","price":25656},{"name":"깻잎","unit":"100속","price":26139},{"name":"시금치","unit":"4kg 상자","price":45389},{"name":"미나리(일반)","unit":"8kg","price":78000},{"name":"쪽파","unit":"10kg 상자","price":69824},{"name":"대파(일반)","unit":"1kg(단)","price":1448},{"name":"배추","unit":"10kg 망대","price":8137},{"name":"얼갈이배추","unit":"4kg 상자","price":7089},{"name":"열무","unit":"4kg 상자","price":15546},{"name":"양배추","unit":"8kg 망대","price":3657},{"name":"무","unit":"20kg 상자","price":10285},{"name":"양파","unit":"1kg","price":1136},{"name":"감자","unit":"20kg 상자","price":27876},{"name":"고구마","unit":"10kg 상자","price":33136},{"name":"당근","unit":"20kg 상자","price":33054},{"name":"브로콜리","unit":"6kg 상자","price":40189},{"name":"수박(일반)","unit":"6kg(개)","price":15814},{"name":"참외(일반)","unit":"10kg 상자","price":37958},{"name":"멜론(머스크)","unit":"5kg 상자","price":15333},{"name":"복숭아(황도)","unit":"10kg 상자","price":31500},{"name":"포도(캠벨얼리)","unit":"2kg 상자","price":7202},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":13173},{"name":"사과","unit":"10kg 상자","price":31591},{"name":"배(신고)","unit":"15kg 상자","price":53401}]},
-  {"date":"2026-08-06","source":"가락시장 경락가격(상품 등급)","weather":"전국 대부분 폭염특보, 서울·전주 38도 등 한낮 40도 육박, 수도권·전남 광양 폭염 중대경보, 제주 오전 비","factors":[],"items":[{"name":"오이(백다다기)","unit":"100개","price":41658},{"name":"가시오이","unit":"50개","price":15295},{"name":"취청오이","unit":"50개","price":18431},{"name":"노각오이","unit":"15kg 상자","price":20352},{"name":"토마토","unit":"10kg 상자","price":17691},{"name":"토마토(완숙)","unit":"5kg 상자","price":15764},{"name":"토마토(대저)","unit":"2.5kg 상자","price":3975},{"name":"방울토마토","unit":"5kg 상자","price":15339},{"name":"대추방울토마토","unit":"3kg 상자","price":8620},{"name":"파프리카(빨강)","unit":"5kg 상자","price":9250},{"name":"파프리카(노랑)","unit":"5kg 상자","price":12784},{"name":"파프리카(오렌지)","unit":"5kg 상자","price":20030},{"name":"홍피망","unit":"10kg 상자","price":27060},{"name":"청피망","unit":"10kg 상자","price":9288},{"name":"애호박","unit":"20개","price":18989},{"name":"둥근애호박","unit":"10kg 상자","price":8997},{"name":"쥬키니호박","unit":"10kg 상자","price":24487},{"name":"단호박(일반)","unit":"10kg 상자","price":12249},{"name":"늙은호박","unit":"10kg","price":15600},{"name":"가지","unit":"5kg 상자","price":7122},{"name":"풋고추(일반)","unit":"10kg 상자","price":68838},{"name":"청양고추","unit":"10kg 상자","price":18206},{"name":"홍고추","unit":"10kg 상자","price":38712},{"name":"꽈리고추","unit":"4kg 상자","price":14299},{"name":"오이맛고추","unit":"10kg 상자","price":39183},{"name":"녹광고추","unit":"10kg 상자","price":69592},{"name":"롱그린고추","unit":"10kg 상자","price":54034},{"name":"청초","unit":"10kg 상자","price":28176},{"name":"상추","unit":"4kg 상자","price":28885},{"name":"적상추","unit":"4kg 상자","price":21978},{"name":"청상추","unit":"4kg 상자","price":32115},{"name":"깻잎","unit":"100속","price":34667},{"name":"깻잎순","unit":"4kg 상자","price":18831},{"name":"시금치","unit":"4kg 상자","price":48272},{"name":"쑥갓","unit":"4kg 상자","price":22111},{"name":"부추(일반)","unit":"500g단","price":2814},{"name":"영양부추","unit":"200g단","price":1820},{"name":"돌산갓","unit":"8kg 상자","price":10621},{"name":"미나리(일반)","unit":"8kg","price":78000},{"name":"미나리","unit":"4kg","price":14058},{"name":"돌미나리","unit":"4kg 상자","price":13674},{"name":"쪽파","unit":"10kg 상자","price":73834},{"name":"실파","unit":"20kg","price":109047},{"name":"깐쪽파","unit":"10kg 상자","price":114247},{"name":"대파(일반)","unit":"1kg(단)","price":1660},{"name":"배추","unit":"10kg 망대","price":10519},{"name":"얼갈이배추","unit":"4kg 상자","price":7663},{"name":"알배기배추","unit":"8kg 상자","price":24219},{"name":"쌈배추","unit":"8kg 상자","price":24335},{"name":"양배추","unit":"8kg 망대","price":4480},{"name":"적양배추","unit":"8kg 상자","price":13200},{"name":"무","unit":"20kg 상자","price":12490},{"name":"열무","unit":"4kg 상자","price":16158},{"name":"당근","unit":"20kg 상자","price":31030},{"name":"양파","unit":"1kg","price":1223},{"name":"자주양파","unit":"12kg","price":7991},{"name":"햇마늘(대서)","unit":"3kg","price":14937},{"name":"햇마늘(한지)","unit":"3kg","price":12462},{"name":"깐마늘(대서)","unit":"20kg","price":165708},{"name":"감자","unit":"20kg 상자","price":29904},{"name":"감자(수미)","unit":"20kg 상자","price":29824},{"name":"감자(두백)","unit":"20kg 상자","price":26615},{"name":"홍감자","unit":"10kg 상자","price":23627},{"name":"고구마","unit":"10kg 상자","price":31526},{"name":"호박고구마","unit":"10kg 상자","price":31315},{"name":"양상추(일반)","unit":"12개","price":33136},{"name":"로메인(일반)","unit":"2kg 상자","price":21948},{"name":"브로콜리","unit":"6kg 상자","price":38841},{"name":"칼리플라워","unit":"8kg 상자","price":27725},{"name":"셀러리","unit":"10kg 상자","price":22154},{"name":"비트","unit":"10kg 상자","price":22706},{"name":"아스파라거스(국산)","unit":"1kg","price":19679},{"name":"파슬리","unit":"4kg 상자","price":51009},{"name":"케일","unit":"2kg 상자","price":7642},{"name":"비타민","unit":"2kg 상자","price":11615},{"name":"청경채","unit":"4kg 상자","price":10117},{"name":"치커리(일반)","unit":"2kg 상자","price":13474},{"name":"적근대","unit":"2kg 상자","price":18392},{"name":"근대","unit":"4kg 상자","price":13421},{"name":"아욱","unit":"4kg 상자","price":29836},{"name":"취나물","unit":"4kg 상자","price":27091},{"name":"곰취나물","unit":"2kg 상자","price":11553},{"name":"참나물","unit":"4kg","price":41309},{"name":"고수","unit":"4kg 상자","price":115025},{"name":"방풍나물","unit":"2kg 상자","price":12786},{"name":"돗나물","unit":"4kg","price":14483},{"name":"머위대","unit":"4kg 상자","price":14751},{"name":"당귀잎","unit":"1kg","price":21335},{"name":"생고구마순","unit":"4kg 상자","price":13625},{"name":"루꼴라","unit":"1kg 상자","price":27135},{"name":"바질","unit":"1kg 상자","price":32492},{"name":"느타리버섯","unit":"2kg 상자","price":3431},{"name":"양송이","unit":"2kg 상자","price":25137},{"name":"새송이버섯","unit":"2kg 상자","price":4317},{"name":"생표고","unit":"4kg 상자","price":18462},{"name":"팽이버섯","unit":"5kg 상자","price":7671},{"name":"만가닥버섯","unit":"1.5kg 상자","price":3547},{"name":"완두콩","unit":"4kg 망대","price":19417},{"name":"강낭콩","unit":"4kg 망대","price":25875},{"name":"호랑이콩","unit":"4kg 망대","price":40286},{"name":"찰옥수수","unit":"8kg","price":12259},{"name":"수박(일반)","unit":"6kg(개)","price":15922},{"name":"참외(일반)","unit":"10kg 상자","price":37450},{"name":"멜론(머스크)","unit":"5kg 상자","price":15333},{"name":"백색멜론","unit":"8kg 상자","price":16971},{"name":"황색멜론","unit":"8kg 상자","price":17122},{"name":"사과","unit":"10kg 상자","price":66434},{"name":"사과(아오리)","unit":"10kg 상자","price":47507},{"name":"사과(홍로)","unit":"10kg 상자","price":58000},{"name":"사과(부사)","unit":"10kg 상자","price":25423},{"name":"사과(썸머킹)","unit":"10kg 상자","price":45211},{"name":"배(신고)","unit":"15kg 상자","price":39897},{"name":"배(원황)","unit":"15kg 상자","price":68943},{"name":"복숭아(황도)","unit":"10kg 상자","price":31500},{"name":"복숭아(백도)","unit":"10kg 상자","price":44135},{"name":"복숭아(천도)","unit":"10kg 상자","price":41837},{"name":"복숭아(대월)","unit":"10kg 상자","price":20439},{"name":"복숭아(미백)","unit":"4kg 상자","price":20566},{"name":"복숭아(유명백도)","unit":"4kg 상자","price":23641},{"name":"포도(캠벨얼리)","unit":"2kg 상자","price":7202},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":12695},{"name":"포도(거봉)","unit":"2kg 상자","price":12248},{"name":"포도(델라웨어)","unit":"2kg 상자","price":9674},{"name":"감귤","unit":"5kg 상자","price":13545},{"name":"자두(대석)","unit":"5kg 상자","price":21045},{"name":"자두(정상)","unit":"5kg 상자","price":31158},{"name":"살구(개량)","unit":"5kg 상자","price":42194},{"name":"청매실","unit":"10kg 상자","price":13943},{"name":"무화과(국산)","unit":"1kg","price":9950},{"name":"오디(국산)","unit":"6kg 상자","price":32182},{"name":"블루베리(국산)","unit":"1kg","price":37187}]},
-  {"date":"2026-08-07","source":"가락시장 경락가격(상품 등급)","weather":"입추에도 폭염 절정, 전국 대부분 폭염특보, 수도권 낮 최고 39도, 열대야 지속","factors":[],"items":[{"name":"오이(백다다기)","unit":"100개","price":50198},{"name":"가시오이","unit":"50개","price":19468},{"name":"취청오이","unit":"50개","price":26157},{"name":"노각오이","unit":"15kg 상자","price":22270},{"name":"토마토","unit":"5kg 상자","price":13984},{"name":"토마토(완숙)","unit":"5kg 상자","price":14037},{"name":"방울토마토","unit":"5kg 상자","price":18789},{"name":"대추방울토마토","unit":"3kg 상자","price":9893},{"name":"파프리카(빨강)","unit":"5kg 상자","price":11222},{"name":"파프리카(노랑)","unit":"5kg 상자","price":13659},{"name":"파프리카(오렌지)","unit":"5kg 상자","price":20030},{"name":"홍피망","unit":"10kg 상자","price":29553},{"name":"청피망","unit":"10kg 상자","price":13580},{"name":"애호박","unit":"20개","price":19730},{"name":"둥근애호박","unit":"10kg 상자","price":7425},{"name":"쥬키니호박","unit":"10kg 상자","price":27498},{"name":"단호박(일반)","unit":"10kg 상자","price":11917},{"name":"늙은호박","unit":"1kg","price":392},{"name":"가지","unit":"8kg 상자","price":32653},{"name":"풋고추(일반)","unit":"10kg 상자","price":71302},{"name":"청양고추","unit":"10kg 상자","price":22623},{"name":"홍고추","unit":"10kg 상자","price":38486},{"name":"꽈리고추","unit":"4kg 상자","price":13790},{"name":"상추","unit":"4kg 상자","price":32903},{"name":"적상추","unit":"4kg 상자","price":28703},{"name":"청상추","unit":"4kg 상자","price":37168},{"name":"깻잎","unit":"100속","price":43024},{"name":"시금치","unit":"4kg 상자","price":62257},{"name":"쑥갓","unit":"4kg 상자","price":30819},{"name":"부추(일반)","unit":"500g단","price":3844},{"name":"영양부추","unit":"200g단","price":2620},{"name":"돌산갓","unit":"8kg 상자","price":9772},{"name":"미나리(일반)","unit":"8kg","price":87435},{"name":"쪽파","unit":"10kg 상자","price":59369},{"name":"실파","unit":"20kg","price":98437},{"name":"대파(일반)","unit":"1kg(단)","price":1607},{"name":"배추","unit":"10kg 망대","price":10674},{"name":"얼갈이배추","unit":"4kg 상자","price":8629},{"name":"알배기배추","unit":"8kg 상자","price":24610},{"name":"쌈배추","unit":"8kg 상자","price":25950},{"name":"양배추","unit":"8kg 망대","price":4449},{"name":"무","unit":"20kg 상자","price":14034},{"name":"열무","unit":"4kg 상자","price":17737},{"name":"당근","unit":"20kg 상자","price":33279},{"name":"양파","unit":"1kg","price":1263},{"name":"햇마늘(한지)","unit":"3kg","price":12462},{"name":"감자","unit":"20kg 상자","price":30777},{"name":"감자(수미)","unit":"20kg 상자","price":30763},{"name":"감자(두백)","unit":"20kg 상자","price":29593},{"name":"고구마","unit":"10kg 상자","price":30529},{"name":"호박고구마","unit":"10kg 상자","price":30500},{"name":"양상추(일반)","unit":"12개","price":32043},{"name":"로메인(일반)","unit":"2kg 상자","price":23262},{"name":"브로콜리","unit":"6kg 상자","price":41098},{"name":"칼리플라워","unit":"8kg 상자","price":28784},{"name":"셀러리","unit":"10kg 상자","price":21747},{"name":"비트","unit":"10kg 상자","price":19510},{"name":"아스파라거스(국산)","unit":"1kg","price":23564},{"name":"케일","unit":"2kg 상자","price":8203},{"name":"청경채","unit":"4kg 상자","price":14797},{"name":"치커리(일반)","unit":"2kg 상자","price":14625},{"name":"근대","unit":"4kg 상자","price":14895},{"name":"아욱","unit":"4kg 상자","price":30817},{"name":"취나물","unit":"4kg 상자","price":21652},{"name":"참나물","unit":"4kg","price":38711},{"name":"루꼴라","unit":"1kg 상자","price":28730},{"name":"바질","unit":"1kg 상자","price":34912},{"name":"느타리버섯","unit":"2kg 상자","price":3679},{"name":"양송이","unit":"2kg 상자","price":27699},{"name":"새송이버섯","unit":"2kg 상자","price":4126},{"name":"생표고","unit":"4kg 상자","price":18462},{"name":"팽이버섯","unit":"5kg 상자","price":7110},{"name":"만가닥버섯","unit":"1.5kg 상자","price":3376},{"name":"완두콩","unit":"4kg 망대","price":19417},{"name":"강낭콩","unit":"4kg 망대","price":26500},{"name":"호랑이콩","unit":"4kg 망대","price":42250},{"name":"찰옥수수","unit":"8kg","price":12458},{"name":"수박(일반)","unit":"6kg(개)","price":17604},{"name":"참외(일반)","unit":"10kg 상자","price":39470},{"name":"멜론(머스크)","unit":"8kg 상자","price":20962},{"name":"사과","unit":"10kg 상자","price":42131},{"name":"사과(아오리)","unit":"10kg 상자","price":51806},{"name":"사과(홍로)","unit":"10kg 상자","price":58876},{"name":"사과(썸머킹)","unit":"10kg 상자","price":39790},{"name":"사과(부사)","unit":"10kg 상자","price":33302},{"name":"배(신고)","unit":"15kg 상자","price":49068},{"name":"배(원황)","unit":"15kg 상자","price":70132},{"name":"복숭아(황도)","unit":"4kg 상자","price":27103},{"name":"복숭아(백도)","unit":"4kg 상자","price":25900},{"name":"복숭아(천도)","unit":"5kg 상자","price":19599},{"name":"복숭아(대월)","unit":"4kg 상자","price":17577},{"name":"복숭아(미백)","unit":"4kg 상자","price":21108},{"name":"포도(캠벨얼리)","unit":"3kg 상자","price":22358},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":13063},{"name":"포도(거봉)","unit":"2kg 상자","price":12591},{"name":"포도(델라웨어)","unit":"2kg 상자","price":9674},{"name":"감귤","unit":"5kg 상자","price":13545},{"name":"자두(대석)","unit":"5kg 상자","price":21045},{"name":"자두(정상)","unit":"5kg 상자","price":31158},{"name":"살구(개량)","unit":"5kg 상자","price":42194},{"name":"청매실","unit":"5kg 상자","price":19143},{"name":"무화과(국산)","unit":"1kg","price":11118},{"name":"오디(국산)","unit":"6kg 상자","price":32182},{"name":"블루베리(국산)","unit":"1kg","price":36558}]},
-  {"date":"2026-08-08","source":"가락시장 경락가격(상품 등급)","weather":"폭염이 1~3도 누그러졌으나 전국 대부분 폭염특보 유지, 낮 최고 29~37도, 열대야 지속","factors":["토마토 기준단위가 10kg 상자에서 5kg 상자로 변경(비교 시 환산 필요)"],"items":[{"name":"고구마","unit":"10kg 상자","price":32084},{"name":"호박고구마","unit":"10kg 상자","price":32071},{"name":"호박밤고구마","unit":"10kg 상자","price":32788},{"name":"감자","unit":"20kg 상자","price":34128},{"name":"감자(수미)","unit":"20kg 상자","price":34076},{"name":"감자(두백)","unit":"20kg 상자","price":26337},{"name":"감자(수미햇)","unit":"20kg 상자","price":33192},{"name":"홍감자","unit":"10kg 상자","price":23627},{"name":"배추","unit":"10kg 망대","price":11229},{"name":"얼갈이배추","unit":"4kg 상자","price":12325},{"name":"쌈배추","unit":"8kg 상자","price":27910},{"name":"알배기배추","unit":"8kg 상자","price":27476},{"name":"양배추","unit":"8kg 망대","price":6461},{"name":"적양배추","unit":"8kg 상자","price":10472},{"name":"시금치","unit":"4kg 상자","price":63959},{"name":"상추","unit":"4kg 상자","price":41518},{"name":"적상추","unit":"4kg 상자","price":38469},{"name":"청상추","unit":"4kg 상자","price":43545},{"name":"상추(포기찹)","unit":"4kg 상자","price":40490},{"name":"쫑상추","unit":"4kg 상자","price":12600},{"name":"깻잎","unit":"100속","price":43271},{"name":"깻잎순","unit":"4kg 상자","price":21412},{"name":"부추(일반)","unit":"500g단","price":3627},{"name":"영양부추","unit":"200g단","price":3210},{"name":"돌산갓","unit":"8kg 상자","price":9772},{"name":"쑥갓","unit":"4kg 상자","price":45851},{"name":"미나리","unit":"4kg","price":25878},{"name":"미나리(일반)","unit":"8kg","price":107511},{"name":"돌미나리","unit":"4kg 상자","price":25882},{"name":"수박(일반)","unit":"6kg(개)","price":18635},{"name":"복수박","unit":"5kg 상자","price":21023},{"name":"애플수박","unit":"3kg 상자","price":10000},{"name":"참외(일반)","unit":"10kg 상자","price":43005},{"name":"오이(백다다기)","unit":"100개","price":51628},{"name":"가시오이","unit":"50개","price":22740},{"name":"취청오이","unit":"50개","price":31779},{"name":"노각오이","unit":"15kg 상자","price":28755},{"name":"쥬키니호박","unit":"10kg 상자","price":32435},{"name":"애호박","unit":"20개","price":19487},{"name":"둥근애호박","unit":"10kg 상자","price":6278},{"name":"단호박(일반)","unit":"10kg 상자","price":12255},{"name":"늙은호박","unit":"10kg","price":15600},{"name":"토마토","unit":"5kg 상자","price":10617},{"name":"방울토마토","unit":"5kg 상자","price":19999},{"name":"대추방울토마토","unit":"3kg 상자","price":11598},{"name":"토마토(완숙)","unit":"5kg 상자","price":11158},{"name":"토마토(대저)","unit":"2.5kg 상자","price":3975},{"name":"멜론(머스크)","unit":"5kg 상자","price":15333},{"name":"백색멜론","unit":"8kg 상자","price":16971},{"name":"황색멜론","unit":"8kg 상자","price":17122},{"name":"가지","unit":"5kg 상자","price":5610},{"name":"무","unit":"20kg 상자","price":16612},{"name":"열무","unit":"4kg 상자","price":16618},{"name":"당근","unit":"20kg 상자","price":33279},{"name":"풋고추(일반)","unit":"10kg 상자","price":58230},{"name":"꽈리고추","unit":"4kg 상자","price":13246},{"name":"청양고추","unit":"10kg 상자","price":23579},{"name":"녹광고추","unit":"10kg 상자","price":60687},{"name":"오이맛고추","unit":"10kg 상자","price":27177},{"name":"청초","unit":"10kg 상자","price":28176},{"name":"롱그린고추","unit":"10kg 상자","price":57179},{"name":"홍고추","unit":"10kg 상자","price":37649},{"name":"햇마늘(한지)","unit":"3kg","price":12462},{"name":"햇마늘(대서)","unit":"3kg","price":14937},{"name":"깐마늘(대서)","unit":"20kg","price":167871},{"name":"양파","unit":"1kg","price":1198},{"name":"저장양파","unit":"12kg","price":11717},{"name":"양파(햇)","unit":"12kg","price":6851},{"name":"자주양파","unit":"12kg","price":6831},{"name":"대파(일반)","unit":"1kg(단)","price":1867},{"name":"쪽파","unit":"10kg 상자","price":76707},{"name":"실파","unit":"20kg","price":133938},{"name":"깐쪽파","unit":"10kg 상자","price":110372},{"name":"청피망","unit":"10kg 상자","price":18684},{"name":"홍피망","unit":"10kg 상자","price":25842},{"name":"파프리카(노랑)","unit":"5kg 상자","price":20282},{"name":"파프리카(빨강)","unit":"5kg 상자","price":18118},{"name":"파프리카(오렌지)","unit":"5kg 상자","price":18398},{"name":"양상추(일반)","unit":"12개","price":29677},{"name":"로메인(일반)","unit":"2kg 상자","price":23511},{"name":"통로메인","unit":"2kg 상자","price":10457},{"name":"아스파라거스(국산)","unit":"1kg","price":23951},{"name":"파슬리","unit":"4kg 상자","price":43707},{"name":"비트","unit":"10kg 상자","price":16175},{"name":"셀러리","unit":"10kg 상자","price":20946},{"name":"칼리플라워","unit":"8kg 상자","price":25842},{"name":"브로콜리","unit":"6kg 상자","price":43573},{"name":"케일","unit":"2kg 상자","price":10530},{"name":"비타민","unit":"2kg 상자","price":8503},{"name":"바질","unit":"1kg 상자","price":36061},{"name":"루꼴라","unit":"1kg 상자","price":53269},{"name":"딜","unit":"1kg 상자","price":12152},{"name":"생고구마순","unit":"4kg 상자","price":13722},{"name":"취나물","unit":"4kg 상자","price":28379},{"name":"곰취나물","unit":"2kg 상자","price":11553},{"name":"아욱","unit":"4kg 상자","price":38923},{"name":"근대","unit":"4kg 상자","price":23793},{"name":"적근대","unit":"2kg 상자","price":20942},{"name":"돗나물","unit":"4kg","price":14483},{"name":"머위대","unit":"4kg 상자","price":14751},{"name":"머위잎","unit":"4kg 상자","price":21162},{"name":"치커리(일반)","unit":"2kg 상자","price":16402},{"name":"레드치커리","unit":"2kg 상자","price":22044},{"name":"청경채","unit":"4kg 상자","price":15784},{"name":"참나물","unit":"4kg","price":34933},{"name":"고수","unit":"4kg 상자","price":163673},{"name":"당귀잎","unit":"1kg","price":28362},{"name":"방풍나물","unit":"2kg 상자","price":8967},{"name":"느타리버섯","unit":"2kg 상자","price":5057},{"name":"맛느타리버섯","unit":"2kg 상자","price":5585},{"name":"꽃느타리버섯","unit":"2kg 상자","price":4661},{"name":"양송이","unit":"2kg 상자","price":39846},{"name":"새송이버섯","unit":"2kg 상자","price":4523},{"name":"생표고","unit":"4kg 상자","price":18462},{"name":"팽이버섯","unit":"5kg 상자","price":7513},{"name":"만가닥버섯","unit":"1.5kg 상자","price":4615},{"name":"완두콩","unit":"4kg 망대","price":19417},{"name":"강낭콩","unit":"4kg 망대","price":26500},{"name":"호랑이콩","unit":"4kg 망대","price":39279},{"name":"찰옥수수","unit":"8kg","price":13086},{"name":"사과","unit":"10kg 상자","price":44852},{"name":"사과(부사)","unit":"10kg 상자","price":37936},{"name":"사과(아오리)","unit":"10kg 상자","price":58036},{"name":"사과(홍로)","unit":"10kg 상자","price":52763},{"name":"사과(썸머킹)","unit":"10kg 상자","price":38133},{"name":"배(신고)","unit":"15kg 상자","price":49068},{"name":"배(원황)","unit":"15kg 상자","price":68330},{"name":"복숭아(황도)","unit":"4kg 상자","price":31320},{"name":"복숭아(백도)","unit":"4kg 상자","price":28888},{"name":"복숭아(천도)","unit":"5kg 상자","price":18730},{"name":"복숭아(대월)","unit":"4kg 상자","price":18000},{"name":"복숭아(미백)","unit":"4kg 상자","price":23230},{"name":"복숭아(유명백도)","unit":"4kg 상자","price":29868},{"name":"복숭아(천중도)","unit":"4kg 상자","price":33731},{"name":"복숭아(산정백도)","unit":"4kg 상자","price":29339},{"name":"복숭아(마도카)","unit":"4kg 상자","price":29593},{"name":"복숭아(대옥계)","unit":"4kg 상자","price":29629},{"name":"복숭아(몽부사)","unit":"4kg 상자","price":30045},{"name":"복숭아(그레이트)","unit":"4kg 상자","price":27420},{"name":"복숭아(애천중도)","unit":"4kg 상자","price":31625},{"name":"포도(캠벨얼리)","unit":"3kg 상자","price":23794},{"name":"포도(거봉)","unit":"2kg 상자","price":13866},{"name":"포도(델라웨어)","unit":"2kg 상자","price":9674},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":12310},{"name":"감귤","unit":"5kg 상자","price":13545},{"name":"자두(대석)","unit":"5kg 상자","price":21045},{"name":"자두(추희)","unit":"5kg 상자","price":27647},{"name":"자두(정상)","unit":"5kg 상자","price":31158},{"name":"대왕자두","unit":"5kg 상자","price":34712},{"name":"살구(개량)","unit":"5kg 상자","price":42194},{"name":"청매실","unit":"5kg 상자","price":19143},{"name":"홍매실","unit":"10kg 상자","price":9227},{"name":"무화과(국산)","unit":"1kg","price":11637},{"name":"오디(국산)","unit":"6kg 상자","price":32182},{"name":"블루베리(국산)","unit":"1kg","price":40665}]},
-  {"date":"2026-08-10","source":"가락시장 경락가격(상품 등급)","weather":"폭염 다소 주춤(낮 최고 34도 안팎)이나 전국 대부분 폭염특보·열대야 지속, 강원·경상·제주 곳곳 비, 해안 너울 주의","factors":["일요일 휴장 뒤 주초 첫 경매","폭염 지속으로 강원 고랭지 등 산지 채소 출하 부담, 강원 채소가격 최대 40% 급등 보도"],"items":[{"name":"배추","unit":"10kg 망대","price":13675},{"name":"얼갈이배추","unit":"4kg 상자","price":13362},{"name":"쌈배추","unit":"8kg 상자","price":31496},{"name":"알배기배추","unit":"8kg 상자","price":37834},{"name":"양배추","unit":"8kg 망대","price":5893},{"name":"적양배추","unit":"8kg 상자","price":9065},{"name":"시금치","unit":"4kg 상자","price":61299},{"name":"상추","unit":"4kg 상자","price":41520},{"name":"적상추","unit":"4kg 상자","price":43100},{"name":"청상추","unit":"4kg 상자","price":43495},{"name":"상추(포기찹)","unit":"4kg 상자","price":38360},{"name":"쫑상추","unit":"4kg 상자","price":16977},{"name":"깻잎","unit":"100속","price":42316},{"name":"깻잎순","unit":"4kg 상자","price":20294},{"name":"부추(일반)","unit":"500g단","price":3563},{"name":"영양부추","unit":"200g단","price":5292},{"name":"돌산갓","unit":"8kg 상자","price":14772},{"name":"쑥갓","unit":"4kg 상자","price":45170},{"name":"미나리","unit":"4kg","price":32832},{"name":"미나리(일반)","unit":"8kg","price":122274},{"name":"돌미나리","unit":"4kg 상자","price":32797},{"name":"수박(일반)","unit":"6kg(개)","price":15479},{"name":"복수박","unit":"5kg 상자","price":21023},{"name":"애플수박","unit":"3kg 상자","price":10000},{"name":"참외(일반)","unit":"10kg 상자","price":46953},{"name":"오이(백다다기)","unit":"100개","price":47017},{"name":"가시오이","unit":"50개","price":29389},{"name":"취청오이","unit":"50개","price":39559},{"name":"노각오이","unit":"15kg 상자","price":28262},{"name":"쥬키니호박","unit":"10kg 상자","price":29331},{"name":"애호박","unit":"20개","price":18042},{"name":"둥근애호박","unit":"10kg 상자","price":6629},{"name":"단호박(일반)","unit":"10kg 상자","price":14217},{"name":"늙은호박","unit":"10kg","price":15600},{"name":"토마토","unit":"5kg 상자","price":11001},{"name":"토마토(완숙)","unit":"5kg 상자","price":9861},{"name":"토마토(대저)","unit":"2.5kg 상자","price":3975},{"name":"방울토마토","unit":"5kg 상자","price":19152},{"name":"대추방울토마토","unit":"3kg 상자","price":13349},{"name":"멜론(머스크)","unit":"5kg 상자","price":15333},{"name":"백색멜론","unit":"8kg 상자","price":16971},{"name":"황색멜론","unit":"8kg 상자","price":17122},{"name":"가지","unit":"5kg 상자","price":7122},{"name":"무","unit":"20kg 상자","price":16720},{"name":"열무","unit":"4kg 상자","price":17653},{"name":"당근","unit":"20kg 상자","price":34900},{"name":"풋고추(일반)","unit":"10kg 상자","price":64296},{"name":"꽈리고추","unit":"4kg 상자","price":16432},{"name":"청양고추","unit":"10kg 상자","price":36701},{"name":"녹광고추","unit":"10kg 상자","price":64796},{"name":"오이맛고추","unit":"10kg 상자","price":37730},{"name":"청초","unit":"10kg 상자","price":28176},{"name":"롱그린고추","unit":"10kg 상자","price":76757},{"name":"홍고추","unit":"10kg 상자","price":37813},{"name":"햇마늘(한지)","unit":"3kg","price":12462},{"name":"햇마늘(대서)","unit":"3kg","price":14937},{"name":"깐마늘(대서)","unit":"20kg","price":167664},{"name":"양파","unit":"1kg","price":1186},{"name":"저장양파","unit":"12kg","price":10339},{"name":"양파(햇)","unit":"12kg","price":6851},{"name":"자주양파","unit":"12kg","price":6831},{"name":"대파(일반)","unit":"1kg(단)","price":1861},{"name":"쪽파","unit":"10kg 상자","price":56299},{"name":"실파","unit":"20kg","price":254619},{"name":"깐쪽파","unit":"10kg 상자","price":132939},{"name":"청피망","unit":"10kg 상자","price":35031},{"name":"홍피망","unit":"10kg 상자","price":33571},{"name":"파프리카(노랑)","unit":"5kg 상자","price":24689},{"name":"파프리카(빨강)","unit":"5kg 상자","price":22929},{"name":"파프리카(오렌지)","unit":"5kg 상자","price":18398},{"name":"양상추(일반)","unit":"12개","price":41608},{"name":"로메인(일반)","unit":"2kg 상자","price":21279},{"name":"통로메인","unit":"2kg 상자","price":17317},{"name":"아스파라거스(국산)","unit":"1kg","price":21030},{"name":"파슬리","unit":"4kg 상자","price":44605},{"name":"비트","unit":"10kg 상자","price":14315},{"name":"셀러리","unit":"10kg 상자","price":26201},{"name":"칼리플라워","unit":"8kg 상자","price":27300},{"name":"브로콜리","unit":"6kg 상자","price":49365},{"name":"케일","unit":"2kg 상자","price":9054},{"name":"비타민","unit":"2kg 상자","price":16875},{"name":"바질","unit":"1kg 상자","price":33820},{"name":"루꼴라","unit":"1kg 상자","price":23674},{"name":"딜","unit":"1kg 상자","price":14362},{"name":"생고구마순","unit":"4kg 상자","price":18098},{"name":"취나물","unit":"4kg 상자","price":37677},{"name":"곰취나물","unit":"2kg 상자","price":11553},{"name":"아욱","unit":"4kg 상자","price":33864},{"name":"근대","unit":"4kg 상자","price":20559},{"name":"적근대","unit":"2kg 상자","price":18049},{"name":"돗나물","unit":"4kg","price":14483},{"name":"치커리(일반)","unit":"2kg 상자","price":20213},{"name":"레드치커리","unit":"2kg 상자","price":19724},{"name":"청경채","unit":"4kg 상자","price":12900},{"name":"참나물","unit":"4kg","price":43399},{"name":"고수","unit":"4kg 상자","price":144193},{"name":"당귀잎","unit":"1kg","price":28772},{"name":"방풍나물","unit":"2kg 상자","price":8728},{"name":"머위잎","unit":"4kg 상자","price":21162},{"name":"느타리버섯","unit":"2kg 상자","price":7967},{"name":"맛느타리버섯","unit":"2kg 상자","price":7989},{"name":"꽃느타리버섯","unit":"2kg 상자","price":5575},{"name":"양송이","unit":"2kg 상자","price":30242},{"name":"새송이버섯","unit":"2kg 상자","price":5156},{"name":"생표고","unit":"4kg 상자","price":18462},{"name":"팽이버섯","unit":"5kg 상자","price":9339},{"name":"만가닥버섯","unit":"1.5kg 상자","price":6054},{"name":"완두콩","unit":"4kg 망대","price":19417},{"name":"강낭콩","unit":"4kg 망대","price":24000},{"name":"호랑이콩","unit":"4kg 망대","price":40524},{"name":"찰옥수수","unit":"8kg","price":14599},{"name":"사과","unit":"10kg 상자","price":66017},{"name":"사과(부사)","unit":"10kg 상자","price":77252},{"name":"사과(아오리)","unit":"10kg 상자","price":55289},{"name":"사과(홍로)","unit":"10kg 상자","price":62928},{"name":"사과(썸머킹)","unit":"10kg 상자","price":53439},{"name":"배(신고)","unit":"15kg 상자","price":62912},{"name":"배(원황)","unit":"15kg 상자","price":66135},{"name":"복숭아(미백)","unit":"4kg 상자","price":22679},{"name":"복숭아(유명백도)","unit":"4kg 상자","price":28211},{"name":"복숭아(황도)","unit":"4kg 상자","price":29023},{"name":"복숭아(백도)","unit":"4kg 상자","price":26835},{"name":"복숭아(천도)","unit":"5kg 상자","price":20111},{"name":"복숭아(천중도)","unit":"4kg 상자","price":30794},{"name":"복숭아(그레이트)","unit":"4kg 상자","price":23056},{"name":"복숭아(산정백도)","unit":"4kg 상자","price":29132},{"name":"복숭아(애천중도)","unit":"4kg 상자","price":28081},{"name":"복숭아(마도카)","unit":"4kg 상자","price":29483},{"name":"복숭아(대월)","unit":"4kg 상자","price":18000},{"name":"복숭아(대옥계)","unit":"4kg 상자","price":30831},{"name":"복숭아(몽부사)","unit":"4kg 상자","price":31500},{"name":"포도(캠벨얼리)","unit":"3kg 상자","price":22808},{"name":"포도(거봉)","unit":"2kg 상자","price":13670},{"name":"포도(델라웨어)","unit":"2kg 상자","price":9674},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":12402},{"name":"감귤","unit":"5kg 상자","price":13545},{"name":"자두(대석)","unit":"5kg 상자","price":21045},{"name":"자두(추희)","unit":"5kg 상자","price":27647},{"name":"자두(정상)","unit":"5kg 상자","price":31158},{"name":"대왕자두","unit":"5kg 상자","price":35395},{"name":"살구(개량)","unit":"5kg 상자","price":42194},{"name":"청매실","unit":"5kg 상자","price":19143},{"name":"홍매실","unit":"10kg 상자","price":9227},{"name":"무화과(국산)","unit":"1kg","price":8387},{"name":"오디(국산)","unit":"6kg 상자","price":32182},{"name":"블루베리(국산)","unit":"1kg","price":37218}]},
-  {"date":"2026-08-14","source":"가락시장 경락가격(상품 등급)","weather":"말복 찜통더위, 전국 대부분 폭염특보·열대야 지속, 낮 최고 33도 안팎(체감 그 이상), 남부지방 가뭄 지속","factors":["폭염 장기화로 고랭지·시설 채소 출하 부담 지속(오이·시금치 등 강세)","추석을 앞두고 정부 농축산물 수급 관리 돌입, 배 등 과일 가격 강세","광복절 사흘 연휴(8/15~17) 직전 거래일","토마토 기준단위가 5kg 상자에서 10kg 상자로 변경(비교 시 환산 필요)"],"items":[{"name":"오이(백다다기)","unit":"100개","price":81632},{"name":"가시오이","unit":"50개","price":38938},{"name":"취청오이","unit":"50개","price":69110},{"name":"노각오이","unit":"15kg 상자","price":22502},{"name":"토마토","unit":"10kg 상자","price":30895},{"name":"토마토(완숙)","unit":"5kg 상자","price":12065},{"name":"방울토마토","unit":"5kg 상자","price":15799},{"name":"대추방울토마토","unit":"3kg 상자","price":10488},{"name":"파프리카(빨강)","unit":"5kg 상자","price":20622},{"name":"파프리카(노랑)","unit":"5kg 상자","price":28207},{"name":"파프리카(오렌지)","unit":"5kg 상자","price":25101},{"name":"홍피망","unit":"10kg 상자","price":17445},{"name":"청피망","unit":"10kg 상자","price":40432},{"name":"애호박","unit":"20개","price":14986},{"name":"둥근애호박","unit":"10kg 상자","price":23097},{"name":"쥬키니호박","unit":"10kg 상자","price":19229},{"name":"단호박(일반)","unit":"10kg 상자","price":15542},{"name":"가지","unit":"8kg 상자","price":21281},{"name":"풋고추(일반)","unit":"10kg 상자","price":69193},{"name":"청양고추","unit":"10kg 상자","price":20451},{"name":"홍고추","unit":"10kg 상자","price":42439},{"name":"꽈리고추","unit":"4kg 상자","price":16903},{"name":"오이맛고추","unit":"10kg 상자","price":43858},{"name":"녹광고추","unit":"10kg 상자","price":69473},{"name":"롱그린고추","unit":"10kg 상자","price":85190},{"name":"상추","unit":"4kg 상자","price":39497},{"name":"적상추","unit":"4kg 상자","price":38615},{"name":"청상추","unit":"4kg 상자","price":42227},{"name":"깻잎","unit":"100속","price":51233},{"name":"시금치","unit":"4kg 상자","price":57566},{"name":"쑥갓","unit":"4kg 상자","price":32899},{"name":"부추(일반)","unit":"500g단","price":3660},{"name":"미나리","unit":"4kg","price":27354},{"name":"배추","unit":"10kg 망대","price":11069},{"name":"얼갈이배추","unit":"4kg 상자","price":9845},{"name":"알배기배추","unit":"8kg 상자","price":30889},{"name":"양배추","unit":"8kg 망대","price":4585},{"name":"열무","unit":"4kg 상자","price":16368},{"name":"무","unit":"20kg 상자","price":14714},{"name":"당근","unit":"20kg 상자","price":34442},{"name":"대파(일반)","unit":"1kg(단)","price":1777},{"name":"쪽파","unit":"10kg 상자","price":74023},{"name":"실파","unit":"20kg","price":174422},{"name":"양파","unit":"1kg","price":1121},{"name":"감자","unit":"20kg 상자","price":31985},{"name":"홍감자","unit":"10kg 상자","price":23627},{"name":"고구마","unit":"10kg 상자","price":33402},{"name":"양상추(일반)","unit":"6개","price":15152},{"name":"로메인(일반)","unit":"2kg 상자","price":21770},{"name":"브로콜리","unit":"6kg 상자","price":43964},{"name":"셀러리","unit":"10kg 상자","price":30634},{"name":"케일","unit":"2kg 상자","price":12588},{"name":"청경채","unit":"4kg 상자","price":11907},{"name":"치커리(일반)","unit":"2kg 상자","price":13718},{"name":"느타리버섯","unit":"2kg 상자","price":9304},{"name":"양송이","unit":"2kg 상자","price":40059},{"name":"새송이버섯","unit":"2kg 상자","price":5649},{"name":"생표고","unit":"1kg","price":17314},{"name":"팽이버섯","unit":"5kg 상자","price":8919},{"name":"만가닥버섯","unit":"1.5kg 상자","price":8324},{"name":"복수박","unit":"5kg 상자","price":21023},{"name":"참외(일반)","unit":"10kg 상자","price":43247},{"name":"멜론(머스크)","unit":"8kg 상자","price":25088},{"name":"백색멜론","unit":"8kg 상자","price":16971},{"name":"사과","unit":"10kg 상자","price":41554},{"name":"사과(부사)","unit":"10kg 상자","price":34257},{"name":"사과(아오리)","unit":"10kg 상자","price":47149},{"name":"사과(홍로)","unit":"10kg 상자","price":72931},{"name":"사과(썸머킹)","unit":"10kg 상자","price":52568},{"name":"배(신고)","unit":"15kg 상자","price":37481},{"name":"배(원황)","unit":"15kg 상자","price":53763},{"name":"복숭아(황도)","unit":"10kg 상자","price":47494},{"name":"복숭아(백도)","unit":"10kg 상자","price":47640},{"name":"복숭아(천도)","unit":"10kg 상자","price":42289},{"name":"포도(캠벨얼리)","unit":"3kg 상자","price":20479},{"name":"포도(샤인머스캣)","unit":"4kg 상자","price":22533},{"name":"포도(거봉)","unit":"4kg 상자","price":25971},{"name":"포도(델라웨어)","unit":"2kg 상자","price":9674},{"name":"자두(대석)","unit":"5kg 상자","price":21045},{"name":"자두(추희)","unit":"5kg 상자","price":33542},{"name":"자두(정상)","unit":"5kg 상자","price":31158},{"name":"대왕자두","unit":"5kg 상자","price":42600},{"name":"블루베리(국산)","unit":"1kg","price":35003},{"name":"무화과(국산)","unit":"1kg","price":15076},{"name":"찰옥수수","unit":"8kg","price":19473}]},
-  {"date":"2026-08-17","source":"가락시장 경락가격(상품 등급)","weather":"전국 대부분 지역 비(남부 중심 강한 비), 고창·전남 서북부 폭염주의보, 비 그친 뒤 후텁지근한 더위","factors":["광복절 사흘 연휴(8/15~17) 휴장 직후 저녁 경매 재개 물량","연휴 직전·연휴 중 남부 집중호우(전남·경남·제주 누적 250mm+)로 산지 출하 차질","오이 기준단위가 100개에서 50개로, 토마토가 10kg 상자에서 5kg 상자로 변경(비교 시 환산 필요)"],"items":[{"name":"고구마","unit":"10kg 상자","price":33055},{"name":"호박밤고구마","unit":"10kg 상자","price":34647},{"name":"호박고구마","unit":"10kg 상자","price":33568},{"name":"감자","unit":"20kg 상자","price":29819},{"name":"감자(수미)","unit":"20kg 상자","price":29712},{"name":"감자(두백)","unit":"20kg 상자","price":32311},{"name":"배추","unit":"10kg 망대","price":9391},{"name":"양배추","unit":"8kg 망대","price":4769},{"name":"시금치","unit":"4kg 상자","price":69306},{"name":"상추","unit":"4kg 상자","price":36990},{"name":"깻잎","unit":"100속","price":39190},{"name":"무","unit":"20kg 상자","price":16306},{"name":"당근","unit":"20kg 상자","price":34725},{"name":"풋고추(일반)","unit":"10kg 상자","price":69129},{"name":"양파","unit":"1kg","price":1106},{"name":"대파(일반)","unit":"1kg(단)","price":1883},{"name":"쪽파","unit":"10kg 상자","price":81261},{"name":"오이(백다다기)","unit":"50개","price":29029},{"name":"토마토","unit":"5kg 상자","price":17442},{"name":"방울토마토","unit":"5kg 상자","price":15506},{"name":"파프리카(빨강)","unit":"5kg 상자","price":18149},{"name":"애호박","unit":"20개","price":14760},{"name":"단호박(일반)","unit":"8kg 망대","price":8121},{"name":"가지","unit":"5kg 상자","price":7122},{"name":"브로콜리","unit":"6kg 상자","price":58056},{"name":"열무","unit":"4kg 상자","price":13307},{"name":"얼갈이배추","unit":"4kg 상자","price":9844},{"name":"미나리","unit":"4kg","price":28951},{"name":"부추(일반)","unit":"500g단","price":3587},{"name":"사과(부사)","unit":"10kg 상자","price":35200},{"name":"배(신고)","unit":"15kg 상자","price":28456},{"name":"포도(거봉)","unit":"2kg 상자","price":14661},{"name":"포도(샤인머스캣)","unit":"2kg 상자","price":12419},{"name":"복숭아(황도)","unit":"4kg 상자","price":22955},{"name":"수박(일반)","unit":"6kg(개)","price":13770},{"name":"참외(일반)","unit":"10kg 상자","price":45752},{"name":"멜론(머스크)","unit":"5kg 상자","price":15333},{"name":"자두(대석)","unit":"5kg 상자","price":21045}]},
+  {
+   "date": "2026-07-22",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "중부 강한 장맛비(수도권·강원 30~80mm, 시간당 최대 30mm), 충청 20~60mm, 남부는 폭염",
+   "factors": [
+    "중부 집중호우로 농경지 침수·출하 차질 우려"
+   ],
+   "all_items_count": 8,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "50개", "price": 19521},
+    {"name": "토마토", "unit": "10kg 상자", "price": 10642},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 9302},
+    {"name": "애호박", "unit": "20개", "price": 13459},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 28728},
+    {"name": "상추", "unit": "4kg 상자", "price": 25251},
+    {"name": "배추", "unit": "10kg 망대", "price": 3627},
+    {"name": "무", "unit": "20kg 상자", "price": 7255}
+   ]
+  },
+  {
+   "date": "2026-07-25",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 폭염, 남부지방·동해안 폭염특보, 오후 내륙·산지 소나기",
+   "factors": [],
+   "all_items_count": 27,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 59958},
+    {"name": "토마토", "unit": "10kg 상자", "price": 12300},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 16383},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 10991},
+    {"name": "애호박", "unit": "20개", "price": 18238},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 37408},
+    {"name": "상추", "unit": "4kg 상자", "price": 37223},
+    {"name": "배추", "unit": "10kg 망대", "price": 10887},
+    {"name": "무", "unit": "20kg 상자", "price": 10522}
+   ]
+  },
+  {
+   "date": "2026-07-27",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "장마 종료 후 전국 대부분 폭염특보, 낮 최고 33~37도, 전남 남동부·경상권 체감 38도, 열대야",
+   "factors": [
+    "가락시장 채소 경매 7월 30일까지 진행 후 하계 휴장 예정"
+   ],
+   "all_items_count": 28,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 54195},
+    {"name": "토마토", "unit": "10kg 상자", "price": 14164},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 21992},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 9358},
+    {"name": "애호박", "unit": "20개", "price": 18304},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 40366},
+    {"name": "상추", "unit": "4kg 상자", "price": 37374},
+    {"name": "배추", "unit": "10kg 망대", "price": 9436},
+    {"name": "무", "unit": "20kg 상자", "price": 8921}
+   ]
+  },
+  {
+   "date": "2026-08-03",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 폭염특보, 낮 최고 39도, 전남·경상 내륙 극한 폭염, 강릉·속초 등 동해안 초열대야, 강원·충북 소나기",
+   "factors": [
+    "가락시장 채소 경매 하계 휴장(7/30~8/2) 후 8월 2일 저녁 재개"
+   ],
+   "all_items_count": 31,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 40511},
+    {"name": "토마토", "unit": "10kg 상자", "price": 21377},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 13354},
+    {"name": "애호박", "unit": "20개", "price": 20511},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 59366},
+    {"name": "상추", "unit": "4kg 상자", "price": 33245},
+    {"name": "배추", "unit": "10kg 망대", "price": 9788},
+    {"name": "무", "unit": "20kg 상자", "price": 10231}
+   ]
+  },
+  {
+   "date": "2026-08-04",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 대부분 폭염특보, 서울·경기 폭염 중대경보 첫 발령, 낮 최고 38도 안팎(일부 39도), 경기 남부 등 서쪽 소나기",
+   "factors": [],
+   "all_items_count": 36,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 36573},
+    {"name": "토마토", "unit": "10kg 상자", "price": 20547},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 10483},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 8550},
+    {"name": "애호박", "unit": "20개", "price": 20964},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 57582},
+    {"name": "상추", "unit": "4kg 상자", "price": 31676},
+    {"name": "배추", "unit": "10kg 망대", "price": 8146},
+    {"name": "무", "unit": "20kg 상자", "price": 10158}
+   ]
+  },
+  {
+   "date": "2026-08-05",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 대부분 폭염특보, 서울 38도·부산 36도, 열대야, 경기·충남 등 서쪽 천둥번개 동반 소나기",
+   "factors": [],
+   "all_items_count": 36,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 37468},
+    {"name": "토마토", "unit": "10kg 상자", "price": 19684},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 13156},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 8986},
+    {"name": "애호박", "unit": "20개", "price": 20126},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 62579},
+    {"name": "상추", "unit": "4kg 상자", "price": 25656},
+    {"name": "배추", "unit": "10kg 망대", "price": 8137},
+    {"name": "무", "unit": "20kg 상자", "price": 10285}
+   ]
+  },
+  {
+   "date": "2026-08-06",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 대부분 폭염특보, 서울·전주 38도 등 한낮 40도 육박, 수도권·전남 광양 폭염 중대경보, 제주 오전 비",
+   "factors": [],
+   "all_items_count": 131,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 41658},
+    {"name": "토마토", "unit": "10kg 상자", "price": 17691},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 15339},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 9250},
+    {"name": "애호박", "unit": "20개", "price": 18989},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 68838},
+    {"name": "상추", "unit": "4kg 상자", "price": 28885},
+    {"name": "배추", "unit": "10kg 망대", "price": 10519},
+    {"name": "무", "unit": "20kg 상자", "price": 12490}
+   ]
+  },
+  {
+   "date": "2026-08-07",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "입추에도 폭염 절정, 전국 대부분 폭염특보, 수도권 낮 최고 39도, 열대야 지속",
+   "factors": [],
+   "all_items_count": 104,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 50198},
+    {"name": "토마토", "unit": "5kg 상자", "price": 13984},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 18789},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 11222},
+    {"name": "애호박", "unit": "20개", "price": 19730},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 71302},
+    {"name": "상추", "unit": "4kg 상자", "price": 32903},
+    {"name": "배추", "unit": "10kg 망대", "price": 10674},
+    {"name": "무", "unit": "20kg 상자", "price": 14034}
+   ]
+  },
+  {
+   "date": "2026-08-08",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "폭염이 1~3도 누그러졌으나 전국 대부분 폭염특보 유지, 낮 최고 29~37도, 열대야 지속",
+   "factors": [
+    "토마토 기준단위가 10kg 상자에서 5kg 상자로 변경(비교 시 환산 필요)"
+   ],
+   "all_items_count": 155,
+   "items": [
+    {"name": "배추", "unit": "10kg 망대", "price": 11229},
+    {"name": "상추", "unit": "4kg 상자", "price": 41518},
+    {"name": "오이(백다다기)", "unit": "100개", "price": 51628},
+    {"name": "애호박", "unit": "20개", "price": 19487},
+    {"name": "토마토", "unit": "5kg 상자", "price": 10617},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 19999},
+    {"name": "무", "unit": "20kg 상자", "price": 16612},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 58230},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 18118}
+   ]
+  },
+  {
+   "date": "2026-08-10",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "폭염 다소 주춤(낮 최고 34도 안팎)이나 전국 대부분 폭염특보·열대야 지속, 강원·경상·제주 곳곳 비, 해안 너울 주의",
+   "factors": [
+    "일요일 휴장 뒤 주초 첫 경매",
+    "폭염 지속으로 강원 고랭지 등 산지 채소 출하 부담, 강원 채소가격 최대 40% 급등 보도"
+   ],
+   "all_items_count": 146,
+   "items": [
+    {"name": "배추", "unit": "10kg 망대", "price": 13675},
+    {"name": "상추", "unit": "4kg 상자", "price": 41520},
+    {"name": "오이(백다다기)", "unit": "100개", "price": 47017},
+    {"name": "애호박", "unit": "20개", "price": 18042},
+    {"name": "토마토", "unit": "5kg 상자", "price": 11001},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 19152},
+    {"name": "무", "unit": "20kg 상자", "price": 16720},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 64296},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 22929}
+   ]
+  },
+  {
+   "date": "2026-08-14",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "말복 찜통더위, 전국 대부분 폭염특보·열대야 지속, 낮 최고 33도 안팎(체감 그 이상), 남부지방 가뭄 지속",
+   "factors": [
+    "폭염 장기화로 고랭지·시설 채소 출하 부담 지속(오이·시금치 등 강세)",
+    "추석을 앞두고 정부 농축산물 수급 관리 돌입, 배 등 과일 가격 강세",
+    "광복절 사흘 연휴(8/15~17) 직전 거래일",
+    "토마토 기준단위가 5kg 상자에서 10kg 상자로 변경(비교 시 환산 필요)"
+   ],
+   "all_items_count": 85,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "100개", "price": 81632},
+    {"name": "토마토", "unit": "10kg 상자", "price": 30895},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 15799},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 20622},
+    {"name": "애호박", "unit": "20개", "price": 14986},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 69193},
+    {"name": "상추", "unit": "4kg 상자", "price": 39497},
+    {"name": "배추", "unit": "10kg 망대", "price": 11069},
+    {"name": "무", "unit": "20kg 상자", "price": 14714}
+   ]
+  },
+  {
+   "date": "2026-08-17",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 대부분 지역 비(남부 중심 강한 비), 고창·전남 서북부 폭염주의보, 비 그친 뒤 후텁지근한 더위",
+   "factors": [
+    "광복절 사흘 연휴(8/15~17) 휴장 직후 저녁 경매 재개 물량",
+    "연휴 직전·연휴 중 남부 집중호우(전남·경남·제주 누적 250mm+)로 산지 출하 차질",
+    "오이 기준단위가 100개에서 50개로, 토마토가 10kg 상자에서 5kg 상자로 변경(비교 시 환산 필요)"
+   ],
+   "all_items_count": 38,
+   "items": [
+    {"name": "배추", "unit": "10kg 망대", "price": 9391},
+    {"name": "상추", "unit": "4kg 상자", "price": 36990},
+    {"name": "무", "unit": "20kg 상자", "price": 16306},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 69129},
+    {"name": "오이(백다다기)", "unit": "50개", "price": 29029},
+    {"name": "토마토", "unit": "5kg 상자", "price": 17442},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 15506},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 18149},
+    {"name": "애호박", "unit": "20개", "price": 14760}
+   ]
+  },
+  {
+   "date": "2026-08-18",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 낮 최고 33도 안팎 무더위, 남부지방·제주 비 후 전국 곳곳 소나기, 높은 습도 속 폭염 재확대",
+   "factors": [
+    "광복절 연휴 휴장 이후 경매 정상화 이틀째",
+    "폭염 재확대로 고랭지·시설 채소 출하 부담 지속",
+    "추석(9월 말)을 앞두고 정부 농축산물 수급 관리·할인 지원 진행"
+   ],
+   "all_items_count": 143,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "50개", "price": 21469},
+    {"name": "토마토", "unit": "5kg 상자", "price": 22445},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 15367},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 18062},
+    {"name": "애호박", "unit": "20개", "price": 13473},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 89427},
+    {"name": "상추", "unit": "4kg 상자", "price": 31040},
+    {"name": "배추", "unit": "10kg 망대", "price": 10824},
+    {"name": "무", "unit": "20kg 상자", "price": 13806}
+   ]
+  },
+  {
+   "date": "2026-08-19",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "아침까지 충청·호남 비 5~30mm 후 전국 대부분 폭염특보 확대, 낮 최고 33도 안팎, 오후 내륙 곳곳 소나기, 높은 습도·열대야",
+   "factors": [
+    "폭염 장기화로 전국 농작물 3,317ha 피해 집계(농식품부), 시설·고랭지 채소 출하 부담 지속",
+    "추석 성수기를 앞두고 정부 농축산물 수급 관리·할인 지원 진행",
+    "토마토·방울토마토 등 과채류 강세, 상추·오이 등 엽채·과채 일부 반락"
+   ],
+   "all_items_count": 148,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "50개", "price": 18410},
+    {"name": "토마토", "unit": "5kg 상자", "price": 32471},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 20446},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 17641},
+    {"name": "애호박", "unit": "20개", "price": 13641},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 79085},
+    {"name": "상추", "unit": "4kg 상자", "price": 23933},
+    {"name": "배추", "unit": "10kg 망대", "price": 11612},
+    {"name": "무", "unit": "20kg 상자", "price": 14514}
+   ]
+  },
+  {
+   "date": "2026-08-20",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 늦더위 속 충청 이남 중심 폭염특보, 낮 최고 28~34도, 오후 전국 곳곳 5~60mm 소나기(남부·제주 돌풍·천둥), 높은 습도·열대야",
+   "factors": [
+    "폭염 장기화로 전국 농작물 3,317ha 피해(농식품부), 시설·고랭지 채소 출하 부담 지속",
+    "방울토마토·토마토 등 과채류 강세 지속, 상추 반등",
+    "추석 성수기를 앞두고 정부 농축산물 수급 관리·할인 지원 진행"
+   ],
+   "all_items_count": 149,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "50개", "price": 18419},
+    {"name": "토마토", "unit": "5kg 상자", "price": 36639},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 30782},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 17026},
+    {"name": "애호박", "unit": "20개", "price": 14467},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 77990},
+    {"name": "상추", "unit": "4kg 상자", "price": 26329},
+    {"name": "배추", "unit": "10kg 망대", "price": 10846},
+    {"name": "무", "unit": "20kg 상자", "price": 13650}
+   ]
+  },
+  {
+   "date": "2026-08-21",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "중부지방 흐리고 비·소나기, 충청 이남 중심 폭염특보 속 낮 최고 35도 안팎, 남부·제주 최대 50mm 소나기, 높은 습도 속 열대야 지속",
+   "factors": [
+    "폭염·소나기 반복으로 시설·고랭지 채소 출하 부담 지속",
+    "전일 급등했던 방울토마토 추가 상승, 풋고추·녹광고추 등 고추류는 급등 후 반락",
+    "추석 성수기를 앞두고 정부 농축산물 수급 관리·할인 지원 진행"
+   ],
+   "all_items_count": 152,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "50개", "price": 18481},
+    {"name": "토마토", "unit": "5kg 상자", "price": 35430},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 41589},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 18980},
+    {"name": "애호박", "unit": "20개", "price": 14934},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 57682},
+    {"name": "상추", "unit": "4kg 상자", "price": 29023},
+    {"name": "배추", "unit": "10kg 망대", "price": 10295},
+    {"name": "무", "unit": "20kg 상자", "price": 14149}
+   ]
+  },
+  {
+   "date": "2026-08-22",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "전국 흐리고 오전 비·오후 소나기, 충청 이남 중심 폭염특보 속 낮 최고 34도 안팎(체감 35도), 강원 내륙 영월 등 폭염주의보 확대, 높은 습도 속 열대야",
+   "factors": [
+    "폭염 장기화로 시설·고랭지 채소 출하 부담 지속",
+    "이틀 연속 급등했던 방울토마토·풋고추 등 과채류가 주말 경매에서 반락",
+    "추석 성수기를 앞두고 정부 농축산물 수급 관리·할인 지원 진행"
+   ],
+   "all_items_count": 152,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "50개", "price": 19665},
+    {"name": "토마토", "unit": "5kg 상자", "price": 35332},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 40820},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 22068},
+    {"name": "애호박", "unit": "20개", "price": 15511},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 40955},
+    {"name": "상추", "unit": "4kg 상자", "price": 28976},
+    {"name": "배추", "unit": "10kg 망대", "price": 8484},
+    {"name": "무", "unit": "20kg 상자", "price": 15073}
+   ]
+  },
+  {
+   "date": "2026-08-24",
+   "source": "가락시장 경락가격(상품 등급)",
+   "weather": "처서 지난 뒤에도 전국 무더위 지속, 낮 최고 35도 안팎 폭염",
+   "factors": [
+    "폭염 장기화로 시금치·오이·애호박·상추 등 잎채소·과채류 출하 급감, 가격 강세 지속",
+    "정부 비축·조기 출하로 배추 공급은 상대적으로 안정",
+    "주말 휴장 후 월요일 개장으로 반입량 변동"
+   ],
+   "all_items_count": 157,
+   "items": [
+    {"name": "오이(백다다기)", "unit": "50개", "price": 26511},
+    {"name": "오이(백다다기)", "unit": "100개", "price": 52359},
+    {"name": "토마토", "unit": "5kg 상자", "price": 30946},
+    {"name": "토마토", "unit": "10kg 상자", "price": 31007},
+    {"name": "방울토마토", "unit": "5kg 상자", "price": 39985},
+    {"name": "파프리카(빨강)", "unit": "5kg 상자", "price": 27025},
+    {"name": "애호박", "unit": "20개", "price": 19999},
+    {"name": "풋고추(일반)", "unit": "10kg 상자", "price": 46828},
+    {"name": "상추", "unit": "4kg 상자", "price": 29139},
+    {"name": "배추", "unit": "10kg 망대", "price": 11023},
+    {"name": "무", "unit": "20kg 상자", "price": 14616}
+   ]
+  }
+ ]
+}
