@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 농업 소식 | FARMILY 파밀리 — 스마트팜 · 농업로봇 · 무인 방제</title>
+<meta name="description" content="9월 첫날 중부지방엔 돌풍·천둥을 동반한 최대 100mm 이상 강한 비, 남부·제주는 34도 안팎 늦더위가 이어집니다. 하우스 배수·결로 관리와 비 갠 뒤 벼멸구·탄저병 방제를 챙기세요.">
+<meta name="keywords" content="스마트팜, 농업, 농업 뉴스, 농업로봇, 방제기, 방제 자동화, 무인방제기, 방제로봇, UV, UV로봇, UV 방제, 수확, 수확로봇, 자율주행, 로봇팔, AMR, 온실 자동화, 시설원예, 병해충 방제, 농산물 시세, 농업 날씨, FARMILY, 파밀리, 랑데뷰">
+<meta property="og:site_name" content="FARMILY 오늘의 농업 소식">
+<meta property="og:title" content="오늘의 농업 소식 (9월 1일) — 날씨 · 병해충 · 농산물 시세">
+<meta property="og:description" content="9월 첫날 중부지방엔 돌풍·천둥을 동반한 최대 100mm 이상 강한 비, 남부·제주는 34도 안팎 늦더위가 이어집니다. 하우스 배수·결로 관리와 비 갠 뒤 벼멸구·탄저병 방제를 챙기세요.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://juhong-rdv.github.io/farmily-daily/">
+<meta property="og:locale" content="ko_KR">
+<link rel="canonical" href="https://juhong-rdv.github.io/farmily-daily/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"오늘의 농업 소식","description":"농업 날씨, 병해충 발생 정보, 농산물 시세, 농업 뉴스를 매일 아침 제공하는 페이지","dateModified":"2026-09-01","inLanguage":"ko","publisher":{"@type":"Organization","name":"FARMILY (주식회사 랑데뷰)","url":"https://farmily.ai","description":"스마트팜 자동화 로봇 기업 — 무인 방제로봇 FARMILY-X S300, UV 방제로봇 FARMILY-X UV 등 자율주행 기반 농업로봇 개발"}}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #222; line-height: 1.75; margin: 0; padding: 4px; background: transparent; }
+  .page-head { padding: 6px 8px 18px; }
+  .page-head h1 { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
+  .page-head .date { font-size: 15px; color: #888; }
+  .lead { background: #f7f9f7; border-left: 4px solid #12341f; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px; font-size: 16px; line-height: 1.8; color: #333; }
+  .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 28px 32px; margin-bottom: 20px; }
+  .card h2 { font-size: 20px; font-weight: 700; margin: 0 0 14px; }
+  .card p { margin: 0 0 14px; }
+  .subhead { font-weight: 700; margin-bottom: 8px; }
+  ul { margin: 0 0 14px; padding-left: 20px; }
+  li { margin-bottom: 8px; }
+  .alert { background: #fff8e1; border-radius: 8px; padding: 12px 16px; font-size: 15px; }
+  .tip { background: #f0f7f2; border-radius: 8px; padding: 14px 16px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 8px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #eee; text-align: left; }
+  th { color: #666; font-weight: 700; background: #fafafa; }
+  .up { color: #d32f2f; }
+  .down { color: #1a56db; }
+  .src { font-size: 13px; color: #999; }
+  .chart { margin: 24px 0 16px; }
+  .chart-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .chart-axis-label { display: flex; align-items: center; font-size: 12px; color: #888; margin-bottom: 8px; }
+  .chart-axis-label .cname { color: #888; }
+  .chart-axis-label .cside.left { justify-content: flex-start; }
+  .chart-axis-label .cside.right { justify-content: flex-end; }
+  .crow { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
+  .cname { width: 76px; flex-shrink: 0; text-align: right; color: #555; padding-right: 8px; }
+  .cside { flex: 1 1 0; display: flex; align-items: center; min-width: 0; }
+  .cside.left { justify-content: flex-end; }
+  .cside.right { justify-content: flex-start; }
+  .caxis { width: 2px; height: 20px; background: #bbb; flex-shrink: 0; }
+  .cbar { height: 14px; min-width: 3px; display: block; }
+  .cbar.up-bg { background: #ef5350; border-radius: 0 4px 4px 0; }
+  .cbar.down-bg { background: #42a5f5; border-radius: 4px 0 0 4px; }
+  .cval { width: 62px; flex-shrink: 0; text-align: right; font-weight: 700; font-size: 13px; white-space: nowrap; }
+  .trend { margin: 30px 0 16px; }
+  .trend svg { width: 100%; height: auto; display: block; }
+  .trend svg.svg-m { display: none; }
+  @media (max-width: 700px) { .trend svg.svg-d { display: none; } .trend svg.svg-m { display: block; } }
+  .trend-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
+  .tab-btn { border: 1px solid #ddd; background: #fafafa; color: #555; border-radius: 16px; padding: 4px 12px; font-size: 13px; cursor: pointer; font-family: inherit; line-height: 1.5; }
+  .tab-btn.active { background: #12341f; color: #fff; border-color: #12341f; font-weight: 700; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .tab-sub { font-size: 13px; color: #888; margin-bottom: 6px; }
+  .trend-note { font-size: 12px; color: #999; margin-top: 6px; line-height: 1.6; }
+  .footer-note { font-size: 14px; color: #777; padding: 4px 8px 12px; }
+  a { color: #1a56db; }
+  @media (max-width: 600px) { .card { padding: 20px 18px; } }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>오늘의 농업 소식 (9월 1일 화)</h1>
+  <div class="date">업데이트: 2026.09.01 06:41 · FARMILY AI 제공</div>
+</div>
+<div class="lead">🍂 오늘부터 9월입니다. 9월 첫날인 오늘은 <strong>중부지방</strong>에 돌풍·천둥을 동반한 강한 비가, 남부와 제주엔 낮 34도 안팎의 늦더위와 기습 소나기가 예보됐습니다. 이달은 추석(9월 25일) 출하 준비와 벼 마무리 방제, 김장용 가을배추·무 심기가 몰리는 달입니다. 비가 잦은 월초에는 배수로 정비와 병해충 예찰부터 챙기고, 하우스는 아침저녁으로 서늘해지는 환절기 온도 관리에 들어가세요.</div>
+<div class="card">
+  <h2>🌤 오늘의 농업 날씨</h2>
+  <p>9월 첫날인 오늘은 전국이 대체로 흐린 가운데 <strong>수도권·강원·충청 등 중부지방</strong>을 중심으로 돌풍과 천둥·번개를 동반한 세찬 비가 내리겠습니다. 많은 곳은 100mm 이상의 집중호우가 예보돼 있으니 하우스 주변 배수로와 비닐 고정 상태를 아침에 한 번 더 살펴 주세요. 주말 사이 <strong>전북</strong>에는 최고 264mm의 폭우로 시설 피해 96건이 접수되고 하천 범람 우려로 주민이 대피하는 등 피해가 잇따랐으니, 침수됐던 포장은 물이 빠진 뒤 잎에 묻은 흙탕물을 씻어 주고 쓰러진 작물부터 세워 주세요.</p>
+  <p><strong>남부지방과 제주</strong>는 비 대신 늦더위가 이어져 낮 최고기온이 33~34도까지 오르고, 오후에는 40mm 안팎의 기습 소나기가 지나는 곳이 있겠습니다. 9월에 들어서도 한낮 더위가 여전하니 밭일과 하우스 작업은 아침저녁 서늘한 시간으로 잡고 물을 자주 마셔 주세요.</p>
+  <div class="subhead">이번 주 전망</div>
+  <p>중부의 비는 오늘을 고비로 차차 잦아들겠고, 이후에는 전국이 낮 30도 안팎(남부는 33도 안팎)의 늦더위로 흘러갈 전망입니다. 밀린 방제와 쓰러진 벼 세우기, 추석 출하 준비는 비 갠 틈을 골라 계획해 두세요.</p>
+  <div class="subhead">농작업 포인트</div>
+  <ul>
+    <li><strong>온실·시설 관리:</strong> 비 오는 중부는 관수량을 평소보다 줄이고 빗줄기가 약해진 틈마다 환기해 결로(이슬 맺힘)와 잿빛곰팡이를 막으세요. 무더운 남부는 차광과 환기로 한낮 고온을 누르고 관수는 아침저녁에 하세요. 이제 밤 기온이 차차 내려가는 환절기이니 야간 온도 관리 계획도 세워 둘 때입니다.</li>
+    <li><strong>배수·침수 대비:</strong> <strong>전북·충청</strong> 등 비 피해 지역은 밭 곁도랑과 배수로를 다시 틔우고, 물이 찼던 포장은 뿌리 회복을 위해 서둘러 물빼기부터 하세요.</li>
+    <li><strong>병해충 예찰:</strong> 비 뒤 늦더위가 이어지면 벼멸구·혹명나방이 빠르게 늘고 고추·과수 탄저병도 번지기 쉽습니다. 비 갠 마른 틈에 논 안쪽과 병든 과실을 살펴보세요.</li>
+    <li><strong>가축·축사:</strong> 고온다습한 날씨에 축사 환기와 시원한 물 급수를 거르지 말고, 비가 많은 중부는 지붕 누수와 전기설비 누전을 점검하세요.</li>
+    <li><strong>호우 안전:</strong> 비가 강하게 내리는 동안에는 논물꼬·배수로를 보러 나가지 마시고, 빗줄기가 잦아든 뒤에 살피세요.</li>
+  </ul>
+  <div class="alert">⚠️ <strong>오늘 특히 주의할 지역:</strong> <strong>수도권·강원·충청 등 중부지방</strong> — 돌풍·천둥을 동반한 100mm 이상 집중호우가 예보됐습니다. 주말 폭우 피해가 컸던 <strong>전북</strong>은 저지대 침수와 하천 주변 농로 이동에 계속 주의하세요.</div>
+</div>
+<div class="card">
+  <h2>🐛 병해충 발생 정보</h2>
+  <p><strong>[남해안]</strong> 지역을 중심으로 중국에서 날아온 벼멸구·혹명나방이 계속 늘고 있습니다. 벼멸구는 볏대 아래쪽에 붙어 즙을 빨아 벼를 주저앉히는 해충으로 논둑에서는 잘 보이지 않으니, 논 안쪽까지 들어가 볏대 아래를 확인하고 발견 즉시 방제하세요. <strong>[전남 고흥]</strong>·<strong>[전남 장흥]</strong> 등 남부 시·군은 이삭이 팬 뒤(출수기 이후) 벼 병해충 적기 방제를 당부하고 있습니다. 비가 오간 이번 주에는 고추·과수 탄저병과 시설채소 잿빛곰팡이·흰가루병도 번지기 쉬우니, 병든 과실과 잎은 바로 따내 밭 밖으로 내고 비 갠 마른 틈에 보완 방제하세요.</p>
+</div>
+<div class="card">
+  <h2>🤖 오늘의 FARMILY-X 활용 팁</h2>
+  <div class="tip">9월에 들어서도 남부는 낮 34도 안팎 늦더위가 이어집니다. 한낮 하우스 안 방제는 온열질환 위험이 커서 미루기 쉬운데, 무인 스프레이 로봇 <a href="https://farmily.ai/FARMILY-XS300" target="_blank" rel="noopener">FARMILY-X S300</a>은 사람 없이 폭염 한낮이나 서늘한 야간에 방제를 대신해 주므로 적기를 놓치지 않으면서 몸도 지킬 수 있습니다. 비가 이어져 습도가 높은 중부 하우스라면 약액이 마르지 않아 살포 효과가 떨어지기 쉬우니, 약액 없이 자외선으로 잿빛곰팡이·흰가루병을 눌러 주는 <a href="https://farmily.ai/FARMILY-XUV" target="_blank" rel="noopener">FARMILY-X UV</a>가 나은 대안입니다. <a href="https://farmily.ai/product" target="_blank" rel="noopener">FARMILY 제품 전체 보기</a></div>
+</div>
+<div class="card">
+  <h2>📈 오늘의 농산물 시세</h2>
+  <p>직전 개장일인 어제 <strong>8월 31일(월)</strong> 가락시장 경락가 기준입니다. 일요일 휴장 뒤 첫 경매로, 그 전 개장일인 <strong>8월 29일(토)</strong> 대비 애호박 18%, 풋고추 18%, 오이 5%, 파프리카 4%가 오른 반면 방울토마토 28%, 토마토 17%, 상추 15%는 내렸습니다. 전국 비 소식과 폭염 뒤끝이 겹치며 애호박·오이 등 과채류가 강세를 이어갔고, 상추 등 잎채소는 높은 가격대에서 소폭 되밀렸습니다. 오늘(9월 1일) 경매 가격은 공개되는 대로 아래 표에 반영됩니다.</p>
+  <table>
+    <tr><th>품목</th><th>단위</th><th>도매가격</th><th>등락</th></tr>
+    <tr><td>오이(백다다기)</td><td>50개</td><td>41,881원</td><td class="up">▲ 4.5%</td></tr>
+    <tr><td>토마토</td><td>5kg 상자</td><td>19,086원</td><td class="down">▼ 17.0%</td></tr>
+    <tr><td>방울토마토</td><td>5kg 상자</td><td>19,713원</td><td class="down">▼ 27.6%</td></tr>
+    <tr><td>파프리카(빨강)</td><td>5kg 상자</td><td>51,149원</td><td class="up">▲ 4.1%</td></tr>
+    <tr><td>애호박</td><td>20개</td><td>47,007원</td><td class="up">▲ 18.0%</td></tr>
+    <tr><td>풋고추(일반)</td><td>10kg 상자</td><td>51,294원</td><td class="up">▲ 18.0%</td></tr>
+    <tr><td>상추</td><td>4kg 상자</td><td>54,395원</td><td class="down">▼ 15.2%</td></tr>
+    <tr><td>배추</td><td>10kg 망대</td><td>12,873원</td><td class="down">▼ 6.0%</td></tr>
+    <tr><td>무</td><td>20kg 상자</td><td>15,574원</td><td class="up">▲ 1.0%</td></tr>
+  </table>
+  <div class="chart">
+    <div class="chart-title">품목별 등락률 (8월 31일, 직전 개장일 8월 29일 대비)</div>
+    <div class="chart-axis-label"><span class="cname"></span><span class="cside left">◀ 하락</span><span class="caxis" style="background:transparent"></span><span class="cside right">상승 ▶</span><span class="cval"></span></div>
+    <div class="crow"><span class="cname">방울토마토</span><span class="cside left"><span class="cbar down-bg" style="width:92.0%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 27.6%</span></div>
+    <div class="crow"><span class="cname">애호박</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:60.1%"></span></span><span class="cval up">▲ 18.0%</span></div>
+    <div class="crow"><span class="cname">풋고추</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:60.0%"></span></span><span class="cval up">▲ 18.0%</span></div>
+    <div class="crow"><span class="cname">토마토</span><span class="cside left"><span class="cbar down-bg" style="width:56.7%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 17.0%</span></div>
+    <div class="crow"><span class="cname">상추</span><span class="cside left"><span class="cbar down-bg" style="width:50.6%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 15.2%</span></div>
+    <div class="crow"><span class="cname">배추</span><span class="cside left"><span class="cbar down-bg" style="width:20.1%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 6.0%</span></div>
+    <div class="crow"><span class="cname">오이</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:15.0%"></span></span><span class="cval up">▲ 4.5%</span></div>
+    <div class="crow"><span class="cname">파프리카</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:13.7%"></span></span><span class="cval up">▲ 4.1%</span></div>
+    <div class="crow"><span class="cname">무</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:3.2%"></span></span><span class="cval up">▲ 1.0%</span></div>
+  </div>
+  <div class="trend">
+    <div class="chart-title">품목별 가격 변동 추이</div>
+    <div class="trend-tabs">
+      <button type="button" class="tab-btn active" onclick="showTrendTab(0)">오이</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(1)">토마토</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(2)">방울토마토</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(3)">파프리카</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(4)">애호박</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(5)">풋고추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(6)">상추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(7)">배추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(8)">무</button>
+    </div>
+    <div class="tab-panel active" id="trend-tab-0">
+      <div class="tab-sub">오이(백다다기) · 50개 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="오이 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">15,000</text>
+          <line x1="90" y1="240.7" x2="1250" y2="240.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="245.5" font-size="15" fill="#999" text-anchor="end">20,000</text>
+          <line x1="90" y1="199.3" x2="1250" y2="199.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="204.1" font-size="15" fill="#999" text-anchor="end">25,000</text>
+          <line x1="90" y1="158.0" x2="1250" y2="158.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="162.8" font-size="15" fill="#999" text-anchor="end">30,000</text>
+          <line x1="90" y1="116.7" x2="1250" y2="116.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="121.5" font-size="15" fill="#999" text-anchor="end">35,000</text>
+          <line x1="90" y1="75.3" x2="1250" y2="75.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="80.1" font-size="15" fill="#999" text-anchor="end">40,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">45,000</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#2a78d6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,238.6 131.4,254.8 172.9,251.1 214.3,233.8 255.7,198.5 297.1,192.6 380.0,211.7 545.7,68.6 670.0,166.0 711.4,228.5 752.9,253.8 794.3,253.7 835.7,253.2 877.1,243.4 960.0,186.8 1001.4,95.9 1042.9,101.9 1084.3,112.8 1125.7,92.1 1167.1,74.7 1250.0,59.8"/>
+          <text x="131.4" y="241.8" font-size="15" font-weight="700" fill="#444" text-anchor="middle">18,286원</text>
+          <text x="1243.0" y="46.8" font-size="15" font-weight="700" fill="#444" text-anchor="end">41,881원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="오이 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">15,000</text>
+          <line x1="78" y1="201.7" x2="616" y2="201.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="205.9" font-size="13" fill="#999" text-anchor="end">20,000</text>
+          <line x1="78" y1="167.3" x2="616" y2="167.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="171.5" font-size="13" fill="#999" text-anchor="end">25,000</text>
+          <line x1="78" y1="133.0" x2="616" y2="133.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="137.2" font-size="13" fill="#999" text-anchor="end">30,000</text>
+          <line x1="78" y1="98.7" x2="616" y2="98.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="102.9" font-size="13" fill="#999" text-anchor="end">35,000</text>
+          <line x1="78" y1="64.3" x2="616" y2="64.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="68.5" font-size="13" fill="#999" text-anchor="end">40,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">45,000</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#2a78d6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,199.9 97.2,213.4 116.4,210.4 135.6,196.0 154.9,166.7 174.1,161.7 212.5,177.6 289.4,58.7 347.0,139.7 366.2,191.6 385.4,212.6 404.6,212.5 423.9,212.1 443.1,204.0 481.5,157.0 500.7,81.4 519.9,86.4 539.1,95.4 558.4,78.2 577.6,63.8 616.0,51.4"/>
+          <text x="118.0" y="202.4" font-size="13" font-weight="700" fill="#444" text-anchor="middle">18,286원</text>
+          <text x="609.0" y="40.4" font-size="13" font-weight="700" fill="#444" text-anchor="end">41,881원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-1">
+      <div class="tab-sub">토마토 · 5kg 상자 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="토마토 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">0</text>
+          <line x1="90" y1="220.0" x2="1250" y2="220.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="224.8" font-size="15" fill="#999" text-anchor="end">10,000</text>
+          <line x1="90" y1="158.0" x2="1250" y2="158.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="162.8" font-size="15" fill="#999" text-anchor="end">20,000</text>
+          <line x1="90" y1="96.0" x2="1250" y2="96.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="100.8" font-size="15" fill="#999" text-anchor="end">30,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">40,000</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#eb6834" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,215.7 131.4,218.3 172.9,221.0 214.3,227.2 255.7,195.3 297.1,216.2 380.0,213.8 545.7,186.2 670.0,173.9 711.4,142.8 752.9,80.7 794.3,54.8 835.7,62.3 877.1,62.9 960.0,90.1 1001.4,112.5 1042.9,123.0 1084.3,64.5 1125.7,97.4 1167.1,139.4 1250.0,163.7"/>
+          <text x="794.3" y="41.8" font-size="15" font-weight="700" fill="#444" text-anchor="middle">36,639원</text>
+          <text x="214.3" y="214.2" font-size="15" font-weight="700" fill="#444" text-anchor="middle">8,846원</text>
+          <text x="1243.0" y="150.7" font-size="15" font-weight="700" fill="#444" text-anchor="end">19,086원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="토마토 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">0</text>
+          <line x1="78" y1="184.5" x2="616" y2="184.5" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="188.7" font-size="13" fill="#999" text-anchor="end">10,000</text>
+          <line x1="78" y1="133.0" x2="616" y2="133.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="137.2" font-size="13" fill="#999" text-anchor="end">20,000</text>
+          <line x1="78" y1="81.5" x2="616" y2="81.5" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="85.7" font-size="13" fill="#999" text-anchor="end">30,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">40,000</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#eb6834" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,181.0 97.2,183.1 116.4,185.3 135.6,190.4 154.9,164.0 174.1,181.3 212.5,179.3 289.4,156.4 347.0,146.2 366.2,120.4 385.4,68.8 404.6,47.3 423.9,53.5 443.1,54.0 481.5,76.6 500.7,95.2 519.9,103.9 539.1,55.4 558.4,82.7 577.6,117.6 616.0,137.7"/>
+          <text x="404.6" y="36.3" font-size="13" font-weight="700" fill="#444" text-anchor="middle">36,639원</text>
+          <text x="135.6" y="179.4" font-size="13" font-weight="700" fill="#444" text-anchor="middle">8,846원</text>
+          <text x="609.0" y="126.7" font-size="13" font-weight="700" fill="#444" text-anchor="end">19,086원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-2">
+      <div class="tab-sub">방울토마토 · 5kg 상자 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="방울토마토 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">10,000</text>
+          <line x1="90" y1="220.0" x2="1250" y2="220.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="224.8" font-size="15" fill="#999" text-anchor="end">20,000</text>
+          <line x1="90" y1="158.0" x2="1250" y2="158.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="162.8" font-size="15" fill="#999" text-anchor="end">30,000</text>
+          <line x1="90" y1="96.0" x2="1250" y2="96.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="100.8" font-size="15" fill="#999" text-anchor="end">40,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">50,000</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#1baf7a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,261.2 131.4,279.0 172.9,262.4 214.3,248.9 255.7,227.5 297.1,220.0 380.0,225.3 545.7,246.0 670.0,247.9 711.4,248.7 752.9,217.2 794.3,153.2 835.7,86.1 877.1,90.9 960.0,96.1 1001.4,131.3 1042.9,150.8 1084.3,171.3 1125.7,186.9 1167.1,175.2 1250.0,221.8"/>
+          <text x="835.7" y="73.1" font-size="15" font-weight="700" fill="#444" text-anchor="middle">41,589원</text>
+          <text x="131.4" y="266.0" font-size="15" font-weight="700" fill="#444" text-anchor="middle">10,483원</text>
+          <text x="1243.0" y="208.8" font-size="15" font-weight="700" fill="#444" text-anchor="end">19,713원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="방울토마토 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">10,000</text>
+          <line x1="78" y1="184.5" x2="616" y2="184.5" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="188.7" font-size="13" fill="#999" text-anchor="end">20,000</text>
+          <line x1="78" y1="133.0" x2="616" y2="133.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="137.2" font-size="13" fill="#999" text-anchor="end">30,000</text>
+          <line x1="78" y1="81.5" x2="616" y2="81.5" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="85.7" font-size="13" fill="#999" text-anchor="end">40,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">50,000</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#1baf7a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,218.7 97.2,233.5 116.4,219.7 135.6,208.5 154.9,190.7 174.1,184.5 212.5,188.9 289.4,206.1 347.0,207.6 366.2,208.4 385.4,182.2 404.6,129.0 423.9,73.3 443.1,77.3 481.5,81.6 500.7,110.8 519.9,127.0 539.1,144.0 558.4,157.0 577.6,147.3 616.0,186.0"/>
+          <text x="423.9" y="62.3" font-size="13" font-weight="700" fill="#444" text-anchor="middle">41,589원</text>
+          <text x="118.0" y="222.5" font-size="13" font-weight="700" fill="#444" text-anchor="middle">10,483원</text>
+          <text x="609.0" y="175.0" font-size="13" font-weight="700" fill="#444" text-anchor="end">19,713원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-3">
+      <div class="tab-sub">파프리카(빨강) · 5kg 상자 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="파프리카 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">0</text>
+          <line x1="90" y1="240.7" x2="1250" y2="240.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="245.5" font-size="15" fill="#999" text-anchor="end">10,000</text>
+          <line x1="90" y1="199.3" x2="1250" y2="199.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="204.1" font-size="15" fill="#999" text-anchor="end">20,000</text>
+          <line x1="90" y1="158.0" x2="1250" y2="158.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="162.8" font-size="15" fill="#999" text-anchor="end">30,000</text>
+          <line x1="90" y1="116.7" x2="1250" y2="116.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="121.5" font-size="15" fill="#999" text-anchor="end">40,000</text>
+          <line x1="90" y1="75.3" x2="1250" y2="75.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="80.1" font-size="15" fill="#999" text-anchor="end">50,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">60,000</text>
+          <text x="131.4" y="308" font-size="15" fill="#999" text-anchor="middle">8/4</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#eda100" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="131.4,246.7 172.9,244.9 214.3,243.8 255.7,235.6 297.1,207.1 380.0,187.2 545.7,196.8 670.0,207.0 711.4,207.3 752.9,209.1 794.3,211.6 835.7,203.5 877.1,190.8 960.0,170.3 1001.4,157.4 1042.9,105.9 1084.3,98.9 1125.7,120.9 1167.1,79.0 1250.0,70.6"/>
+          <text x="131.4" y="233.7" font-size="15" font-weight="700" fill="#444" text-anchor="middle">8,550원</text>
+          <text x="1243.0" y="57.6" font-size="15" font-weight="700" fill="#444" text-anchor="end">51,149원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="파프리카 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">0</text>
+          <line x1="78" y1="201.7" x2="616" y2="201.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="205.9" font-size="13" fill="#999" text-anchor="end">10,000</text>
+          <line x1="78" y1="167.3" x2="616" y2="167.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="171.5" font-size="13" fill="#999" text-anchor="end">20,000</text>
+          <line x1="78" y1="133.0" x2="616" y2="133.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="137.2" font-size="13" fill="#999" text-anchor="end">30,000</text>
+          <line x1="78" y1="98.7" x2="616" y2="98.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="102.9" font-size="13" fill="#999" text-anchor="end">40,000</text>
+          <line x1="78" y1="64.3" x2="616" y2="64.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="68.5" font-size="13" fill="#999" text-anchor="end">50,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">60,000</text>
+          <text x="97.2" y="260" font-size="14" fill="#999" text-anchor="middle">8/4</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#eda100" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="97.2,206.6 116.4,205.1 135.6,204.2 154.9,197.5 174.1,173.8 212.5,157.3 289.4,165.2 347.0,173.7 366.2,174.0 385.4,175.4 404.6,177.5 423.9,170.8 443.1,160.2 481.5,143.2 500.7,132.5 519.9,89.7 539.1,83.9 558.4,102.2 577.6,67.3 616.0,60.4"/>
+          <text x="118.0" y="195.6" font-size="13" font-weight="700" fill="#444" text-anchor="middle">8,550원</text>
+          <text x="609.0" y="49.4" font-size="13" font-weight="700" fill="#444" text-anchor="end">51,149원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-4">
+      <div class="tab-sub">애호박 · 20개 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="애호박 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">10,000</text>
+          <line x1="90" y1="220.0" x2="1250" y2="220.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="224.8" font-size="15" fill="#999" text-anchor="end">20,000</text>
+          <line x1="90" y1="158.0" x2="1250" y2="158.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="162.8" font-size="15" fill="#999" text-anchor="end">30,000</text>
+          <line x1="90" y1="96.0" x2="1250" y2="96.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="100.8" font-size="15" fill="#999" text-anchor="end">40,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">50,000</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#e87ba4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,216.8 131.4,214.0 172.9,219.2 214.3,226.3 255.7,221.7 297.1,223.2 380.0,232.1 545.7,251.1 670.0,252.5 711.4,260.5 752.9,259.4 794.3,254.3 835.7,251.4 877.1,247.8 960.0,220.0 1001.4,163.3 1042.9,118.6 1084.3,133.7 1125.7,130.3 1167.1,97.1 1250.0,52.6"/>
+          <text x="711.4" y="247.5" font-size="15" font-weight="700" fill="#444" text-anchor="middle">13,473원</text>
+          <text x="1243.0" y="39.6" font-size="15" font-weight="700" fill="#444" text-anchor="end">47,007원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="애호박 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">10,000</text>
+          <line x1="78" y1="184.5" x2="616" y2="184.5" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="188.7" font-size="13" fill="#999" text-anchor="end">20,000</text>
+          <line x1="78" y1="133.0" x2="616" y2="133.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="137.2" font-size="13" fill="#999" text-anchor="end">30,000</text>
+          <line x1="78" y1="81.5" x2="616" y2="81.5" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="85.7" font-size="13" fill="#999" text-anchor="end">40,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">50,000</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#e87ba4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,181.9 97.2,179.5 116.4,183.9 135.6,189.7 154.9,185.9 174.1,187.1 212.5,194.6 289.4,210.3 347.0,211.5 366.2,218.1 385.4,217.2 404.6,213.0 423.9,210.6 443.1,207.6 481.5,184.5 500.7,137.4 519.9,100.3 539.1,112.8 558.4,110.0 577.6,82.4 616.0,45.4"/>
+          <text x="366.2" y="207.1" font-size="13" font-weight="700" fill="#444" text-anchor="middle">13,473원</text>
+          <text x="609.0" y="34.4" font-size="13" font-weight="700" fill="#444" text-anchor="end">47,007원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-5">
+      <div class="tab-sub">풋고추(일반) · 10kg 상자 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="풋고추 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">30,000</text>
+          <line x1="90" y1="240.7" x2="1250" y2="240.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="245.5" font-size="15" fill="#999" text-anchor="end">40,000</text>
+          <line x1="90" y1="199.3" x2="1250" y2="199.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="204.1" font-size="15" fill="#999" text-anchor="end">50,000</text>
+          <line x1="90" y1="158.0" x2="1250" y2="158.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="162.8" font-size="15" fill="#999" text-anchor="end">60,000</text>
+          <line x1="90" y1="116.7" x2="1250" y2="116.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="121.5" font-size="15" fill="#999" text-anchor="end">70,000</text>
+          <line x1="90" y1="75.3" x2="1250" y2="75.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="80.1" font-size="15" fill="#999" text-anchor="end">80,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">90,000</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#008300" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,160.6 131.4,168.0 172.9,147.3 214.3,121.5 255.7,111.3 297.1,165.3 380.0,140.2 545.7,120.0 670.0,120.3 711.4,36.4 752.9,79.1 794.3,83.6 835.7,167.6 877.1,236.7 960.0,212.4 1001.4,255.2 1042.9,211.8 1084.3,205.0 1125.7,156.7 1167.1,226.3 1250.0,194.0"/>
+          <text x="711.4" y="23.4" font-size="15" font-weight="700" fill="#444" text-anchor="middle">89,427원</text>
+          <text x="1001.4" y="242.2" font-size="15" font-weight="700" fill="#444" text-anchor="middle">36,483원</text>
+          <text x="1243.0" y="181.0" font-size="15" font-weight="700" fill="#444" text-anchor="end">51,294원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="풋고추 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">30,000</text>
+          <line x1="78" y1="201.7" x2="616" y2="201.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="205.9" font-size="13" fill="#999" text-anchor="end">40,000</text>
+          <line x1="78" y1="167.3" x2="616" y2="167.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="171.5" font-size="13" fill="#999" text-anchor="end">50,000</text>
+          <line x1="78" y1="133.0" x2="616" y2="133.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="137.2" font-size="13" fill="#999" text-anchor="end">60,000</text>
+          <line x1="78" y1="98.7" x2="616" y2="98.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="102.9" font-size="13" fill="#999" text-anchor="end">70,000</text>
+          <line x1="78" y1="64.3" x2="616" y2="64.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="68.5" font-size="13" fill="#999" text-anchor="end">80,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">90,000</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#008300" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,135.2 97.2,141.3 116.4,124.1 135.6,102.7 154.9,94.2 174.1,139.1 212.5,118.3 289.4,101.4 347.0,101.7 366.2,32.0 385.4,67.5 404.6,71.2 423.9,141.0 443.1,198.4 481.5,178.2 500.7,213.7 519.9,177.7 539.1,172.0 558.4,131.9 577.6,189.7 616.0,162.9"/>
+          <text x="366.2" y="21.0" font-size="13" font-weight="700" fill="#444" text-anchor="middle">89,427원</text>
+          <text x="500.7" y="202.7" font-size="13" font-weight="700" fill="#444" text-anchor="middle">36,483원</text>
+          <text x="609.0" y="151.9" font-size="13" font-weight="700" fill="#444" text-anchor="end">51,294원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-6">
+      <div class="tab-sub">상추 · 4kg 상자 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="상추 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">20,000</text>
+          <line x1="90" y1="232.4" x2="1250" y2="232.4" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="237.2" font-size="15" fill="#999" text-anchor="end">30,000</text>
+          <line x1="90" y1="182.8" x2="1250" y2="182.8" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="187.6" font-size="15" fill="#999" text-anchor="end">40,000</text>
+          <line x1="90" y1="133.2" x2="1250" y2="133.2" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="138.0" font-size="15" fill="#999" text-anchor="end">50,000</text>
+          <line x1="90" y1="83.6" x2="1250" y2="83.6" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="88.4" font-size="15" fill="#999" text-anchor="end">60,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">70,000</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#4a3aa7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,216.3 131.4,224.1 172.9,253.9 214.3,237.9 255.7,218.0 297.1,175.3 380.0,175.3 545.7,185.3 670.0,197.7 711.4,227.2 752.9,262.5 794.3,250.6 835.7,237.2 877.1,237.5 960.0,236.7 1001.4,222.2 1042.9,212.2 1084.3,180.0 1125.7,127.7 1167.1,63.1 1250.0,111.4"/>
+          <text x="1167.1" y="50.1" font-size="15" font-weight="700" fill="#444" text-anchor="middle">64,132원</text>
+          <text x="752.9" y="249.5" font-size="15" font-weight="700" fill="#444" text-anchor="middle">23,933원</text>
+          <text x="1243.0" y="98.4" font-size="15" font-weight="700" fill="#444" text-anchor="end">54,395원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="상추 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">20,000</text>
+          <line x1="78" y1="194.8" x2="616" y2="194.8" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="199.0" font-size="13" fill="#999" text-anchor="end">30,000</text>
+          <line x1="78" y1="153.6" x2="616" y2="153.6" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="157.8" font-size="13" fill="#999" text-anchor="end">40,000</text>
+          <line x1="78" y1="112.4" x2="616" y2="112.4" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="116.6" font-size="13" fill="#999" text-anchor="end">50,000</text>
+          <line x1="78" y1="71.2" x2="616" y2="71.2" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="75.4" font-size="13" fill="#999" text-anchor="end">60,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">70,000</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#4a3aa7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,181.4 97.2,187.9 116.4,212.7 135.6,199.4 154.9,182.8 174.1,147.3 212.5,147.3 289.4,155.7 347.0,166.0 366.2,190.5 385.4,219.8 404.6,209.9 423.9,198.8 443.1,199.0 481.5,198.3 500.7,186.3 519.9,178.1 539.1,151.2 558.4,107.8 577.6,54.2 616.0,94.3"/>
+          <text x="576.0" y="43.2" font-size="13" font-weight="700" fill="#444" text-anchor="middle">64,132원</text>
+          <text x="385.4" y="208.8" font-size="13" font-weight="700" fill="#444" text-anchor="middle">23,933원</text>
+          <text x="609.0" y="83.3" font-size="13" font-weight="700" fill="#444" text-anchor="end">54,395원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-7">
+      <div class="tab-sub">배추 · 10kg 망대 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="배추 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">8,000</text>
+          <line x1="90" y1="240.7" x2="1250" y2="240.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="245.5" font-size="15" fill="#999" text-anchor="end">9,000</text>
+          <line x1="90" y1="199.3" x2="1250" y2="199.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="204.1" font-size="15" fill="#999" text-anchor="end">10,000</text>
+          <line x1="90" y1="158.0" x2="1250" y2="158.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="162.8" font-size="15" fill="#999" text-anchor="end">11,000</text>
+          <line x1="90" y1="116.7" x2="1250" y2="116.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="121.5" font-size="15" fill="#999" text-anchor="end">12,000</text>
+          <line x1="90" y1="75.3" x2="1250" y2="75.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="80.1" font-size="15" fill="#999" text-anchor="end">13,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">14,000</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#e34948" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,208.1 131.4,276.0 172.9,276.3 214.3,177.9 255.7,171.5 297.1,148.5 380.0,47.4 545.7,155.1 670.0,224.5 711.4,165.3 752.9,132.7 794.3,164.4 835.7,187.1 877.1,262.0 960.0,157.0 1001.4,254.5 1042.9,265.6 1084.3,190.3 1125.7,192.0 1167.1,46.4 1250.0,80.6"/>
+          <text x="1167.1" y="33.4" font-size="15" font-weight="700" fill="#444" text-anchor="middle">13,699원</text>
+          <text x="172.9" y="263.3" font-size="15" font-weight="700" fill="#444" text-anchor="middle">8,137원</text>
+          <text x="1243.0" y="67.6" font-size="15" font-weight="700" fill="#444" text-anchor="end">12,873원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="배추 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">8,000</text>
+          <line x1="78" y1="201.7" x2="616" y2="201.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="205.9" font-size="13" fill="#999" text-anchor="end">9,000</text>
+          <line x1="78" y1="167.3" x2="616" y2="167.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="171.5" font-size="13" fill="#999" text-anchor="end">10,000</text>
+          <line x1="78" y1="133.0" x2="616" y2="133.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="137.2" font-size="13" fill="#999" text-anchor="end">11,000</text>
+          <line x1="78" y1="98.7" x2="616" y2="98.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="102.9" font-size="13" fill="#999" text-anchor="end">12,000</text>
+          <line x1="78" y1="64.3" x2="616" y2="64.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="68.5" font-size="13" fill="#999" text-anchor="end">13,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">14,000</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#e34948" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,174.6 97.2,231.0 116.4,231.3 135.6,149.5 154.9,144.2 174.1,125.1 212.5,41.2 289.4,130.6 347.0,188.2 366.2,139.0 385.4,112.0 404.6,138.3 423.9,157.2 443.1,219.4 481.5,132.2 500.7,213.2 519.9,222.4 539.1,159.8 558.4,161.3 577.6,40.3 616.0,68.7"/>
+          <text x="576.0" y="29.3" font-size="13" font-weight="700" fill="#444" text-anchor="middle">13,699원</text>
+          <text x="118.0" y="220.3" font-size="13" font-weight="700" fill="#444" text-anchor="middle">8,137원</text>
+          <text x="609.0" y="57.7" font-size="13" font-weight="700" fill="#444" text-anchor="end">12,873원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-8">
+      <div class="tab-sub">무 · 20kg 상자 · 가락시장 상품 등급</div>
+      <svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="무 가격 변동 추이">
+          <line x1="90" y1="282.0" x2="1250" y2="282.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="286.8" font-size="15" fill="#999" text-anchor="end">10,000</text>
+          <line x1="90" y1="199.3" x2="1250" y2="199.3" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="204.1" font-size="15" fill="#999" text-anchor="end">12,500</text>
+          <line x1="90" y1="116.7" x2="1250" y2="116.7" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="121.5" font-size="15" fill="#999" text-anchor="end">15,000</text>
+          <line x1="90" y1="34.0" x2="1250" y2="34.0" stroke="#ececec" stroke-width="1"/>
+          <text x="80" y="38.8" font-size="15" fill="#999" text-anchor="end">17,500</text>
+          <text x="90.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/3</text>
+          <text x="380.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/10</text>
+          <text x="877.1" y="308" font-size="15" fill="#999" text-anchor="middle">8/22</text>
+          <text x="1250.0" y="308" font-size="15" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#52514e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="90.0,274.4 131.4,276.8 172.9,272.6 214.3,199.7 255.7,148.6 297.1,63.4 380.0,59.8 545.7,126.1 670.0,73.5 711.4,156.1 752.9,132.7 794.3,161.3 835.7,144.8 877.1,114.3 960.0,129.4 1001.4,193.6 1042.9,171.7 1084.3,197.4 1125.7,77.1 1167.1,102.5 1250.0,97.7"/>
+          <text x="380.0" y="46.8" font-size="15" font-weight="700" fill="#444" text-anchor="middle">16,720원</text>
+          <text x="131.4" y="263.8" font-size="15" font-weight="700" fill="#444" text-anchor="middle">10,158원</text>
+          <text x="1243.0" y="84.7" font-size="15" font-weight="700" fill="#444" text-anchor="end">15,574원</text>
+        </svg>
+      <svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="무 가격 변동 추이">
+          <line x1="78" y1="236.0" x2="616" y2="236.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="240.2" font-size="13" fill="#999" text-anchor="end">10,000</text>
+          <line x1="78" y1="167.3" x2="616" y2="167.3" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="171.5" font-size="13" fill="#999" text-anchor="end">12,500</text>
+          <line x1="78" y1="98.7" x2="616" y2="98.7" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="102.9" font-size="13" fill="#999" text-anchor="end">15,000</text>
+          <line x1="78" y1="30.0" x2="616" y2="30.0" stroke="#ececec" stroke-width="1"/>
+          <text x="69" y="34.2" font-size="13" fill="#999" text-anchor="end">17,500</text>
+          <text x="78.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/3</text>
+          <text x="212.5" y="260" font-size="14" fill="#999" text-anchor="middle">8/10</text>
+          <text x="443.1" y="260" font-size="14" fill="#999" text-anchor="middle">8/22</text>
+          <text x="616.0" y="260" font-size="14" fill="#999" text-anchor="middle">8/31</text>
+          <polyline fill="none" stroke="#52514e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="78.0,229.7 97.2,231.7 116.4,228.2 135.6,167.6 154.9,125.2 174.1,54.4 212.5,51.4 289.4,106.5 347.0,62.8 366.2,131.5 385.4,112.0 404.6,135.7 423.9,122.0 443.1,96.7 481.5,109.2 500.7,162.6 519.9,144.4 539.1,165.7 558.4,65.8 577.6,86.9 616.0,82.9"/>
+          <text x="212.5" y="40.4" font-size="13" font-weight="700" fill="#444" text-anchor="middle">16,720원</text>
+          <text x="118.0" y="220.7" font-size="13" font-weight="700" fill="#444" text-anchor="middle">10,158원</text>
+          <text x="609.0" y="71.9" font-size="13" font-weight="700" fill="#444" text-anchor="end">15,574원</text>
+        </svg>
+      <div class="trend-note">시세 이력이 매일 누적되면서 그래프가 길어집니다.</div>
+    </div>
+    <script>
+      function showTrendTab(i) {
+        var btns = document.querySelectorAll('.trend-tabs .tab-btn');
+        var panels = document.querySelectorAll('.tab-panel');
+        for (var k = 0; k < btns.length; k++) {
+          btns[k].className = 'tab-btn' + (k === i ? ' active' : '');
+          panels[k].className = 'tab-panel' + (k === i ? ' active' : '');
+        }
+        if (typeof postHeight === 'function') { postHeight(); }
+      }
+    </script>
+  </div>
+  <div class="src">가격 기준일 2026년 8월 31일(월) 가락시장 경락가격 · 상품(상) 등급 · 등락은 직전 개장일인 8월 29일(토) 대비 · 상 등급 전체 157개 품목 시세는 이력에 누적 중 · 오늘 경락가가 공개되는 대로 갱신됩니다.</div>
+</div>
+<div class="card">
+  <h2>📰 오늘의 농업 뉴스</h2>
+  <ul>
+    <li><a href="https://www.khan.co.kr/article/202608310834001/" target="_blank" rel="noopener"><strong>[전북]</strong> 최고 264mm 폭우…시설 피해 96건</a> — 경향신문</li>
+    <li><a href="https://www.newscj.com/news/articleView.html?idxno=3429098" target="_blank" rel="noopener">영호남·충청 폭우 피해 속출…1명 사망·1명 실종</a> — 천지일보</li>
+    <li><a href="https://www.korea.kr/news/policyNewsView.do?newsId=148949765" target="_blank" rel="noopener">8월 호우 피해 복구에 869억 원 투입…침수주택 복구비 두 배로</a> — 대한민국 정책브리핑</li>
+    <li><a href="https://www.dailybizon.com/news/articleView.html?idxno=70142" target="_blank" rel="noopener"><strong>[전남 고흥]</strong> 벼멸구 등 벼 병해충 적기방제 당부</a> — 데일리비즈온</li>
+    <li><a href="https://www.mt.co.kr/economy/2026/08/19/2026081919025363107" target="_blank" rel="noopener">폭염에 농작물 3317ha 피해…농식품부 "추석 수급 차질 없도록 선제 대응"</a> — 머니투데이</li>
+    <li><a href="https://www.korea.kr/news/policyNewsView.do?newsId=148943020" target="_blank" rel="noopener">스마트팜 농장, 진짜 이렇게 바뀐다고?!…정부가 그리는 스마트농업 청사진</a> — 대한민국 정책브리핑</li>
+  </ul>
+</div>
+<div class="card">
+  <h2>📋 지원사업·공고</h2>
+  <ul>
+    <li><a href="https://www.hankyung.com/article/2026082647961" target="_blank" rel="noopener"><strong>[경남]</strong> 폭염·가뭄 농작물 피해 신고 접수(일소·열과·시듦·고사 등)</a> — 경상남도, 농지 소재지 읍면동 행정복지센터 · <strong>9월 7일(월)까지, 마감 임박</strong></li>
+    <li><a href="https://www.mjjnews.net/news/article.html?no=58571" target="_blank" rel="noopener"><strong>[전북 진안]</strong> 벼멸구 방제 약제 교환권 지급</a> — 진안군 · 9월 18일(금)까지 사용</li>
+  </ul>
+</div>
+<div class="card">
+  <h2>📅 지난 소식 보기</h2>
+  <div id="cal" data-current="2026-09-01"></div>
+</div>
+<script src="/farmily-daily/cal.js"></script>
+<p class="footer-note">본 정보는 스마트팜 농업로봇 기업 <a href="https://farmily.ai" target="_blank" rel="noopener">FARMILY(파밀리)</a>가 매일 아침 전합니다. 무인 방제로봇 <a href="https://farmily.ai/FARMILY-XS300" target="_blank" rel="noopener">FARMILY-X S300</a>, UV 방제로봇 <a href="https://farmily.ai/FARMILY-XUV" target="_blank" rel="noopener">FARMILY-X UV</a> 등 자율주행 기반 방제 자동화 솔루션은 <a href="https://farmily.ai/product" target="_blank" rel="noopener">FARMILY 제품 페이지</a>에서 확인하세요.</p>
+<script>
+  function postHeight() {
+    if (window.parent !== window) {
+      window.parent.postMessage({ farmilyHeight: document.body.scrollHeight }, '*');
+    }
+  }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+  setTimeout(postHeight, 500);
+</script>
+</body>
+</html>
