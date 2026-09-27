@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 농업 소식 | FARMILY 파밀리 — 스마트팜 · 농업로봇 · 무인 방제</title>
+<meta name="description" content="연휴 끝 월요일, 수도권·서해안 새벽 비에 내륙 일교차 15도 안팎입니다. 30일 비 뒤 찬 공기가 내려오니 방제는 오늘·내일에 끝내고 보온 자재를 점검하세요.">
+<meta name="keywords" content="스마트팜, 농업, 농업 뉴스, 농업로봇, 방제기, 방제 자동화, 무인방제기, 방제로봇, UV, UV로봇, UV 방제, 수확, 수확로봇, 자율주행, 로봇팔, AMR, 온실 자동화, 시설원예, 병해충 방제, 농산물 시세, 농업 날씨, FARMILY, 파밀리, 랑데뷰">
+<meta property="og:site_name" content="FARMILY 오늘의 농업 소식">
+<meta property="og:title" content="오늘의 농업 소식 (9월 28일) — 날씨 · 농산물 시세 · 농업 뉴스">
+<meta property="og:description" content="연휴 끝 월요일, 수도권·서해안 새벽 비에 내륙 일교차 15도 안팎입니다. 30일 비 뒤 찬 공기가 내려오니 방제는 오늘·내일에 끝내고 보온 자재를 점검하세요.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://juhong-rdv.github.io/farmily-daily/">
+<meta property="og:locale" content="ko_KR">
+<link rel="canonical" href="https://juhong-rdv.github.io/farmily-daily/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"오늘의 농업 소식","description":"농업 날씨, 병해충 발생 정보, 농산물 시세, 농업 뉴스를 매일 아침 제공하는 페이지","dateModified":"2026-09-28","inLanguage":"ko","publisher":{"@type":"Organization","name":"FARMILY (주식회사 랑데뷰)","url":"https://farmily.ai","description":"스마트팜 자동화 로봇 기업 — 무인 방제로봇 FARMILY-X S300, UV 방제로봇 FARMILY-X UV 등 자율주행 기반 농업로봇 개발"}}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #222; line-height: 1.75; margin: 0; padding: 4px; background: transparent; }
+  .page-head { padding: 6px 8px 18px; }
+  .page-head h1 { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
+  .page-head .date { font-size: 15px; color: #888; }
+  .lead { background: #f7f9f7; border-left: 4px solid #12341f; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px; font-size: 16px; line-height: 1.8; color: #333; }
+  .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 28px 32px; margin-bottom: 20px; }
+  .card h2 { font-size: 20px; font-weight: 700; margin: 0 0 14px; }
+  .card p { margin: 0 0 14px; }
+  .subhead { font-weight: 700; margin-bottom: 8px; }
+  ul { margin: 0 0 14px; padding-left: 20px; }
+  li { margin-bottom: 8px; }
+  .alert { background: #fff8e1; border-radius: 8px; padding: 12px 16px; font-size: 15px; }
+  .tip { background: #f0f7f2; border-radius: 8px; padding: 14px 16px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 8px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #eee; text-align: left; }
+  th { color: #666; font-weight: 700; background: #fafafa; }
+  .up { color: #d32f2f; }
+  .down { color: #1a56db; }
+  .src { font-size: 13px; color: #999; }
+  .chart { margin: 24px 0 16px; }
+  .chart-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .chart-axis-label { display: flex; align-items: center; font-size: 12px; color: #888; margin-bottom: 8px; }
+  .chart-axis-label .cname { color: #888; }
+  .chart-axis-label .cside.left { justify-content: flex-start; }
+  .chart-axis-label .cside.right { justify-content: flex-end; }
+  .crow { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
+  .cname { width: 76px; flex-shrink: 0; text-align: right; color: #555; padding-right: 8px; }
+  .cside { flex: 1 1 0; display: flex; align-items: center; min-width: 0; }
+  .cside.left { justify-content: flex-end; }
+  .cside.right { justify-content: flex-start; }
+  .caxis { width: 2px; height: 20px; background: #bbb; flex-shrink: 0; }
+  .cbar { height: 14px; min-width: 3px; display: block; }
+  .cbar.up-bg { background: #ef5350; border-radius: 0 4px 4px 0; }
+  .cbar.down-bg { background: #42a5f5; border-radius: 4px 0 0 4px; }
+  .cval { width: 62px; flex-shrink: 0; text-align: right; font-weight: 700; font-size: 13px; white-space: nowrap; }
+  .trend { margin: 30px 0 16px; }
+  .trend svg { width: 100%; height: auto; display: block; }
+  .trend svg.svg-m { display: none; }
+  @media (max-width: 700px) { .trend svg.svg-d { display: none; } .trend svg.svg-m { display: block; } }
+  .trend-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
+  .tab-btn { border: 1px solid #ddd; background: #fafafa; color: #555; border-radius: 16px; padding: 4px 12px; font-size: 13px; cursor: pointer; font-family: inherit; line-height: 1.5; }
+  .tab-btn.active { background: #12341f; color: #fff; border-color: #12341f; font-weight: 700; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .tab-sub { font-size: 13px; color: #888; margin-bottom: 6px; }
+  .trend-note { font-size: 12px; color: #999; margin-top: 6px; line-height: 1.6; }
+  .footer-note { font-size: 14px; color: #777; padding: 4px 8px 12px; }
+  a { color: #1a56db; }
+  @media (max-width: 600px) { .card { padding: 20px 18px; } }
+</style>
+</head>
+<body>
+<div class="page-head">
+  <h1>오늘의 농업 소식 (9월 28일 월)</h1>
+  <div class="date">업데이트: 2026.09.28 06:42 · FARMILY AI 제공</div>
+</div>
+<div class="lead">🌥 추석 연휴를 지나 다시 일터로 돌아오는 월요일입니다. 오늘은 전국이 구름 많고 <strong>[수도권]</strong>·<strong>[서해안]</strong>을 중심으로 새벽에 약한 비가 지나며, 아침은 선선하지만 낮 최고기온이 29도까지 올라 <strong>[내륙]</strong> 일교차가 15도 안팎으로 벌어집니다. 이번 주는 중간중간 비가 끼었다가 30일(수) 비가 지난 뒤 북쪽 찬 공기가 내려오는 흐름이라, 연휴 동안 밀린 예찰과 방제를 오늘부터 이틀 안에 앞당겨 끝내 두시고 하우스 보온 커튼·부직포 점검을 이번 주 일정에 함께 넣어 두시는 것이 좋습니다. 9월도 사흘 남았습니다. 이달은 비와 폭염이 번갈아 오면서 곰팡이병과 일소(햇볕 데임)가 많았고 시세는 추석 선취매 뒤 되밀린 채 달을 마감하는데, 10월은 아침 기온이 한 자릿수까지 떨어지며 보온·김장채소 관리가 중심이 됩니다.</div>
+<div class="card">
+  <h2>🌤 오늘의 농업 날씨</h2>
+  <p>연휴가 끝난 오늘(28일 월)은 전국이 구름 많은 하늘을 보이겠습니다. <strong>[수도권]</strong>과 <strong>[인천·경기 서해안]</strong>을 중심으로 새벽부터 아침 사이 약한 비가 지나가고, 그 밖의 지역에서도 곳에 따라 빗방울이 떨어지는 곳이 있겠습니다. 양이 많지 않은 비여서 관수를 대신할 정도는 아니니, 비가 왔다고 오늘 물 주기를 건너뛰지는 마시기 바랍니다.</p>
+  <p>아침은 선선하고 낮 최고기온은 29도까지 올라 <strong>[내륙]</strong>을 중심으로 일교차가 15도 안팎까지 벌어집니다. 현재 전국에 발효 중인 기상특보는 없지만, 큰 일교차 자체가 이 시기 농작물과 가축에 가장 부담이 되는 조건입니다. 아침에 물기가 남은 잎이 낮에 급하게 더워지면 병이 들어오기 쉽고, 새벽에는 <strong>[내륙]</strong>과 강 주변에 안개가 끼기 쉽습니다.</p>
+  <div class="subhead">이번 주 전망</div>
+  <p>이번 주는 주중에도 비 소식이 이어지다가 30일(수)에 <strong>[수도권]</strong>과 <strong>[강원영서]</strong>를 중심으로 비가 지날 것으로 예보됐습니다. 이 비를 기점으로 북쪽에서 찬 공기가 내려오면서 낮 더위가 물러나고, 10월 초에는 전국 아침 기온이 한 자릿수까지 떨어지는 곳이 있겠습니다. 한 주 사이 아침 기온이 크게 내려가는 흐름이니, 방제는 비가 오기 전인 오늘과 내일에 몰아서 끝내고 보온 준비는 이번 주 안에 마쳐 두시는 편이 안전합니다.</p>
+  <div class="subhead">농작업 포인트</div>
+  <ul>
+    <li><strong>온실·시설 관리 &mdash; 아침 결로부터 걷어내기:</strong> 새벽에 비가 지나고 낮 기온이 29도까지 오르는 오늘은 하우스 안이 종일 축축해지기 쉽습니다. 아침에 하우스에 들어가시면 먼저 <strong>측창과 천창을 조금 열어 습한 공기를 빼내</strong> 주세요. 문을 닫아 둔 채 온도만 올리면 비닐 안쪽 물방울(결로)이 잎으로 떨어져 곰팡이병이 퍼지는 길이 됩니다. 낮에는 하우스 안이 35도를 넘길 수 있으니 환기를 넉넉히 하시되, 일교차가 큰 만큼 <strong>오후 4~5시에는 창을 닫아</strong> 밤사이 온도가 급하게 떨어지지 않게 해 주시기 바랍니다.</li>
+    <li><strong>관수는 오전에 끝내기:</strong> 새벽 비는 땅 표면만 적시는 정도여서 작물이 쓸 물로는 부족합니다. 흙에 손가락을 3~4cm 찔러 보아 속이 말라 있으면 예정대로 물을 주시고, 시간은 <strong>오전 9시~11시</strong>로 앞당겨 끝내 주세요. 오후 늦게 주면 젖은 흙에서 올라온 수증기가 밤에 결로로 바뀌어 병을 부릅니다.</li>
+    <li><strong>연휴 동안 밀린 방제·예찰을 오늘·내일에 몰아서:</strong> 나흘간 손을 대지 못한 하우스라면 병해충이 이미 늘어 있을 수 있습니다. 노란 끈끈이 트랩의 가루이·총채벌레 마릿수, 아래 잎의 노란 반점과 잿빛 곰팡이를 먼저 확인하시고 방제 순서를 정해 주세요. 30일(수) 비가 예보돼 있으니 약액 살포는 <strong>비 오기 전인 오늘과 내일</strong>에 끝내는 것이 약효를 지키는 방법입니다.</li>
+    <li><strong>노지·과수 &mdash; 잎이 마른 뒤 작업하고 보온 자재 점검:</strong> 새벽 비에 젖은 과일과 잎을 그대로 만지면 상처로 병균이 들어갑니다. 수확과 봉지 작업은 표면이 마르는 오전 늦게 이후로 미뤄 주세요. 아울러 10월 초 아침 기온이 한 자릿수까지 떨어질 전망이므로, 부직포와 보온 커튼, 난방기 상태를 이번 주 안에 미리 확인해 두시기 바랍니다.</li>
+    <li><strong>가축&middot;축사 &mdash; 낮과 새벽의 온도 차 줄이기:</strong> 낮에는 덥고 새벽에는 쌀쌀한 지금이 가축 호흡기 질병이 가장 늘기 쉬운 때입니다. 낮에 열어 둔 창과 환기팬은 저녁에 줄여 찬 바람이 가축에 바로 닿지 않게 해 주시고, 새벽 비에 젖은 깔짚은 마른 것으로 갈아 주세요. 연휴 동안 성묘나 다른 농장을 다녀오셨다면 축사에 들어가기 전 옷과 신발을 갈아입고 소독하시기 바랍니다.</li>
+  </ul>
+  <div class="alert">⚠️ <strong>오늘 특히 주의할 지역:</strong> <strong>[수도권]</strong>과 <strong>[인천·경기 서해안]</strong>은 새벽~아침 사이 비가 지나니 야외에 펴 말리던 고추·깨는 미리 거둬 두시고, <strong>[내륙]</strong>과 <strong>[강 주변]</strong>은 이른 아침 안개로 시야가 흐려질 수 있어 농기계 이동 시 전조등을 켜고 속도를 줄여 주세요. 전국적으로 일교차가 15도 안팎까지 벌어지므로, 하우스를 운영하시는 모든 지역에서 아침 환기와 저녁 창 닫기가 오늘의 기본 작업입니다.</div>
+</div>
+<div class="card">
+  <h2>🐛 병해충 발생 정보</h2>
+  <p>가을 시설채소에서 <strong>가루이류</strong> 발생이 늘어 방제에 비상이 걸렸습니다. 특히 토마토는 담배가루이가 옮기는 <strong>토마토황화잎말림바이러스(TYLCV)</strong> 피해가 문제인데, 농촌진흥청은 잎이 노랗게 변하며 위로 말려 올라가는 증상이 보이면 이 바이러스를 의심하고 매개충인 담배가루이 방제에 집중하라고 당부했습니다. 바이러스병은 한번 걸리면 약으로 고칠 수 없어, 벌레를 먼저 잡는 것이 유일한 방법입니다.</p>
+  <p>관리 요령은 세 가지입니다. 첫째, 노란 끈끈이 트랩을 하우스 안 작물 높이에 걸어 마릿수 변화를 매일 확인하세요. 둘째, 가루이는 잎 뒷면에 붙어 있으므로 약액이 잎 뒤까지 닿도록 노즐을 아래에서 위로 향해 뿌려야 합니다. 셋째, 같은 약을 계속 쓰면 벌레가 약에 견디게 되므로 계통이 다른 약제를 번갈아 쓰시고, 증상이 나타난 포기는 뽑아 봉투에 담아 하우스 밖으로 내다 버려 주세요.</p>
+  <p>노지에서는 김장용 <strong>가을배추 무름병</strong> 대비가 중요한 시기입니다. 무름병은 포기 밑동이 물러 썩으면서 고약한 냄새가 나는 병으로, 비가 온 뒤 물이 고인 밭에서 특히 잘 번집니다. 밭 가장자리 물길을 미리 터 두고, 병든 포기는 발견 즉시 뿌리째 걷어내 밭 밖으로 내보내시기 바랍니다.</p>
+</div>
+<div class="card">
+  <h2>🤖 오늘의 FARMILY-X 활용 팁</h2>
+  <div class="tip">연휴 나흘 동안 미뤄 둔 방제가 오늘 한꺼번에 몰리는 데다, 30일(수) 비 예보까지 있어 약액 살포에 쓸 수 있는 시간은 오늘과 내일뿐입니다. 하우스 동 수가 많은 농가라면 사람 손으로 순서대로 도는 데만 며칠이 걸려 그사이 가루이가 먼저 번지는 것이 매년 반복되는 문제입니다. 이럴 때 무인 방제로봇 <a href="https://farmily.ai/FARMILY-XS300" target="_blank" rel="noopener">FARMILY-X S300</a>을 사람이 맡은 고랑 반대편에서 동시에 돌리면 같은 면적을 도는 시간과 인건비를 절반 수준으로 줄일 수 있어, 이틀 안에 전체 동을 마치는 일정이 현실적으로 가능해집니다. 사람이 타지 않는 무인 로봇이라 낮에 환기·관수로 손이 바쁘실 때는 야간이나 새벽 시간대로 작업을 돌려 두는 것도 방법입니다. 오늘처럼 새벽 비로 잎이 젖어 약액을 치기 어려운 시간대에는, 물과 약액 없이 자외선으로 곰팡이를 억제하는 <a href="https://farmily.ai/FARMILY-XUV" target="_blank" rel="noopener">FARMILY-X UV</a>가 대안이 됩니다. <a href="https://farmily.ai/product" target="_blank" rel="noopener">FARMILY 제품 전체 보기</a></div>
+</div>
+<div class="card">
+  <h2>📈 오늘의 농산물 시세</h2>
+  <p>오늘 아침 기준으로 가락시장에 공개된 가장 최신 경락가는 추석 휴장 직전 마지막 채소 경매였던 <strong>9월 24일(목)</strong> 자료입니다. 아래 수치는 그 9월 24일 상품(상) 등급 경락가이며, 등락은 직전 개장일인 9월 23일(수)과 비교한 값입니다. 연휴가 끝나 경매가 재개됐으므로, 오늘 자 경락가는 오전 중에 공개될 것으로 보입니다.</p>
+  <p>연휴 전 막바지 선취매가 마무리되면서 대부분 품목이 크게 되밀린 모습입니다. 오이(백다다기) ▼59.6%, 방울토마토 ▼49.5%, 무 ▼47.8%, 애호박 ▼47.1%, 풋고추(일반) ▼45.1%가 일제히 반락했고, 파프리카(빨강) ▼20.8%·배추 ▼14.0%·상추 ▼5.4%도 내렸습니다. 토마토만 ▲17.5%로 홀로 올랐습니다.</p>
+  <p>휴장 직전 경매는 거래 물량이 얇아 값이 평소보다 크게 출렁이므로, 위 숫자를 오늘 시세의 기준으로 삼지 마시기 바랍니다. 연휴 동안 산지 출하가 멈춘 만큼 재개 직후에는 물량이 한꺼번에 몰려 값이 눌릴 수 있고, 반대로 명절 뒤 가정 수요가 살아나며 잎채소가 먼저 오르는 흐름도 자주 나타납니다. 한국농촌경제연구원은 추석 이후 농축산물 값이 전반적으로 안정세로 돌아서고 배추는 10월부터 하향 흐름을 보일 것으로 전망했으니, 출하 시점을 잡으실 때 함께 참고하시기 바랍니다.</p>
+  <table>
+    <tr><th>품목</th><th>단위</th><th>도매가격</th><th>등락</th></tr>
+    <tr><td>오이(백다다기)</td><td>50개</td><td>11,926원</td><td class="down">▼ 59.6%</td></tr>
+    <tr><td>토마토</td><td>5kg 상자</td><td>30,986원</td><td class="up">▲ 17.5%</td></tr>
+    <tr><td>방울토마토</td><td>5kg 상자</td><td>17,535원</td><td class="down">▼ 49.5%</td></tr>
+    <tr><td>파프리카(빨강)</td><td>5kg 상자</td><td>22,713원</td><td class="down">▼ 20.8%</td></tr>
+    <tr><td>애호박</td><td>20개</td><td>13,213원</td><td class="down">▼ 47.1%</td></tr>
+    <tr><td>풋고추(일반)</td><td>10kg 상자</td><td>39,198원</td><td class="down">▼ 45.1%</td></tr>
+    <tr><td>상추</td><td>4kg 상자</td><td>11,031원</td><td class="down">▼ 5.4%</td></tr>
+    <tr><td>배추</td><td>10kg 망대</td><td>13,704원</td><td class="down">▼ 14.0%</td></tr>
+    <tr><td>무</td><td>20kg 상자</td><td>12,038원</td><td class="down">▼ 47.8%</td></tr>
+  </table>
+  <div class="chart">
+    <div class="chart-title">품목별 등락률 (9월 24일(목) 기준, 직전 개장일 9월 23일(수) 대비)</div>
+    <div class="chart-axis-label"><span class="cname"></span><span class="cside left">◀ 하락</span><span class="caxis" style="background:transparent"></span><span class="cside right">상승 ▶</span><span class="cval"></span></div>
+    <div class="crow"><span class="cname">오이</span><span class="cside left"><span class="cbar down-bg" style="width:92.0%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 59.6%</span></div>
+    <div class="crow"><span class="cname">방울토마토</span><span class="cside left"><span class="cbar down-bg" style="width:76.4%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 49.5%</span></div>
+    <div class="crow"><span class="cname">무</span><span class="cside left"><span class="cbar down-bg" style="width:73.8%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 47.8%</span></div>
+    <div class="crow"><span class="cname">애호박</span><span class="cside left"><span class="cbar down-bg" style="width:72.7%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 47.1%</span></div>
+    <div class="crow"><span class="cname">풋고추</span><span class="cside left"><span class="cbar down-bg" style="width:69.6%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 45.1%</span></div>
+    <div class="crow"><span class="cname">파프리카</span><span class="cside left"><span class="cbar down-bg" style="width:32.1%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 20.8%</span></div>
+    <div class="crow"><span class="cname">토마토</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:27.0%"></span></span><span class="cval up">▲ 17.5%</span></div>
+    <div class="crow"><span class="cname">배추</span><span class="cside left"><span class="cbar down-bg" style="width:21.6%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 14.0%</span></div>
+    <div class="crow"><span class="cname">상추</span><span class="cside left"><span class="cbar down-bg" style="width:8.3%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 5.4%</span></div>
+  </div>
+  <div class="trend">
+    <div class="chart-title">품목별 가격 변동 추이</div>
+    <div class="trend-tabs">
+      <button type="button" class="tab-btn active" onclick="showTrendTab(0)">오이</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(1)">토마토</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(2)">방울토마토</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(3)">파프리카</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(4)">애호박</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(5)">풋고추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(6)">상추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(7)">배추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(8)">무</button>
+    </div>
+    <div id="trend-pick"></div>
+    <div class="tab-panel active" id="trend-tab-0">
+      <div class="tab-sub">오이(백다다기) · 50개 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="오이(백다다기) 가격 추이">
+<path d="M90 282H1250M90 240.667H1250M90 199.333H1250M90 158H1250M90 116.667H1250M90 75.3333H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">10,000</text><text x="80" y="245.667">20,000</text><text x="80" y="204.333">30,000</text><text x="80" y="163">40,000</text><text x="80" y="121.667">50,000</text><text x="80" y="80.3333">60,000</text><text x="80" y="39">70,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,73.3865 148,47.6979 264,60.4947 322,74.3041 380,110.004 438,97.9344 496,119.969 554,144.777 670,188.508 728,216.565 786,222.488 844,206.021 902,210.791 960,230.379 1076,251.327 1134,241.026 1192,201.388 1250,274.039" fill="none" stroke="#2a78d6" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="261.039" text-anchor="end">11,926</text><text x="148" y="34.6979">66,686</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="오이(백다다기) 가격 추이">
+<path d="M78 236H616M78 201.667H616M78 167.333H616M78 133H616M78 98.6667H616M78 64.3333H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">10,000</text><text x="69" y="205.667">20,000</text><text x="69" y="171.333">30,000</text><text x="69" y="137">40,000</text><text x="69" y="102.667">50,000</text><text x="69" y="68.3333">60,000</text><text x="69" y="34">70,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,62.7162 104.9,41.3781 158.7,52.0077 185.6,63.4784 212.5,93.1321 239.4,83.1068 266.3,101.41 293.2,122.017 347,158.341 373.9,181.647 400.8,186.567 427.7,172.888 454.6,176.851 481.5,193.121 535.3,210.521 562.2,201.965 589.1,169.04 616,229.387" fill="none" stroke="#2a78d6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="218.387" text-anchor="end">11,926</text><text x="104.9" y="30.3781">66,686</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-1">
+      <div class="tab-sub">토마토 · 5kg 상자 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="토마토 가격 추이">
+<path d="M90 282H1250M90 220H1250M90 158H1250M90 96H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">10,000</text><text x="80" y="225">20,000</text><text x="80" y="163">30,000</text><text x="80" y="101">40,000</text><text x="80" y="39">50,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,232.772 148,237.527 264,240.59 322,242.326 380,234.998 438,219.988 496,206.912 554,194.964 670,186.477 728,160.158 786,160.697 844,96.4216 902,81.7338 960,60.04 1076,121.339 1134,190.798 1192,180.438 1250,151.887" fill="none" stroke="#eb6834" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="138.887" text-anchor="end">30,986</text><text x="960" y="47.04">45,800</text><text x="322" y="261.326">16,399</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="토마토 가격 추이">
+<path d="M78 236H616M78 184.5H616M78 133H616M78 81.5H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">10,000</text><text x="69" y="188.5">20,000</text><text x="69" y="137">30,000</text><text x="69" y="85.5">40,000</text><text x="69" y="34">50,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,195.109 104.9,199.059 158.7,201.603 185.6,203.045 212.5,196.958 239.4,184.49 266.3,173.628 293.2,163.704 347,156.654 373.9,134.792 400.8,135.24 427.7,81.8502 454.6,69.6498 481.5,51.63 535.3,102.548 562.2,160.243 589.1,151.638 616,127.922" fill="none" stroke="#eb6834" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="116.922" text-anchor="end">30,986</text><text x="481.5" y="40.63">45,800</text><text x="185.6" y="220.045">16,399</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-2">
+      <div class="tab-sub">방울토마토 · 5kg 상자 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="방울토마토 가격 추이">
+<path d="M90 282H1250M90 232.4H1250M90 182.8H1250M90 133.2H1250M90 83.6H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">10,000</text><text x="80" y="237.4">20,000</text><text x="80" y="187.8">30,000</text><text x="80" y="138.2">40,000</text><text x="80" y="88.6">50,000</text><text x="80" y="39">60,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,219.291 148,189.372 264,155.847 322,113.375 380,141.176 438,133.255 496,168.004 554,186.674 670,213.691 728,219.529 786,211.637 844,193.623 902,107.825 960,63.3582 1076,113.499 1134,68.2686 1192,159.245 1250,244.626" fill="none" stroke="#1baf7a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="231.626" text-anchor="end">17,535</text><text x="960" y="50.3582">54,081</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="방울토마토 가격 추이">
+<path d="M78 236H616M78 194.8H616M78 153.6H616M78 112.4H616M78 71.2H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">10,000</text><text x="69" y="198.8">20,000</text><text x="69" y="157.6">30,000</text><text x="69" y="116.4">40,000</text><text x="69" y="75.2">50,000</text><text x="69" y="34">60,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,183.911 104.9,159.059 158.7,131.212 185.6,95.9324 212.5,119.025 239.4,112.445 266.3,141.31 293.2,156.818 347,179.259 373.9,184.109 400.8,177.554 427.7,162.59 454.6,91.3221 481.5,54.3863 535.3,96.0354 562.2,58.4651 589.1,134.034 616,204.956" fill="none" stroke="#1baf7a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="193.956" text-anchor="end">17,535</text><text x="481.5" y="43.3863">54,081</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-3">
+      <div class="tab-sub">파프리카(빨강) · 5kg 상자 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="파프리카(빨강) 가격 추이">
+<path d="M90 282H1250M90 232.4H1250M90 182.8H1250M90 133.2H1250M90 83.6H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">20,000</text><text x="80" y="237.4">30,000</text><text x="80" y="187.8">40,000</text><text x="80" y="138.2">50,000</text><text x="80" y="88.6">60,000</text><text x="80" y="39">70,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,185.543 148,107.259 264,49.2917 322,131.613 380,89.2792 438,37.8093 496,43.0322 554,143.18 670,158.362 728,157.658 786,163.54 844,153.174 902,180.687 960,208.964 1076,207.848 1134,193.395 1192,238.997 1250,268.544" fill="none" stroke="#eda100" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="255.544" text-anchor="end">22,713</text><text x="438" y="24.8093">69,232</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="파프리카(빨강) 가격 추이">
+<path d="M78 236H616M78 194.8H616M78 153.6H616M78 112.4H616M78 71.2H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">20,000</text><text x="69" y="198.8">30,000</text><text x="69" y="157.6">40,000</text><text x="69" y="116.4">50,000</text><text x="69" y="75.2">60,000</text><text x="69" y="34">70,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,155.878 104.9,90.8524 158.7,42.702 185.6,111.082 212.5,75.9174 239.4,33.1642 266.3,37.5025 293.2,120.689 347,133.301 373.9,132.716 400.8,137.602 427.7,128.991 454.6,151.845 481.5,175.333 535.3,174.406 562.2,162.4 589.1,200.28 616,224.822" fill="none" stroke="#eda100" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="213.822" text-anchor="end">22,713</text><text x="239.4" y="22.1642">69,232</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-4">
+      <div class="tab-sub">애호박 · 20개 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="애호박 가격 추이">
+<path d="M90 282H1250M90 220H1250M90 158H1250M90 96H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">10,000</text><text x="80" y="225">20,000</text><text x="80" y="163">30,000</text><text x="80" y="101">40,000</text><text x="80" y="39">50,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,37.9556 148,109.752 264,131.985 322,113.162 380,104.847 438,114.123 496,117.818 554,121.029 670,123.206 728,116.913 786,126.994 844,139.84 902,163.623 960,213.695 1076,243.362 1134,228.364 1192,189.025 1250,262.079" fill="none" stroke="#e87ba4" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="249.079" text-anchor="end">13,213</text><text x="97" y="24.9556" text-anchor="start">49,362</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="애호박 가격 추이">
+<path d="M78 236H616M78 184.5H616M78 133H616M78 81.5H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">10,000</text><text x="69" y="188.5">20,000</text><text x="69" y="137">30,000</text><text x="69" y="85.5">40,000</text><text x="69" y="34">50,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,33.2857 104.9,92.9227 158.7,111.391 185.6,95.7552 212.5,88.8491 239.4,96.5534 266.3,99.6228 293.2,102.291 347,104.098 373.9,98.8709 400.8,107.245 427.7,117.916 454.6,137.671 481.5,179.262 535.3,203.905 562.2,191.447 589.1,158.771 616,219.453" fill="none" stroke="#e87ba4" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="208.453" text-anchor="end">13,213</text><text x="85" y="22.2857" text-anchor="start">49,362</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-5">
+      <div class="tab-sub">풋고추(일반) · 10kg 상자 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="풋고추(일반) 가격 추이">
+<path d="M90 282H1250M90 220H1250M90 158H1250M90 96H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">20,000</text><text x="80" y="225">40,000</text><text x="80" y="163">60,000</text><text x="80" y="101">80,000</text><text x="80" y="39">100,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,212.241 148,232.4 264,219.411 322,192.937 380,207.03 438,185.24 496,148.712 554,113.512 670,99.937 728,134.48 786,58.6946 844,96.4557 902,96.7998 960,163.351 1076,137.965 1134,138.792 1192,122.809 1250,222.486" fill="none" stroke="#008300" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="209.486" text-anchor="end">39,198</text><text x="786" y="45.6946">92,034</text><text x="148" y="251.4">36,000</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="풋고추(일반) 가격 추이">
+<path d="M78 236H616M78 184.5H616M78 133H616M78 81.5H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">20,000</text><text x="69" y="188.5">40,000</text><text x="69" y="137">60,000</text><text x="69" y="85.5">80,000</text><text x="69" y="34">100,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,178.055 104.9,194.8 158.7,184.011 185.6,162.02 212.5,173.726 239.4,155.627 266.3,125.285 293.2,96.0462 347,84.7703 373.9,113.463 400.8,50.5125 427.7,81.8785 454.6,82.1644 481.5,137.444 535.3,116.358 562.2,117.045 589.1,103.769 616,186.565" fill="none" stroke="#008300" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="175.565" text-anchor="end">39,198</text><text x="400.8" y="39.5125">92,034</text><text x="104.9" y="211.8">36,000</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-6">
+      <div class="tab-sub">상추 · 4kg 상자 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="상추 가격 추이">
+<path d="M90 282H1250M90 220H1250M90 158H1250M90 96H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">0</text><text x="80" y="225">20,000</text><text x="80" y="163">40,000</text><text x="80" y="101">60,000</text><text x="80" y="39">80,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,88.1508 148,78.8663 264,72.4741 322,51.6886 380,64.5288 438,85.6398 496,108.989 554,133.817 670,160.926 728,192.472 786,222.821 844,225.121 902,229.75 960,236.07 1076,244.109 1134,245.336 1192,245.863 1250,247.804" fill="none" stroke="#4a3aa7" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="234.804" text-anchor="end">11,031</text><text x="322" y="38.6886">74,294</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="상추 가격 추이">
+<path d="M78 236H616M78 184.5H616M78 133H616M78 81.5H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">0</text><text x="69" y="188.5">20,000</text><text x="69" y="137">40,000</text><text x="69" y="85.5">60,000</text><text x="69" y="34">80,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,74.9801 104.9,67.268 158.7,61.9583 185.6,44.6929 212.5,55.3586 239.4,72.8944 266.3,92.2892 293.2,112.912 347,135.431 373.9,161.634 400.8,186.843 427.7,188.754 454.6,192.598 481.5,197.849 535.3,204.526 562.2,205.545 589.1,205.983 616,207.595" fill="none" stroke="#4a3aa7" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="196.595" text-anchor="end">11,031</text><text x="185.6" y="33.6929">74,294</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-7">
+      <div class="tab-sub">배추 · 10kg 망대 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="배추 가격 추이">
+<path d="M90 282H1250M90 232.4H1250M90 182.8H1250M90 133.2H1250M90 83.6H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">8,000</text><text x="80" y="237.4">10,000</text><text x="80" y="187.8">12,000</text><text x="80" y="138.2">14,000</text><text x="80" y="88.6">16,000</text><text x="80" y="39">18,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,226.572 148,261.59 264,136.424 322,245.519 380,204.153 438,100.563 496,147.088 554,176.154 670,111.5 728,145.65 786,131.018 844,105.424 902,117.948 960,136.97 1076,175.682 1134,83.104 1192,85.1128 1250,140.541" fill="none" stroke="#e34948" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="127.541" text-anchor="end">13,704</text><text x="1134" y="70.104">16,020</text><text x="148" y="280.59">8,823</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="배추 가격 추이">
+<path d="M78 236H616M78 194.8H616M78 153.6H616M78 112.4H616M78 71.2H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">8,000</text><text x="69" y="198.8">10,000</text><text x="69" y="157.6">12,000</text><text x="69" y="116.4">14,000</text><text x="69" y="75.2">16,000</text><text x="69" y="34">18,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,189.959 104.9,219.046 158.7,115.078 185.6,205.697 212.5,171.337 239.4,85.2904 266.3,123.936 293.2,148.079 347,94.375 373.9,122.741 400.8,110.587 427.7,89.328 454.6,99.731 481.5,115.531 535.3,147.688 562.2,70.788 589.1,72.4566 616,118.498" fill="none" stroke="#e34948" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="107.498" text-anchor="end">13,704</text><text x="562.2" y="59.788">16,020</text><text x="104.9" y="236.046">8,823</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-8">
+      <div class="tab-sub">무 · 20kg 상자 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="무 가격 추이">
+<path d="M90 282H1250M90 240.667H1250M90 199.333H1250M90 158H1250M90 116.667H1250M90 75.3333H1250M90 34H1250" stroke="#ececec" fill="none"/>
+<g font-size="15" fill="#999" text-anchor="end"><text x="80" y="287">10,000</text><text x="80" y="245.667">12,500</text><text x="80" y="204.333">15,000</text><text x="80" y="163">17,500</text><text x="80" y="121.667">20,000</text><text x="80" y="80.3333">22,500</text><text x="80" y="39">25,000</text></g>
+<g font-size="15" fill="#999"><text x="90" y="308" text-anchor="start">9/4</text><text x="380" y="308" text-anchor="middle">9/9</text><text x="728" y="308" text-anchor="middle">9/15</text><text x="960" y="308" text-anchor="middle">9/19</text><text x="1250" y="308" text-anchor="end">9/24</text></g>
+<polyline points="90,264.194 148,253.678 264,207.633 322,230.151 380,233.623 438,201.45 496,226.051 554,239.079 670,258.043 728,227.242 786,229.242 844,220.595 902,208.526 960,197.482 1076,167.457 1134,131.051 1192,65.7771 1250,248.305" fill="none" stroke="#52514e" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="15" font-weight="700" fill="#444" text-anchor="middle"><text x="1243" y="235.305" text-anchor="end">12,038</text><text x="1192" y="52.7771">23,078</text><text x="97" y="283.194" text-anchor="start">11,077</text></g>
+</svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="무 가격 추이">
+<path d="M78 236H616M78 201.667H616M78 167.333H616M78 133H616M78 98.6667H616M78 64.3333H616M78 30H616" stroke="#ececec" fill="none"/>
+<g font-size="13" fill="#999" text-anchor="end"><text x="69" y="240">10,000</text><text x="69" y="205.667">12,500</text><text x="69" y="171.333">15,000</text><text x="69" y="137">17,500</text><text x="69" y="102.667">20,000</text><text x="69" y="68.3333">22,500</text><text x="69" y="34">25,000</text></g>
+<g font-size="14" fill="#999"><text x="78" y="260" text-anchor="start">9/4</text><text x="212.5" y="260" text-anchor="middle">9/9</text><text x="373.9" y="260" text-anchor="middle">9/15</text><text x="481.5" y="260" text-anchor="middle">9/19</text><text x="616" y="260" text-anchor="end">9/24</text></g>
+<polyline points="78,221.209 104.9,212.475 158.7,174.227 185.6,192.932 212.5,195.816 239.4,169.091 266.3,189.526 293.2,200.348 347,216.1 373.9,190.515 400.8,192.177 427.7,184.994 454.6,174.969 481.5,165.795 535.3,140.855 562.2,110.615 589.1,56.3955 616,208.011" fill="none" stroke="#52514e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<g font-size="13" font-weight="700" fill="#444" text-anchor="middle"><text x="609" y="197.011" text-anchor="end">12,038</text><text x="589.1" y="45.3955">23,078</text><text x="85" y="238.209" text-anchor="start">11,077</text></g>
+</svg>
+      <div class="trend-note">9월 4일~9월 24일 가락시장 상품(상) 등급 경락가 · 단위 변경 없이 연결 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일입니다.</div>
+    </div>
+    <script>
+      function showTrendTab(i) {
+        var btns = document.querySelectorAll('.trend-tabs .tab-btn');
+        var panels = document.querySelectorAll('.tab-panel');
+        for (var k = 0; k < btns.length; k++) {
+          btns[k].className = 'tab-btn' + (k === i ? ' active' : '');
+          panels[k].className = 'tab-panel' + (k === i ? ' active' : '');
+        }
+        if (typeof postHeight === 'function') { postHeight(); }
+      }
+    </script>
+  </div>
+  <div class="src">가격 기준일 9월 24일(목) 가락시장 경락가격 · 상품(상) 등급 · 등락은 직전 개장일 9월 23일(수) 대비 · 모든 품목이 이력과 같은 단위여서 환산 없이 비교 · 상 등급 전체 품목 268개 시세는 이력에 누적 중 · 추석 연휴(9월 25~27일) 휴장으로 9월 24일이 마지막 경매일이며, 오늘 경락가가 공개되는 대로 갱신됩니다.</div>
+</div>
+<div class="card">
+  <h2>📰 오늘의 농업 뉴스</h2>
+  <ul>
+    <li><a href="https://www.sisamirae.com/news/article.html?no=548670" target="_blank" rel="noopener">농식품부, 여름철 폭염&middot;우박 등 피해 농가에 추석 명절 전 재해복구비 지원</a> &mdash; 시사미래신문</li>
+    <li><a href="https://newsseoul.co.kr/news/view/1065586818467379" target="_blank" rel="noopener">농식품부, 농업인의 풍성하고 안전한 추석을 위해 세심하게 지원</a> &mdash; 뉴스서울</li>
+    <li><a href="https://rda.go.kr/board/board.do?boardId=farmprmninfo&amp;dataNo=100000812021&amp;mode=updateCnt&amp;prgId=day_farmprmninfoEntry" target="_blank" rel="noopener">토마토 잎 노랗게 말리면 &lsquo;토마토황화잎말림바이러스&rsquo; 의심&hellip;방제 집중 당부</a> &mdash; 농촌진흥청</li>
+    <li><a href="https://www.newsfm.kr/news/article.html?no=6149" target="_blank" rel="noopener">가을배추, 무름병 피해 대비 방제 철저히</a> &mdash; 영농자재신문</li>
+    <li><a href="https://www.newsam.co.kr/mobile/article.html?no=34829" target="_blank" rel="noopener">추석 이후 농축산물 가격 안정세&hellip;배추는 10월부터 하향 전망</a> &mdash; 농기자재신문</li>
+    <li><a href="https://biz.sbs.co.kr/article/20000336761" target="_blank" rel="noopener">[다음주 날씨] 10월 들어서면 기온 &lsquo;뚝&rsquo;&hellip;북쪽서 찬 공기 유입</a> &mdash; SBS Biz</li>
+  </ul>
+</div>
+<div class="card">
+  <h2>📋 지원사업&middot;공고</h2>
+  <ul>
+    <li><a href="https://www.agrinet.co.kr/news/articleView.html?idxno=407184" target="_blank" rel="noopener">2026년 공익직불 의무교육(온라인&middot;집합) 이수</a> &mdash; 국립농산물품질관리원 · <strong>9월 30일(수)까지</strong> · 기한 안에 마치지 않으면 올해 직불금이 10% 깎입니다. 남은 기간이 이틀뿐이니, 아직 이수하지 않으셨다면 오늘 온라인 교육으로 마쳐 두시는 편이 안전합니다.</li>
+  </ul>
+</div>
+<div class="card">
+  <h2>📅 지난 소식 보기</h2>
+  <div id="cal" data-current="2026-09-28"></div>
+</div>
+<script src="/farmily-daily/cal.js"></script>
+<script src="/farmily-daily/trend.js"></script>
+<p class="footer-note">본 정보는 스마트팜 농업로봇 기업 <a href="https://farmily.ai" target="_blank" rel="noopener">FARMILY(파밀리)</a>가 매일 아침 전합니다. 무인 방제로봇 <a href="https://farmily.ai/FARMILY-XS300" target="_blank" rel="noopener">FARMILY-X S300</a>, UV 방제로봇 <a href="https://farmily.ai/FARMILY-XUV" target="_blank" rel="noopener">FARMILY-X UV</a> 등 자율주행 기반 방제 자동화 솔루션은 <a href="https://farmily.ai/product" target="_blank" rel="noopener">FARMILY 제품 페이지</a>에서 확인하세요.</p>
+<script>
+  function postHeight() {
+    if (window.parent !== window) {
+      window.parent.postMessage({ farmilyHeight: document.body.scrollHeight }, '*');
+    }
+  }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+  setTimeout(postHeight, 500);
+</script>
+</body>
+</html>
