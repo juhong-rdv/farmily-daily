@@ -1,7 +1,7 @@
 /* FARMILY 오늘의 농업 정보 — 대표 품목 가격 변동 추이
    기간 버튼(1개월 / 6개월 / 1년 / 전체)으로 창을 바꿔 가며 다시 그립니다.
-   y축은 0을 강제하지 않고 보이는 구간의 실제 범위에 맞추고, 배경에 계절 띄를 깔아
-   철에 따른 시세 흐름을 볼 수 있게 합니다.
+   y축은 0을 강제하지 않고 보이는 구간의 실제 범위에 맞추며, 계절은 그래프 배경이 아니라
+   플롯 아래 얇은 띄로 표시해 선이 먼저 읽히게 합니다(여백 정리형).
    데이터: trend-primary.json (dates 공유 + 품목별 p 배열, 결측일은 null) */
 (function () {
   var BASE = location.pathname.indexOf('/log/') > -1 ? '../' : './';
@@ -9,11 +9,15 @@
     { k: 30, t: '1개월' }, { k: 182, t: '6개월' },
     { k: 365, t: '1년' }, { k: 0, t: '전체' }
   ];
-  var SEASON = [['봄', '#f3f8ee'], ['여름', '#edf5fa'], ['가을', '#fdf5ea'], ['겨울', '#f4f5f9']];
+  var SEASON = [['봄', '#eef5e6'], ['여름', '#e7f1fa'], ['가을', '#fbf0e2'], ['겨울', '#eef0f5']];
   var STEPS = [50, 100, 250, 500, 1000, 2000, 2500, 5000, 10000, 20000, 25000, 50000, 100000];
   var GEOM = {
-    d: { cls: 'svg-d', vb: '0 0 1280 320', x0: 90, x1: 1250, y0: 34, y1: 282, fs: 15, tx: 80, xy: 308, xfs: 15, sw: 3, r: 5, vfs: 15, dy: 13, minw: 78, sfs: 13 },
-    m: { cls: 'svg-m', vb: '0 0 640 268', x0: 78, x1: 616, y0: 30, y1: 236, fs: 13, tx: 69, xy: 262, xfs: 14, sw: 2.5, r: 4, vfs: 13, dy: 11, minw: 54, sfs: 12 }
+    d: { cls: 'svg-d', vb: '0 0 1280 320', x0: 92, x1: 1252, y0: 30, y1: 230,
+         sy0: 244, sy1: 264, xy: 292, fs: 15, tx: 80, xfs: 14, sw: 2.8, r: 4,
+         vfs: 13, lfs: 17, dy: 11, dyb: 21, minw: 74, sfs: 13 },
+    m: { cls: 'svg-m', vb: '0 0 640 268', x0: 78, x1: 616, y0: 26, y1: 180,
+         sy0: 192, sy1: 209, xy: 237, fs: 13, tx: 68, xfs: 13, sw: 2.4, r: 3.5,
+         vfs: 12, lfs: 15, dy: 10, dyb: 19, minw: 52, sfs: 12 }
   };
   var DAY = 86400000;
   var data = null, host = null, cur = 30;
@@ -58,39 +62,78 @@
     return best;
   }
 
+  /* 계절 띄 — 플롯 아래 얇은 막대. 구간 경계는 공통 좌표를 써서 툓이 생기지 않게 한다. */
   function bands(pts, X, g) {
-    var segs = [], cur = null, o = [];
+    var segs = [], cur = null, o = [], edges = [g.x0];
     pts.forEach(function (p) {
       var s = seasonOf(new Date(p.d));
       if (!cur || cur[0] !== s) { cur = [s, p.d, p.d]; segs.push(cur); } else cur[2] = p.d;
     });
+    for (var i = 0; i < segs.length - 1; i++) edges.push((X(segs[i][2]) + X(segs[i + 1][1])) / 2);
+    edges.push(g.x1);
     segs.forEach(function (sg, i) {
-      var xa = i ? X(sg[1]) : g.x0;
-      var xb = (i === segs.length - 1) ? g.x1 : (X(sg[2]) + X(segs[i + 1][1])) / 2;
-      o.push('<rect x="' + xa.toFixed(1) + '" y="' + g.y0 + '" width="' + Math.max(xb - xa, 0).toFixed(1) +
-        '" height="' + (g.y1 - g.y0) + '" fill="' + SEASON[sg[0]][1] + '"/>');
-      if (i) o.push('<line x1="' + xa.toFixed(1) + '" y1="' + g.y0 + '" x2="' + xa.toFixed(1) +
-        '" y2="' + g.y1 + '" stroke="#e3ddd2" stroke-width="1"/>');
-      if (xb - xa >= g.minw) o.push('<text x="' + ((xa + xb) / 2).toFixed(1) + '" y="' + (g.y0 + g.sfs + 3) +
-        '" font-size="' + g.sfs + '" fill="#b9b0a2" text-anchor="middle">' + SEASON[sg[0]][0] + '</text>');
+      var a = edges[i], b = edges[i + 1], h = g.sy1 - g.sy0;
+      o.push('<rect x="' + a.toFixed(1) + '" y="' + g.sy0 + '" width="' + Math.max(b - a, 0).toFixed(1) +
+        '" height="' + h + '" fill="' + SEASON[sg[0]][1] + '"/>');
+      if (b - a >= g.minw) o.push('<text x="' + ((a + b) / 2).toFixed(1) + '" y="' + (g.sy0 + h / 2 + g.sfs * 0.36).toFixed(1) +
+        '" font-size="' + g.sfs + '" fill="#a79f93" text-anchor="middle">' + SEASON[sg[0]][0] + '</text>');
     });
     return o.join('');
   }
 
-  function svg(pts, kind, label, color) {
+  function svg(pts, kind, label, color, uid) {
     var g = GEOM[kind], vals = pts.map(function (p) { return p.v; });
     var t = ticks(Math.min.apply(null, vals), Math.max.apply(null, vals));
     var d0 = pts[0].d, span = (pts[pts.length - 1].d - d0) / DAY || 1;
     var X = function (d) { return g.x0 + (d - d0) / DAY / span * (g.x1 - g.x0); };
     var Y = function (v) { return g.y1 - (v - t.lo) / (t.hi - t.lo) * (g.y1 - g.y0); };
+    var gid = 'tpg-' + uid + '-' + kind;
     var o = ['<svg class="' + g.cls + '" viewBox="' + g.vb + '" role="img" aria-label="' + label + ' 가격 변동 추이">'];
-    o.push(bands(pts, X, g));
+
+    /* 가로 눈금 */
     for (var v = t.lo; v <= t.hi + 0.5; v += t.st) {
       var y = Y(v);
-      o.push('<line x1="' + g.x0 + '" y1="' + y.toFixed(1) + '" x2="' + g.x1 + '" y2="' + y.toFixed(1) + '" stroke="#e4e4e4" stroke-width="1"/>');
-      o.push('<text x="' + g.tx + '" y="' + (y + g.fs * 0.32).toFixed(1) + '" font-size="' + g.fs + '" fill="#999" text-anchor="end">' + won(v) + '</text>');
+      o.push('<line x1="' + g.x0 + '" y1="' + y.toFixed(1) + '" x2="' + g.x1 + '" y2="' + y.toFixed(1) + '" stroke="#f0f0f0" stroke-width="1"/>');
+      o.push('<text x="' + g.tx + '" y="' + (y + g.fs * 0.33).toFixed(1) + '" font-size="' + g.fs + '" fill="#aaa" text-anchor="end">' + won(v) + '</text>');
     }
-    var n = pts.length, pick = [];
+
+    /* 선 아래 얇은 그라데이션 */
+    var pl = pts.map(function (p) { return X(p.d).toFixed(1) + ',' + Y(p.v).toFixed(1); }).join(' ');
+    o.push('<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.16"/>' +
+      '<stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>');
+    o.push('<polygon points="' + X(pts[0].d).toFixed(1) + ',' + g.y1 + ' ' + pl + ' ' +
+      X(pts[pts.length - 1].d).toFixed(1) + ',' + g.y1 + '" fill="url(#' + gid + ')"/>');
+    o.push('<polyline points="' + pl + '" fill="none" stroke="' + color + '" stroke-width="' + g.sw +
+      '" stroke-linejoin="round" stroke-linecap="round"/>');
+
+    var n = pts.length;
+    if (n <= 14) pts.forEach(function (p) {
+      o.push('<circle cx="' + X(p.d).toFixed(1) + '" cy="' + Y(p.v).toFixed(1) + '" r="' + g.r +
+        '" fill="' + color + '" stroke="#fff" stroke-width="2"/>');
+    });
+
+    /* 최고·최저는 속 빈 점과 작은 회색 글자, 최신만 색을 넣어 크게 */
+    var mx = vals.indexOf(Math.max.apply(null, vals)), mn = vals.indexOf(Math.min.apply(null, vals)), last = n - 1;
+    [mx, mn].forEach(function (i) {
+      if (i === last) return;
+      var p = pts[i], below = (i === mn);
+      if (n > 14) o.push('<circle cx="' + X(p.d).toFixed(1) + '" cy="' + Y(p.v).toFixed(1) +
+        '" r="3.5" fill="#fff" stroke="' + color + '" stroke-width="2"/>');
+      var anc = i === 0 ? 'start' : (i === last ? 'end' : 'middle');
+      var ax = X(p.d) + (i === 0 ? 7 : 0);
+      o.push('<text x="' + ax.toFixed(1) + '" y="' + (below ? Y(p.v) + g.dyb : Y(p.v) - g.dy).toFixed(1) +
+        '" font-size="' + g.vfs + '" font-weight="600" fill="#999" text-anchor="' + anc + '">' + won(p.v) + '</text>');
+    });
+    var lp = pts[last];
+    o.push('<circle cx="' + X(lp.d).toFixed(1) + '" cy="' + Y(lp.v).toFixed(1) + '" r="' + (g.r + 2) +
+      '" fill="' + color + '" stroke="#fff" stroke-width="2.5"/>');
+    o.push('<text x="' + (X(lp.d) - 10).toFixed(1) + '" y="' + (Y(lp.v) - g.dy - 3).toFixed(1) +
+      '" font-size="' + g.lfs + '" font-weight="800" fill="' + color + '" text-anchor="end">' + won(lp.v) + '원</text>');
+
+    /* 계절 띄와 날짜는 플롯 밖 아래에 */
+    o.push(bands(pts, X, g));
+    var pick = [];
     function add(i) { if (pick.indexOf(i) < 0) pick.push(i); }
     if (n > 14) [0, n >> 2, n >> 1, (3 * n) >> 2, n - 1].forEach(add);
     else if (n > 7) [0, (n / 3) | 0, ((2 * n) / 3) | 0, n - 1].forEach(add);
@@ -98,22 +141,7 @@
     pick.sort(function (a, b) { return a - b; }).forEach(function (i) {
       var dt = new Date(pts[i].d), anc = i === 0 ? 'start' : (i === n - 1 ? 'end' : 'middle');
       o.push('<text x="' + X(pts[i].d).toFixed(1) + '" y="' + g.xy + '" text-anchor="' + anc +
-        '" font-size="' + g.xfs + '" fill="#999">' + (dt.getUTCMonth() + 1) + '/' + dt.getUTCDate() + '</text>');
-    });
-    o.push('<polyline points="' + pts.map(function (p) { return X(p.d).toFixed(1) + ',' + Y(p.v).toFixed(1); }).join(' ') +
-      '" fill="none" stroke="' + color + '" stroke-width="' + g.sw + '" stroke-linejoin="round" stroke-linecap="round"/>');
-    if (n <= 14) pts.forEach(function (p) {
-      o.push('<circle cx="' + X(p.d).toFixed(1) + '" cy="' + Y(p.v).toFixed(1) + '" r="' + g.r +
-        '" fill="' + color + '" stroke="#fff" stroke-width="2"/>');
-    });
-    var mx = vals.indexOf(Math.max.apply(null, vals)), mn = vals.indexOf(Math.min.apply(null, vals));
-    [n - 1, mx, mn].filter(function (i, k, a) { return a.indexOf(i) === k; }).forEach(function (i) {
-      var anc = i === 0 ? 'start' : (i === n - 1 ? 'end' : 'middle');
-      var ax = X(pts[i].d) + (i === 0 ? 7 : (i === n - 1 ? -7 : 0));
-      var below = (i === mn && i !== n - 1 && i !== mx);
-      var ay = below ? Y(pts[i].v) + g.dy + g.vfs * 0.5 : Y(pts[i].v) - g.dy;
-      o.push('<text x="' + ax.toFixed(1) + '" y="' + ay.toFixed(1) + '" font-size="' + g.vfs +
-        '" font-weight="700" fill="#444" text-anchor="' + anc + '">' + won(pts[i].v) + '</text>');
+        '" font-size="' + g.xfs + '" fill="#aaa">' + (dt.getUTCMonth() + 1) + '/' + dt.getUTCDate() + '</text>');
     });
     o.push('</svg>');
     return o.join('');
@@ -143,10 +171,10 @@
       var f = new Date(pts[0].d), l = new Date(pts[pts.length - 1].d);
       panel.innerHTML =
         '<div class="tab-sub">' + esc(it.n) + ' · ' + esc(it.u) + ' · 가락시장 상품 등급</div>' +
-        svg(pts, 'd', esc(it.n), it.c) + svg(pts, 'm', esc(it.n), it.c) +
+        svg(pts, 'd', esc(it.n), it.c, idx) + svg(pts, 'm', esc(it.n), it.c, idx) +
         '<div class="trend-note">' + (f.getUTCMonth() + 1) + '월 ' + f.getUTCDate() + '일~' +
         (l.getUTCMonth() + 1) + '월 ' + l.getUTCDate() + '일 가락시장 상품(상) 등급 경락가 ' + pts.length +
-        '일치 · 배경색은 계절(가을 9~11월 등)을 나타냅니다 · 자료가 없는 날은 건너뛰고 이었습니다.</div>';
+        '일치 · 그래프 아래 띄는 계절(가을 9~11월 등)입니다 · 자료가 없는 날은 건너뛰고 이었습니다.</div>';
     });
     host.querySelectorAll('button').forEach(function (b) {
       b.className = (+b.dataset.k === days) ? 'on' : '';
