@@ -2,6 +2,7 @@
    기간 버튼(1개월 / 6개월 / 1년 / 전체)으로 창을 바꿔 가며 다시 그립니다.
    y축은 0을 강제하지 않고 보이는 구간의 실제 범위에 맞추며, 계절은 그래프 배경이 아니라
    플롯 아래 얇은 띠로 표시해 선이 먼저 읽히게 합니다(여백 정리형).
+   선 위에 마우스를 올리거나 손가락으로 짚으면 그날 날짜와 경락가가 말풍선으로 나옵니다.
    데이터: trend-primary.json (dates 공유 + 품목별 p 배열, 결측일은 null) */
 (function () {
   var BASE = location.pathname.indexOf('/log/') > -1 ? '../' : './';
@@ -81,6 +82,85 @@
     return o.join('');
   }
 
+  /* ── 마우스/터치로 가격 읽기 ──────────────────────────────────────────
+     차트 위에 투명한 감지 영역을 덮고, 가로 위치에서 가장 가까운 날짜를 찾아
+     세로 안내선·점·말풍선을 보여 준다. 말풍선 글자는 SVG viewBox 안에 그려서
+     PC와 모바일에서 다른 라벨들과 같은 비율로 커지고 줄어든다.
+     trend.js의 드롭다운 차트도 이 함수를 그대로 쓴다. */
+  var DOW = ['일', '월', '화', '수', '목', '금', '토'];
+
+  function svgEl(tag, attrs) {
+    var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function attachHover(el, o) {
+    if (!el || !o.pts || o.pts.length < 2) return;
+    var vbw = o.vbw, fs = o.fs || 14, pad = 9;
+    var g = svgEl('g', { 'pointer-events': 'none', opacity: '0' });
+    var vline = svgEl('line', { y1: o.y0, y2: o.y1, stroke: o.color, 'stroke-opacity': '.45', 'stroke-width': '1', 'stroke-dasharray': '4 4' });
+    var dot = svgEl('circle', { r: o.fs >= 14 ? 6 : 5, fill: o.color, stroke: '#fff', 'stroke-width': '2.5' });
+    var box = svgEl('rect', { rx: '6', fill: '#2d2d2d', 'fill-opacity': '.93' });
+    var t1 = svgEl('text', { fill: '#fff', 'font-size': fs + 1, 'font-weight': '700', 'text-anchor': 'middle' });
+    var t2 = svgEl('text', { fill: '#cfcfcf', 'font-size': fs - 1, 'text-anchor': 'middle' });
+    [vline, dot, box, t1, t2].forEach(function (n) { g.appendChild(n); });
+    el.appendChild(g);
+    var hit = svgEl('rect', {
+      x: o.x0, y: o.y0 - 8, width: o.x1 - o.x0, height: (o.y1 - o.y0) + 20,
+      fill: 'transparent', 'pointer-events': 'all'
+    });
+    hit.style.cursor = 'crosshair';
+    el.appendChild(hit);
+    var labs = [].slice.call(el.querySelectorAll('.tp-vlab'));
+
+    function show(clientX) {
+      var r = el.getBoundingClientRect();
+      if (!r.width) return;
+      var vx = (clientX - r.left) / r.width * vbw;
+      var best = 0, bd = Infinity;
+      for (var i = 0; i < o.pts.length; i++) {
+        var d = Math.abs(o.X(o.pts[i].d) - vx);
+        if (d < bd) { bd = d; best = i; }
+      }
+      var p = o.pts[best], px = o.X(p.d), py = o.Y(p.v), dt = new Date(p.d);
+      vline.setAttribute('x1', px.toFixed(1)); vline.setAttribute('x2', px.toFixed(1));
+      dot.setAttribute('cx', px.toFixed(1)); dot.setAttribute('cy', py.toFixed(1));
+      t1.textContent = won(p.v) + '원';
+      t2.textContent = (dt.getUTCMonth() + 1) + '월 ' + dt.getUTCDate() + '일 (' + DOW[dt.getUTCDay()] + ')';
+      var w = Math.max(t1.getComputedTextLength(), t2.getComputedTextLength()) + pad * 2;
+      var h = fs * 2 + 16;
+      var bx = Math.min(Math.max(px - w / 2, o.x0), o.x1 - w);
+      var above = py - h - 14 >= o.y0 - 6;
+      var by = above ? py - h - 14 : py + 14;
+      box.setAttribute('x', bx.toFixed(1)); box.setAttribute('y', by.toFixed(1));
+      box.setAttribute('width', w.toFixed(1)); box.setAttribute('height', h);
+      t1.setAttribute('x', (bx + w / 2).toFixed(1)); t1.setAttribute('y', (by + fs + 3).toFixed(1));
+      t2.setAttribute('x', (bx + w / 2).toFixed(1)); t2.setAttribute('y', (by + fs * 2 + 5).toFixed(1));
+      g.setAttribute('opacity', '1');
+      /* 말풍선과 겹치는 고정 값 라벨은 잠시 숨겨 글자가 포개지지 않게 한다 */
+      labs.forEach(function (n) {
+        var b = n.getBBox();
+        var hitX = b.x < bx + w && b.x + b.width > bx;
+        var hitY = b.y < by + h && b.y + b.height > by;
+        n.style.opacity = (hitX && hitY) ? '0' : '';
+      });
+    }
+    function hide() {
+      g.setAttribute('opacity', '0');
+      labs.forEach(function (n) { n.style.opacity = ''; });
+    }
+
+    hit.addEventListener('mousemove', function (e) { show(e.clientX); });
+    hit.addEventListener('mouseleave', hide);
+    hit.addEventListener('touchstart', function (e) { if (e.touches[0]) show(e.touches[0].clientX); }, { passive: true });
+    hit.addEventListener('touchmove', function (e) { if (e.touches[0]) show(e.touches[0].clientX); }, { passive: true });
+    hit.addEventListener('touchend', hide);
+  }
+
+  /* 드롭다운 차트(trend.js)도 같은 동작을 쓰도록 공개한다 */
+  window.farmilyTrendHover = attachHover;
+
   function svg(pts, kind, label, color, uid) {
     var g = GEOM[kind], vals = pts.map(function (p) { return p.v; });
     var t = ticks(Math.min.apply(null, vals), Math.max.apply(null, vals));
@@ -122,13 +202,13 @@
         '" r="3.5" fill="#fff" stroke="' + color + '" stroke-width="2"/>');
       var anc = i === 0 ? 'start' : (i === last ? 'end' : 'middle');
       var ax = X(p.d) + (i === 0 ? 7 : 0);
-      o.push('<text x="' + ax.toFixed(1) + '" y="' + (below ? Y(p.v) + g.dyb : Y(p.v) - g.dy).toFixed(1) +
+      o.push('<text class="tp-vlab" x="' + ax.toFixed(1) + '" y="' + (below ? Y(p.v) + g.dyb : Y(p.v) - g.dy).toFixed(1) +
         '" font-size="' + g.vfs + '" font-weight="600" fill="#999" text-anchor="' + anc + '">' + won(p.v) + '</text>');
     });
     var lp = pts[last];
     o.push('<circle cx="' + X(lp.d).toFixed(1) + '" cy="' + Y(lp.v).toFixed(1) + '" r="' + (g.r + 2) +
       '" fill="' + color + '" stroke="#fff" stroke-width="2.5"/>');
-    o.push('<text x="' + (X(lp.d) - 10).toFixed(1) + '" y="' + (Y(lp.v) - g.dy - 3).toFixed(1) +
+    o.push('<text class="tp-vlab" x="' + (X(lp.d) - 10).toFixed(1) + '" y="' + (Y(lp.v) - g.dy - 3).toFixed(1) +
       '" font-size="' + g.lfs + '" font-weight="800" fill="' + color + '" text-anchor="end">' + won(lp.v) + '원</text>');
 
     /* 계절 띠와 날짜는 플롯 밖 아래에 */
@@ -174,7 +254,19 @@
         svg(pts, 'd', esc(it.n), it.c, idx) + svg(pts, 'm', esc(it.n), it.c, idx) +
         '<div class="trend-note">' + (f.getUTCMonth() + 1) + '월 ' + f.getUTCDate() + '일~' +
         (l.getUTCMonth() + 1) + '월 ' + l.getUTCDate() + '일 가락시장 상품(상) 등급 경락가 ' + pts.length +
-        '일치 · 그래프 아래 띠는 계절(가을 9~11월 등)입니다 · 자료가 없는 날은 건너뛰고 이었습니다.</div>';
+        '일치 · 그래프 아래 띠는 계절(가을 9~11월 등)입니다 · 마우스를 올리거나 손가락으로 짚으면 그날 가격이 나옵니다 · 자료가 없는 날은 건너뛰고 이었습니다.</div>';
+      panel.querySelectorAll('svg').forEach(function (el) {
+        var kind = el.getAttribute('class') === 'svg-m' ? 'm' : 'd', gg = GEOM[kind];
+        var vals = pts.map(function (q) { return q.v; });
+        var tt = ticks(Math.min.apply(null, vals), Math.max.apply(null, vals));
+        var dd = pts[0].d, sp2 = (pts[pts.length - 1].d - dd) / DAY || 1;
+        attachHover(el, {
+          pts: pts, color: it.c, vbw: kind === 'm' ? 640 : 1280, fs: gg.xfs,
+          x0: gg.x0, x1: gg.x1, y0: gg.y0, y1: gg.y1,
+          X: function (d) { return gg.x0 + (d - dd) / DAY / sp2 * (gg.x1 - gg.x0); },
+          Y: function (v) { return gg.y1 - (v - tt.lo) / (tt.hi - tt.lo) * (gg.y1 - gg.y0); }
+        });
+      });
     });
     host.querySelectorAll('button').forEach(function (b) {
       b.className = (+b.dataset.k === days) ? 'on' : '';
