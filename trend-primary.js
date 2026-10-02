@@ -1,7 +1,7 @@
 /* FARMILY 오늘의 농업 정보 — 대표 품목 가격 변동 추이
    기간 버튼(1개월 / 6개월 / 1년 / 전체)으로 창을 바꿔 가며 다시 그립니다.
    y축은 0을 강제하지 않고 보이는 구간의 실제 범위에 맞추며, 계절은 그래프 배경이 아니라
-   플롯 아래 얇은 띄로 표시해 선이 먼저 읽히게 합니다(여백 정리형).
+   플롯 아래 얇은 띠로 표시해 선이 먼저 읽히게 합니다(여백 정리형).
    데이터: trend-primary.json (dates 공유 + 품목별 p 배열, 결측일은 null) */
 (function () {
   var BASE = location.pathname.indexOf('/log/') > -1 ? '../' : './';
@@ -39,7 +39,7 @@
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function seasonOf(d) { var m = d.getUTCMonth() + 1; return (m >= 3 && m <= 5) ? 0 : (m >= 6 && m <= 8) ? 1 : (m >= 9 && m <= 11) ? 2 : 3; }
 
-  /* 눈금 4~7개, 데이터가 축을 가장 꿉 채우는 후보. 0 기준선을 강제하지 않는다. */
+  /* 눈금 4~7개, 데이터가 축을 가장 꽉 채우는 후보. 0 기준선을 강제하지 않는다. */
   function ticks(lo, hi) {
     if (!(hi > lo)) { var pad = Math.abs(hi) * 0.1 + 1; lo = hi - pad; hi = hi + pad; }
     var best = null, i;
@@ -62,7 +62,7 @@
     return best;
   }
 
-  /* 계절 띄 — 플롯 아래 얇은 막대. 구간 경계는 공통 좌표를 써서 툓이 생기지 않게 한다. */
+  /* 계절 띠 — 플롯 아래 얇은 막대. 구간 경계는 공통 좌표를 써서 틈이 생기지 않게 한다. */
   function bands(pts, X, g) {
     var segs = [], cur = null, o = [], edges = [g.x0];
     pts.forEach(function (p) {
@@ -97,7 +97,7 @@
       o.push('<text x="' + g.tx + '" y="' + (y + g.fs * 0.33).toFixed(1) + '" font-size="' + g.fs + '" fill="#aaa" text-anchor="end">' + won(v) + '</text>');
     }
 
-    /* 선 아래 얇은 그라데이션 */
+    /* 선 아래 옅은 그라데이션 */
     var pl = pts.map(function (p) { return X(p.d).toFixed(1) + ',' + Y(p.v).toFixed(1); }).join(' ');
     o.push('<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
       '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.16"/>' +
@@ -131,7 +131,7 @@
     o.push('<text x="' + (X(lp.d) - 10).toFixed(1) + '" y="' + (Y(lp.v) - g.dy - 3).toFixed(1) +
       '" font-size="' + g.lfs + '" font-weight="800" fill="' + color + '" text-anchor="end">' + won(lp.v) + '원</text>');
 
-    /* 계절 띄와 날짜는 플롯 밖 아래에 */
+    /* 계절 띠와 날짜는 플롯 밖 아래에 */
     o.push(bands(pts, X, g));
     var pick = [];
     function add(i) { if (pick.indexOf(i) < 0) pick.push(i); }
@@ -174,7 +174,7 @@
         svg(pts, 'd', esc(it.n), it.c, idx) + svg(pts, 'm', esc(it.n), it.c, idx) +
         '<div class="trend-note">' + (f.getUTCMonth() + 1) + '월 ' + f.getUTCDate() + '일~' +
         (l.getUTCMonth() + 1) + '월 ' + l.getUTCDate() + '일 가락시장 상품(상) 등급 경락가 ' + pts.length +
-        '일치 · 그래프 아래 띄는 계절(가을 9~11월 등)입니다 · 자료가 없는 날은 건너뛰고 이었습니다.</div>';
+        '일치 · 그래프 아래 띠는 계절(가을 9~11월 등)입니다 · 자료가 없는 날은 건너뛰고 이었습니다.</div>';
     });
     host.querySelectorAll('button').forEach(function (b) {
       b.className = (+b.dataset.k === days) ? 'on' : '';
