@@ -112,7 +112,7 @@
         svg(pts, false, esc(s.n)) + svg(pts, true, esc(s.n)) +
         '<div class="trend-note">' + (first.getUTCMonth() + 1) + '월 ' + first.getUTCDate() + '일부터 ' +
         (last.getUTCMonth() + 1) + '월 ' + last.getUTCDate() + '일까지 ' + pts.length + '일치 경락가입니다. 자료가 없는 날은 건너뛰고 이었습니다.' +
-        (flat ? ' 이 기간 가격이 한 번도 바뀜지 않았습니다 — 경매 물량이 적어 직전 가격이 그대로 유지되는 품목일 수 있습니다.' : '') +
+        (flat ? ' 이 기간 가격이 한 번도 바뀌지 않았습니다 — 경매 물량이 적어 직전 가격이 그대로 유지되는 품목일 수 있습니다.' : '') +
         ' 마우스를 올리거나 손가락으로 짚으면 그날 가격이 나옵니다.</div>';
       /* 대표 품목 차트와 같은 호버 기능을 붙인다(trend-primary.js가 공개한 함수) */
       if (typeof window.farmilyTrendHover === 'function') {
