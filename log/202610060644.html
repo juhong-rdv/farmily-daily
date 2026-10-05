@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 농업 소식 | FARMILY 파밀리 — 스마트팜 · 농업로봇 · 무인 방제</title>
+<meta name="description" content="10월 6일 전국 맑지만 아침 쌀쌀 &middot; 내륙 10도 안팎, 일교차 15도 안팎에 강풍 &middot; 강원 평창&middot;태백 한파특보, 산지 서리&middot;얼음 &middot; 가락시장 10/5 기준 오이 ▲34.5%&middot;상추 ▼27.1% &middot; 8일 한로">
+<meta name="keywords" content="스마트팜, 농업, 농업 뉴스, 농업로봇, 방제기, 방제 자동화, 무인방제기, 방제로봇, UV, UV로봇, UV 방제, 수확, 수확로봇, 자율주행, 로봇팔, AMR, 온실 자동화, 시설원예, 병해충 방제, 농산물 시세, 농업 날씨, FARMILY, 파밀리, 랑데뷰">
+<meta property="og:site_name" content="FARMILY 오늘의 농업 소식">
+<meta property="og:title" content="오늘의 농업 소식 (10월 6일 화) — FARMILY">
+<meta property="og:description" content="10월 6일 전국 맑지만 아침 쌀쌀 &middot; 내륙 10도 안팎, 일교차 15도 안팎에 강풍 &middot; 강원 평창&middot;태백 한파특보, 산지 서리&middot;얼음 &middot; 가락시장 10/5 기준 오이 ▲34.5%&middot;상추 ▼27.1% &middot; 8일 한로">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://juhong-rdv.github.io/farmily-daily/">
+<meta property="og:locale" content="ko_KR">
+<link rel="canonical" href="https://juhong-rdv.github.io/farmily-daily/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"오늘의 농업 소식","description":"농업 날씨, 병해충 발생 정보, 농산물 시세, 농업 뉴스를 매일 아침 제공하는 페이지","dateModified":"2026-10-06","inLanguage":"ko","publisher":{"@type":"Organization","name":"FARMILY (주식회사 랑데뷰)","url":"https://farmily.ai","description":"스마트팜 자동화 로봇 기업 — 무인 방제로봇 FARMILY-X S300, UV 방제로봇 FARMILY-X UV 등 자율주행 기반 농업로봇 개발"}}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #222; line-height: 1.75; margin: 0; padding: 4px; background: transparent; }
+  .page-head { padding: 6px 8px 18px; }
+  .page-head h1 { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
+  .page-head .date { font-size: 15px; color: #888; }
+  .lead { background: #f7f9f7; border-left: 4px solid #12341f; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px; font-size: 16px; line-height: 1.8; color: #333; }
+  .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 28px 32px; margin-bottom: 20px; }
+  .card h2 { font-size: 20px; font-weight: 700; margin: 0 0 14px; }
+  .card p { margin: 0 0 14px; }
+  .subhead { font-weight: 700; margin-bottom: 8px; }
+  ul { margin: 0 0 14px; padding-left: 20px; }
+  li { margin-bottom: 8px; }
+  .alert { background: #fff8e1; border-radius: 8px; padding: 12px 16px; font-size: 15px; }
+  .tip { background: #f0f7f2; border-radius: 8px; padding: 14px 16px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 8px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #eee; text-align: left; }
+  th { color: #666; font-weight: 700; background: #fafafa; }
+  .up { color: #d32f2f; }
+  .down { color: #1a56db; }
+  .src { font-size: 13px; color: #999; }
+  .chart { margin: 24px 0 16px; }
+  .chart-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .chart-axis-label { display: flex; align-items: center; font-size: 12px; color: #888; margin-bottom: 8px; }
+  .chart-axis-label .cname { color: #888; }
+  .chart-axis-label .cside.left { justify-content: flex-start; }
+  .chart-axis-label .cside.right { justify-content: flex-end; }
+  .crow { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
+  .cname { width: 76px; flex-shrink: 0; text-align: right; color: #555; padding-right: 8px; }
+  .cside { flex: 1 1 0; display: flex; align-items: center; min-width: 0; }
+  .cside.left { justify-content: flex-end; }
+  .cside.right { justify-content: flex-start; }
+  .caxis { width: 2px; height: 20px; background: #bbb; flex-shrink: 0; }
+  .cbar { height: 14px; min-width: 3px; display: block; }
+  .cbar.up-bg { background: #ef5350; border-radius: 0 4px 4px 0; }
+  .cbar.down-bg { background: #42a5f5; border-radius: 4px 0 0 4px; }
+  .cval { width: 62px; flex-shrink: 0; text-align: right; font-weight: 700; font-size: 13px; white-space: nowrap; }
+  .trend { margin: 30px 0 16px; }
+  .trend svg { width: 100%; height: auto; display: block; }
+  .trend svg.svg-m { display: none; }
+  @media (max-width: 700px) { .trend svg.svg-d { display: none; } .trend svg.svg-m { display: block; } }
+  .trend-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
+  .tab-btn { border: 1px solid #ddd; background: #fafafa; color: #555; border-radius: 16px; padding: 4px 12px; font-size: 13px; cursor: pointer; font-family: inherit; line-height: 1.5; }
+  .tab-btn.active { background: #12341f; color: #fff; border-color: #12341f; font-weight: 700; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .tab-sub { font-size: 13px; color: #888; margin-bottom: 6px; }
+  .trend-note { font-size: 12px; color: #999; margin-top: 6px; line-height: 1.6; }
+  .footer-note { font-size: 14px; color: #777; padding: 4px 8px 12px; }
+  a { color: #1a56db; }
+  @media (max-width: 600px) { .card { padding: 20px 18px; } }
+</style>
+</head>
+<body>
+<div class="page-head">
+  <h1>오늘의 농업 소식 (10월 6일 화)</h1>
+  <div class="date">업데이트: 2026.10.06 06:44 · FARMILY AI 제공</div>
+</div>
+<div class="lead">🍂 사흘 연휴를 지나 다시 일을 여는 첫날입니다. 오늘은 전국이 대체로 맑지만 북서쪽 찬 공기가 들어와 아침 기온이 내륙을 중심으로 10도 안팎까지 떨어지고, <strong>[강원 평창&middot;태백]</strong>에는 10월 기준 역대 가장 이른 <strong>한파특보</strong>가 발표돼 산지에는 서리나 얼음이 생길 수 있습니다. 이번 주는 맑고 건조한 날에 아침은 쌀쌀하고 낮은 포근해 일교차가 15도 안팎으로 크게 벌어지는 흐름이니, 연휴에 밀린 방제는 바람이 잦아드는 이른 아침이나 저녁으로 잡고 하우스 환기&middot;관수 시각은 기온이 오른 뒤로 옮겨 두시는 편이 좋습니다. 모레 8일은 찬 이슬이 맺힌다는 절기 <strong>한로</strong>로 첫서리가 시작되는 시기이니, 보온 자재 점검과 서리에 약한 과실&middot;엽채류의 출하 순서는 이번 주 안에 정해 두시면 뒤가 수월합니다.</div>
+<div class="card">
+  <h2>🌤 오늘의 농업 날씨</h2>
+  <p>오늘(6일 화)은 전국이 대체로 맑습니다. 다만 북서쪽에서 찬 공기가 들어와 아침 최저기온이 2~16도, 내륙을 중심으로는 10도 안팎까지 떨어져 어제보다 확실히 쌀쌀합니다. <strong>[강원 평창&middot;태백]</strong>에는 10월 기준 역대 가장 이른 <strong>한파특보</strong>가 발표됐고, <strong>[강원 산지]</strong>는 서리 또는 얼음이 생길 수 있어 노지 작물은 오늘 아침이 고비입니다.</p>
+  <p>낮에는 기온이 제법 올라 아침과의 차이가 15도, 지역에 따라 19도까지 벌어집니다. 여기에 <strong>전국에 바람이 강하게</strong> 불고 <strong>[서해&middot;제주 해상]</strong>은 물결이 1.5~3.5m로 높게 일 전망이라, 체감온도는 기온보다 낮고 약액 살포는 날려 흩어지기 쉽습니다. 오늘 작업은 바람이 비교적 약한 이른 아침과 해 질 무렵으로 나눠 잡으시는 편이 안전합니다.</p>
+  <div class="subhead">이번 주 전망</div>
+  <p>찬 공기가 머무는 동안 맑고 건조한 날이 이어지고, 아침은 쌀쌀하지만 낮은 포근해 일교차가 큰 흐름이 이번 주 내내 계속될 전망입니다. 모레 8일은 찬 이슬이 맺힌다는 절기 <strong>한로</strong>로, 중부 내륙과 산간에서는 이번 주 중 첫서리가 내릴 수 있습니다. 비 예보가 없어 노지는 흙이 빨리 마르니 관수 간격을 다시 짧게 잡아 주시고, 서리 예보가 뜨기 전에 부직포&middot;보온 커튼&middot;온풍기를 미리 꺼내 작동 여부를 확인해 두시기 바랍니다.</p>
+  <div class="subhead">농작업 포인트</div>
+  <ul>
+    <li><strong>온실&middot;시설 관리 &mdash; 환기는 ‘기온이 오른 뒤’, 밤에는 닫기:</strong> 아침 기온이 10도 아래로 내려가는 날에 일찍 창을 열면 찬 공기가 바로 들어와 작물이 몸살을 앓습니다. 하우스 안 기온이 25도에 닿은 뒤부터 열고, 바람이 센 날이니 <strong>바람이 불어오는 반대쪽 창만</strong> 여세요. 낮에 환기를 줄이면 밤에 습도가 올라 비닐 안쪽과 잎에 이슬(결로)이 맺히니, 해가 지기 2~3시간 전에 10~15분 짧게 한 번 더 빼 주시는 것이 좋습니다. 관수는 오전에 끝내 해 지기 전 잎이 마르게 하고, 열매채소는 밤 최저 12~15도를 목표로 보온을 챙겨 주세요.</li>
+    <li><strong>저온&middot;첫서리 대비 &mdash; 오늘 아침 강원 산지가 가장 위험:</strong> <strong>[강원 평창&middot;태백]</strong>은 한파특보, <strong>[강원 산지]</strong>는 서리&middot;얼음이 예상됩니다. 서리를 맞은 과실은 껍질에 얼음 반점이 남아 상품성이 떨어지니 수확이 가능한 과실은 서리 전에 먼저 거두시고, 노지 엽채류와 모종에는 부직포나 터널을 덮어 주세요. 고랭지와 중부 내륙은 오늘 밤부터 서리 예보를 하루 한 번만 확인해 두시면 충분합니다.</li>
+    <li><strong>강풍 대비 &mdash; 연휴 동안 느슨해진 결속부터:</strong> 사흘 연휴 사이 비바람이 지나갔으니 하우스 옆면 비닐&middot;고정끈&middot;차광망 결속과 환기창 걸쇠가 느슨해진 곳이 있습니다. 작업 시작 전에 한 바퀴 돌며 조여 주시고, 지주를 세운 고추&middot;가지&middot;토마토는 유인끈을 한 번 더 당겨 주세요. 빈 상자&middot;부직포&middot;모종판&middot;사다리처럼 날아갈 수 있는 것은 바람이 닿지 않는 곳으로 들여놓으시기 바랍니다.</li>
+    <li><strong>병해충 예찰 &mdash; 밖이 추워지면 해충이 하우스로 들어옵니다:</strong> 기온이 내려가면 <strong>가루이류</strong>와 <strong>진딧물</strong>이 따뜻한 하우스 안으로 몰려들고, 밤 습도가 높아진 시설채소에는 <strong>잿빛곰팡이병</strong>&middot;<strong>흰가루병</strong>이 함께 올라옵니다. 노란 끈끈이 트랩으로 마릿수가 늘었는지 하루 한 번만 확인하시고, 병든 잎&middot;열매는 보이는 대로 걷어 하우스 밖으로 내보내 주세요. 김장채소 밭은 물컹하게 썩는 <strong>무름병</strong> 포기를 뽑아 밭 밖으로 치우는 것이 번짐을 막는 가장 빠른 방법입니다.</li>
+    <li><strong>가축&middot;축사 &mdash; 밤 찬바람 들이치는 쪽만 막아 주세요:</strong> 아침 기온이 10도 아래로 떨어지고 일교차가 커지면 송아지&middot;자돈 호흑기 질병이 늘어납니다. 바람이 바로 들이치는 쪽은 막아 주시되 암모니아가 빠지도록 환기는 남겨 두시고, 젖은 깔짚은 그날 걷어내고 마른 깔짚을 두툼하게 깔아 바닥 냉기를 막아 주세요. 겨울철 조류인플루엔자&middot;구제역 특별방역 기간이 다가오니 소독 장비 작동 여부도 이번 주에 확인해 두시면 좋습니다.</li>
+    <li><strong>수확&middot;출하 &mdash; 연휴 뒤 첫 개장일 반입 집중:</strong> 사흘 연휴가 끝나고 산지 작업이 한꺼번에 재개되는 날입니다. 같은 날 반입이 몰리면 값이 눌리기 쉬우니, 저장이 가능한 품목은 출하를 하루이틀 나눠 잡고 수확은 이슬이 마른 뒤에 하셔야 저장 중 곰팡이를 줄일 수 있습니다.</li>
+  </ul>
+  <div class="alert">⚠️ <strong>오늘 특히 주의할 지역:</strong> <strong>[강원 평창&middot;태백]</strong>은 한파특보가 발효돼 노지 작물&middot;모종 보온이 급하고, <strong>[강원 산지]</strong>와 <strong>[중부 내륙 고랭지]</strong>는 서리&middot;얼음에 주의하셔야 합니다. <strong>[전국]</strong>은 바람이 강해 약액 살포 효율이 떨어지니 방제는 바람이 잦아드는 시간대로 미루시고, <strong>[서해&middot;제주 해상]</strong>과 <strong>[제주]</strong>는 물결이 최고 3.5m로 높게 일어 해안가 작업과 선박 이용에 주의가 필요합니다.</div>
+</div>
+<div class="card">
+  <h2>🤖 오늘의 FARMILY-X 활용 팁</h2>
+  <div class="tip">연휴가 끝나 밀린 방제를 한꺼번에 해야 하는 날인데, 하필 오늘은 전국에 바람이 강합니다. 바람이 세면 약액이 목표 잎에 닿기 전에 흩어져 묻는 양이 줄고, 같은 면적에 약과 시간을 두 번 쓰게 됩니다. 바람이 잦아드는 밤과 새벽이 약액 방제에 가장 좋은 시간대지만 사람이 그 시간에 들어가기는 어렵습니다. 무인으로 움직이는 <a href="https://farmily.ai/FARMILY-XS300" target="_blank" rel="noopener">FARMILY-X S300</a>은 사람 없이 작업하므로 바람이 멎은 야간 시간대를 그대로 쓸 수 있고, 밀린 물량이 많은 날에는 사람이 작업하는 통로 반대편에서 동시에 운용하면 같은 면적을 절반의 시간과 인건비로 마칠 수 있습니다.<br><br>또 아침 기온이 10도 아래로 내려가면서 환기를 줄이는 시기로 들어섰습니다. 밤 습도가 높은 하우스에 약액을 더하면 잎이 젖은 시간만 길어져 잿빛곰팡이병에 오히려 유리한 조건이 됩니다. 이런 날에는 물을 쓰지 않는 <a href="https://farmily.ai/FARMILY-XUV" target="_blank" rel="noopener">FARMILY-X UV</a>의 UV(자외선) 방제로 넘기면 습도를 더 올리지 않고 곰팡이병 고비를 지날 수 있습니다. <a href="https://farmily.ai/product" target="_blank" rel="noopener">FARMILY 제품 전체 보기</a></div>
+</div>
+<div class="card">
+  <h2>📈 오늘의 농산물 시세</h2>
+  <table>
+    <tr><th>품목</th><th>단위</th><th>도매가격</th><th>등락</th></tr>
+    <tr><td>오이(백다다기)</td><td>50개</td><td>21,422원</td><td class="up">▲ 34.5%</td></tr>
+    <tr><td>토마토</td><td>5kg 상자</td><td>18,195원</td><td class="down">▼ 4.4%</td></tr>
+    <tr><td>방울토마토</td><td>5kg 상자</td><td>14,604원</td><td class="up">▲ 3.8%</td></tr>
+    <tr><td>파프리카(빨강)</td><td>5kg 상자</td><td>16,555원</td><td class="down">▼ 4.4%</td></tr>
+    <tr><td>애호박</td><td>20개</td><td>10,003원</td><td class="up">▲ 19.3%</td></tr>
+    <tr><td>풋고추(일반)</td><td>10kg 상자</td><td>35,773원</td><td class="down">▼ 7.8%</td></tr>
+    <tr><td>상추</td><td>4kg 상자</td><td>12,038원</td><td class="down">▼ 27.1%</td></tr>
+    <tr><td>배추</td><td>10kg 망대</td><td>11,521원</td><td class="down">▼ 9.5%</td></tr>
+    <tr><td>무</td><td>20kg 상자</td><td>16,007원</td><td class="up">▲ 21.0%</td></tr>
+  </table>
+  <div class="chart">
+    <div class="chart-title">품목별 등락률 (10월 5일(월) 기준, 직전 비교 가능일 10월 3일(토) 대비)</div>
+    <div class="chart-axis-label"><span class="cname"></span><span class="cside left">◀ 하락</span><span class="caxis" style="background:transparent"></span><span class="cside right">상승 ▶</span><span class="cval"></span></div>
+    <div class="crow"><span class="cname">오이</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:92.0%"></span></span><span class="cval up">▲ 34.5%</span></div>
+    <div class="crow"><span class="cname">상추</span><span class="cside left"><span class="cbar down-bg" style="width:72.3%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 27.1%</span></div>
+    <div class="crow"><span class="cname">무</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:56.0%"></span></span><span class="cval up">▲ 21.0%</span></div>
+    <div class="crow"><span class="cname">애호박</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:51.5%"></span></span><span class="cval up">▲ 19.3%</span></div>
+    <div class="crow"><span class="cname">배추</span><span class="cside left"><span class="cbar down-bg" style="width:25.3%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 9.5%</span></div>
+    <div class="crow"><span class="cname">풋고추</span><span class="cside left"><span class="cbar down-bg" style="width:20.8%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 7.8%</span></div>
+    <div class="crow"><span class="cname">토마토</span><span class="cside left"><span class="cbar down-bg" style="width:11.7%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 4.4%</span></div>
+    <div class="crow"><span class="cname">파프리카</span><span class="cside left"><span class="cbar down-bg" style="width:11.7%"></span></span><span class="caxis"></span><span class="cside right"></span><span class="cval down">▼ 4.4%</span></div>
+    <div class="crow"><span class="cname">방울토마토</span><span class="cside left"></span><span class="caxis"></span><span class="cside right"><span class="cbar up-bg" style="width:10.1%"></span></span><span class="cval up">▲ 3.8%</span></div>
+  </div>
+  <div class="trend">
+    <div class="chart-title">품목별 가격 변동 추이</div>
+    <div id="trend-period"></div>
+    <div class="trend-tabs">
+      <button type="button" class="tab-btn active" onclick="showTrendTab(0)">오이</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(1)">토마토</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(2)">방울토마토</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(3)">파프리카</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(4)">애호박</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(5)">풋고추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(6)">상추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(7)">배추</button>
+      <button type="button" class="tab-btn" onclick="showTrendTab(8)">무</button>
+    </div>
+    <div id="trend-pick"></div>
+    <div class="tab-panel active" id="trend-tab-0">
+      <div class="tab-sub">오이(백다다기) · 50개 · 가락시장 상품 등급</div>
+<svg class="svg-d" viewBox="0 0 1280 320" role="img" aria-label="오이(백다다기) 가격 변동 추이"><line x1="92" y1="230.0" x2="1252" y2="230.0" stroke="#f0f0f0" stroke-width="1"/><text x="80" y="235.0" font-size="15" fill="#aaa" text-anchor="end">0</text><line x1="92" y1="163.3" x2="1252" y2="163.3" stroke="#f0f0f0" stroke-width="1"/><text x="80" y="168.3" font-size="15" fill="#aaa" text-anchor="end">25,000</text><line x1="92" y1="96.7" x2="1252" y2="96.7" stroke="#f0f0f0" stroke-width="1"/><text x="80" y="101.6" font-size="15" fill="#aaa" text-anchor="end">50,000</text><line x1="92" y1="30.0" x2="1252" y2="30.0" stroke="#f0f0f0" stroke-width="1"/><text x="80" y="35.0" font-size="15" fill="#aaa" text-anchor="end">75,000</text><defs><linearGradient id="tpg-0-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a78d6" stop-opacity="0.16"/><stop offset="100%" stop-color="#2a78d6" stop-opacity="0"/></linearGradient></defs><polygon points="92.0,230 92.0,52.2 169.3,60.4 208.0,69.3 246.7,92.4 285.3,84.6 324.0,98.8 362.7,114.8 440.0,143.0 478.7,161.1 517.3,164.9 556.0,154.3 594.7,157.4 633.3,170.0 710.7,183.5 749.3,176.9 788.0,151.3 826.7,198.2 981.3,204.8 1020.0,200.8 1058.7,181.8 1097.3,180.7 1136.0,186.2 1174.7,187.5 1252.0,172.9 1252.0,230" fill="url(#tpg-0-d)"/><polyline points="92.0,52.2 169.3,60.4 208.0,69.3 246.7,92.4 285.3,84.6 324.0,98.8 362.7,114.8 440.0,143.0 478.7,161.1 517.3,164.9 556.0,154.3 594.7,157.4 633.3,170.0 710.7,183.5 749.3,176.9 788.0,151.3 826.7,198.2 981.3,204.8 1020.0,200.8 1058.7,181.8 1097.3,180.7 1136.0,186.2 1174.7,187.5 1252.0,172.9" fill="none" stroke="#2a78d6" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/><circle cx="92.0" cy="52.2" r="3.5" fill="#fff" stroke="#2a78d6" stroke-width="2"/><text class="tp-vlab" x="99.0" y="41.2" font-size="13" font-weight="600" fill="#999" text-anchor="start">66,686</text><circle cx="981.3" cy="204.8" r="3.5" fill="#fff" stroke="#2a78d6" stroke-width="2"/><text class="tp-vlab" x="981.3" y="225.8" font-size="13" font-weight="600" fill="#999" text-anchor="middle">9,461</text><circle cx="1252.0" cy="172.9" r="6" fill="#2a78d6" stroke="#fff" stroke-width="2.5"/><text class="tp-vlab" x="1242.0" y="158.9" font-size="17" font-weight="800" fill="#2a78d6" text-anchor="end">21,422원</text><rect x="92.0" y="244" width="1160.0" height="20" fill="#fbf0e2"/><text x="672.0" y="258.7" font-size="13" fill="#a79f93" text-anchor="middle">가을</text><text x="92.0" y="292" text-anchor="start" font-size="14" fill="#aaa">9/5</text><text x="362.7" y="292" text-anchor="middle" font-size="14" fill="#aaa">9/12</text><text x="633.3" y="292" text-anchor="middle" font-size="14" fill="#aaa">9/19</text><text x="1020.0" y="292" text-anchor="middle" font-size="14" fill="#aaa">9/29</text><text x="1252.0" y="292" text-anchor="end" font-size="14" fill="#aaa">10/5</text></svg>
+<svg class="svg-m" viewBox="0 0 640 268" role="img" aria-label="오이(백다다기) 가격 변동 추이"><line x1="78" y1="180.0" x2="616" y2="180.0" stroke="#f0f0f0" stroke-width="1"/><text x="68" y="184.3" font-size="13" fill="#aaa" text-anchor="end">0</text><line x1="78" y1="128.7" x2="616" y2="128.7" stroke="#f0f0f0" stroke-width="1"/><text x="68" y="133.0" font-size="13" fill="#aaa" text-anchor="end">25,000</text><line x1="78" y1="77.3" x2="616" y2="77.3" stroke="#f0f0f0" stroke-width="1"/><text x="68" y="81.6" font-size="13" fill="#aaa" text-anchor="end">50,000</text><line x1="78" y1="26.0" x2="616" y2="26.0" stroke="#f0f0f0" stroke-width="1"/><text x="68" y="30.3" font-size="13" fill="#aaa" text-anchor="end">75,000</text><defs><linearGradient id="tpg-0-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a78d6" stop-opacity="0.16"/><stop offset="100%" stop-color="#2a78d6" stop-opacity="0"/></linearGradient></defs><polygon points="78.0,180 78.0,43.1 113.9,49.4 131.8,56.3 149.7,74.0 167.7,68.0 185.6,79.0 203.5,91.3 239.4,113.0 257.3,127.0 275.3,129.9 293.2,121.7 311.1,124.1 329.1,133.8 364.9,144.2 382.9,139.1 400.8,119.4 418.7,155.5 490.5,160.6 508.4,157.5 526.3,142.9 544.3,142.0 562.2,146.3 580.1,147.3 616.0,136.0 616.0,180" fill="url(#tpg-0-m)"/><polyline points="78.0,43.1 113.9,49.4 131.8,56.3 149.7,74.0 167.7,68.0 185.6,79.0 203.5,91.3 239.4,113.0 257.3,127.0 275.3,129.9 293.2,121.7 311.1,124.1 329.1,133.8 364.9,144.2 382.9,139.1 400.8,119.4 418.7,155.5 490.5,160.6 508.4,157.5 526.3,142.9 544.3,142.0 562.2,146.3 580.1,147.3 616.0,136.0" fill="none" stroke="#2a78d6" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="78.0" cy="43.1" r="3.5" fill="#fff" stroke="#2a78d6" stroke-width="2"/><text class="tp-vlab" x="85.0" y="33.1" font-size="12" font-weight="600" fill="#999" text-anchor="start">66,686</text><circle cx="490.5" cy="160.6" r="3.5" fill="#fff" stroke="#2a78d6" stroke-width="2"/><text class="tp-vlab" x="490.5" y="179.6" font-size="12" font-weight="600" fill="#999" text-anchor="middle">9,461</text><circle cx="616.0" cy="136.0" r="5.5" fill="#2a78d6" stroke="#fff" stroke-width="2.5"/><text class="tp-vlab" x="606.0" y="123.0" font-size="15" font-weight="800" fill="#2a78d6" text-anchor="end">21,422원</text><rect x="78.0" y="192" width="538.0" height="17" fill="#fbf0e2"/><text x="347.0" y="204.8" font-size="12" fill="#a79f93" text-anchor="middle">가을</text><text x="78.0" y="237" text-anchor="start" font-size="13" fill="#aaa">9/5</text><text x="203.5" y="237" text-anchor="middle" font-size="13" fill="#aaa">9/12</text><text x="329.1" y="237" text-anchor="middle" font-size="13" fill="#aaa">9/19</text><text x="508.4" y="237" text-anchor="middle" font-size="13" fill="#aaa">9/29</text><text x="616.0" y="237" text-anchor="end" font-size="13" fill="#aaa">10/5</text></svg>
+      <div class="trend-note">9월 5일~10월 5일 가락시장 상품(상) 등급 경락가 24일치 · 그래프 아래 띠는 계절(가을 9~11월 등)입니다 · 마우스를 올리거나 손가락으로 짚으면 그날 가격이 나옵니다 · 자료가 없는 날은 건너뛰고 이었습니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-1">
+      <div class="tab-sub">토마토 · 5kg 상자 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-2">
+      <div class="tab-sub">방울토마토 · 5kg 상자 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-3">
+      <div class="tab-sub">파프리카(빨강) · 5kg 상자 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-4">
+      <div class="tab-sub">애호박 · 20개 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-5">
+      <div class="tab-sub">풋고추(일반) · 10kg 상자 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-6">
+      <div class="tab-sub">상추 · 4kg 상자 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-7">
+      <div class="tab-sub">배추 · 10kg 망대 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <div class="tab-panel" id="trend-tab-8">
+      <div class="tab-sub">무 · 20kg 상자 · 가락시장 상품 등급</div>
+      <div class="trend-note">그래프를 불러오는 중입니다.</div>
+    </div>
+    <script>
+      function showTrendTab(i) {
+        var btns = document.querySelectorAll('.trend-tabs .tab-btn');
+        var panels = document.querySelectorAll('.tab-panel');
+        for (var k = 0; k < btns.length; k++) {
+          btns[k].className = 'tab-btn' + (k === i ? ' active' : '');
+          panels[k].className = 'tab-panel' + (k === i ? ' active' : '');
+        }
+        if (typeof postHeight === 'function') { postHeight(); }
+      }
+    </script>
+  </div>
+  <div class="src">가격 기준일 10월 5일(월) 가락시장 경락가격 &middot; 상품(상) 등급 &middot; 등락은 직전 비교 가능일 10월 3일(토) 대비 &middot; 모든 품목이 이력과 같은 단위여서 환산 없이 비교 &middot; 상 등급 전체 품목 272개 시세는 이력에 누적 중 &middot; 오늘 경락가가 공개되는 대로 갱신됩니다.</div>
+</div>
+<div class="card">
+  <h2>📰 오늘의 농업 뉴스</h2>
+  <ul>
+    <li><a href="https://news.sbs.co.kr/news/endPage.do?news_id=N1008783589" target="_blank" rel="noopener"><strong>[강원]</strong> “벌써 영하권” 강원 산지에 역대 가장 이른 한파특보</a> &mdash; SBS</li>
+    <li><a href="https://www.segye.com/newsView/20261005507242" target="_blank" rel="noopener">출근길 아침 최저 5도&hellip;강원 평창&middot;태백 ‘한파특보’ 발표</a> &mdash; 세계일보</li>
+    <li><a href="https://www.mediafine.co.kr/news/articleView.html?idxno=91679" target="_blank" rel="noopener">6일 전국 맑지만 아침 쌀쌀&hellip;큰 일교차에 강풍까지</a> &mdash; 미디어파인</li>
+    <li><a href="https://www.joongdo.co.kr/web/view.php?key=20261006010001049" target="_blank" rel="noopener"><strong>[충남 예산]</strong> 예산군, 고추 재배농가 비가림시설 추가 지원&hellip;8일까지 신청</a> &mdash; 중도일보</li>
+    <li><a href="https://seoul.co.kr/news/economy/2026/10/05/20261005032005" target="_blank" rel="noopener">비싼 농축산물&hellip; 정부, 6년간 1.3조원 할인 지원</a> &mdash; 서울신문</li>
+    <li><a href="https://www.nongmin.com/article/20261003500005" target="_blank" rel="noopener">수확기 쌀값 약보합세 전망</a> &mdash; 농민신문</li>
+  </ul>
+</div>
+<div class="card">
+  <h2>📋 지원사업&middot;공고</h2>
+  <ul>
+    <li><a href="https://www.joongdo.co.kr/web/view.php?key=20261006010001049" target="_blank" rel="noopener">2026년 고추 재배농가 비가림시설 추가 지원</a> &mdash; 충남 예산군 &middot; <strong>10월 8일까지 신청</strong><br><span class="src">비를 막아 주는 간이 시설을 세워 고추 역병&middot;탄저병 피해를 줄이는 사업으로, 추가 물량에 대한 신청을 받습니다. 마감이 이틀 뒤이니 신청은 거주지 읍&middot;면 또는 예산군 농업기술센터로 서둘러 주세요.</span></li>
+    <li><a href="https://www.ccdn.co.kr/news/articleView.html?idxno=1102207" target="_blank" rel="noopener">2026년 하반기 영농부산물 파쇄 지원사업 (1차)</a> &mdash; 충북 단양군농업기술센터 &middot; <strong>10월 9일까지 접수</strong><br><span class="src">고춧대&middot;과수 가지 등 영농부산물을 태우지 않고 파쇄 처리해 주는 사업으로, 고령&middot;여성&middot;소규모 등 취약농가를 우선 지원합니다. 다른 지자체도 하반기 사업을 접수 중인 곳이 있으니, 마감일은 해당 지역 농업기술센터에 확인해 보세요.</span></li>
+  </ul>
+</div>
+<div class="card">
+  <h2>📅 지난 소식 보기</h2>
+  <div id="cal" data-current="2026-10-06"></div>
+</div>
+<script src="/farmily-daily/cal.js"></script>
+<script src="/farmily-daily/trend.js"></script>
+<script src="/farmily-daily/trend-primary.js"></script>
+<p class="footer-note">본 정보는 스마트팜 농업로봇 기업 <a href="https://farmily.ai" target="_blank" rel="noopener">FARMILY(파밀리)</a>가 매일 아침 전합니다. 무인 방제로봇 <a href="https://farmily.ai/FARMILY-XS300" target="_blank" rel="noopener">FARMILY-X S300</a>, UV 방제로봇 <a href="https://farmily.ai/FARMILY-XUV" target="_blank" rel="noopener">FARMILY-X UV</a> 등 자율주행 기반 방제 자동화 솔루션은 <a href="https://farmily.ai/product" target="_blank" rel="noopener">FARMILY 제품 페이지</a>에서 확인하세요.</p>
+<script>
+  function postHeight() {
+    if (window.parent !== window) {
+      window.parent.postMessage({ farmilyHeight: document.body.scrollHeight }, '*');
+    }
+  }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+  setTimeout(postHeight, 500);
+</script>
+</body>
+</html>
