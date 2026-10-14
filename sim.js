@@ -26,7 +26,7 @@
     ctrl: Object.assign(F.defaults(saved.crop || 'tomato'), saved.ctrl || {})
   };
   if (!saved.house) { var o = ls('farmily.orient'); if (o === 'ns') S.house.axis = 90; }
-  S.date = ''; S.days = 2;  // 날짜 선택: '' = 지금부터(예보), 'YYYY-MM-DD' = 그날부터(지난 시간은 관측, 앞으로는 예보)
+  S.date = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); S.days = 2;  // 날짜 선택(처음엔 오늘): '' = 지금부터(예보), 'YYYY-MM-DD' = 그날 0시부터(지난 시간은 관측, 앞으로는 예보)
   var regions = null, sido = [], weather = null, result = null, prevSummary = null, lastWin = '';
   function save() { ls('farmily.sim', JSON.stringify({ crop: S.crop, stage: S.stage, house: S.house, ctrl: S.ctrl })); }
 
@@ -141,6 +141,7 @@
     el.innerHTML = '<label class="dsel">📅 <input type="date" id="d_date" aria-label="날짜"></label>'
       + '<select id="d_len" aria-label="기간"><option value="1">1일</option><option value="2" selected>2일</option><option value="3">3일</option></select>'
       + '<button class="btn ghost sm" id="d_now" type="button">지금부터</button><span id="d_note"></span>';
+    $('d_date').value = S.date;
     $('d_date').onchange = function () { S.date = this.value || ''; prevSummary = null; simulate(); };
     $('d_len').onchange = function () { S.days = +this.value; prevSummary = null; simulate(); };
     $('d_now').onclick = function () { S.date = ''; $('d_date').value = ''; prevSummary = null; simulate(); };
@@ -188,20 +189,24 @@
       var t0 = Date.parse(S.date + 'T00:00:00+09:00'), t1 = Math.min(t0 + S.days * 86400000, bd.hi);
       if (t1 - t0 < 6 * H) { $('d_note').innerHTML = ' <b style="color:#b91c1c">이 날짜는 예보 범위를 벗어났습니다 (' + ymd(bd.hi) + '까지 가능)</b>'; return; }
       dv = driverFor(t0 - 24 * H, t1, obs);
-      if (dv.miss > dv.n * 0.3) { $('d_note').innerHTML = ' <b style="color:#b91c1c">이 기간은 바깥 자료가 부족합니다 (관측 자료 ' + ymd(bd.lo + 86400000) + '부터)</b>'; return; }
+      if (dv.miss > dv.n * 0.3) {
+        if (S.date !== ymd(Date.now())) { $('d_note').innerHTML = ' <b style="color:#b91c1c">이 기간은 바깥 자료가 부족합니다 (관측 자료 ' + ymd(bd.lo + 86400000) + '부터)</b>'; return; }
+        dv = null; note = ' · 오늘 새벽 바깥 자료가 모자라 지금부터 예보로 계산';  // 오늘은 자료가 모자라면 예보 계산으로 대신
+      } else {
       fillGaps(dv.w); w = dv.w; opt.noPast = true; opt.recordFrom = t0;
       var cnt = { obs: 0, past: 0, fc: 0 }; dv.w.src.forEach(function (x, i) { if (dv.w.h0t + i * H >= t0 && x) cnt[x]++; });
       note = ' · ' + S.date.slice(5).replace('-', '/') + '부터 ' + S.days + '일: 관측소 관측 ' + cnt.obs + '시간' + (cnt.past ? ' + 지난 자료 ' + cnt.past + '시간' : '') + ' + 예보 ' + cnt.fc + '시간' + (dv.miss ? ' (빈 ' + dv.miss + '시간은 앞뒤 값으로 이음)' : '');
+      }
     } else if (stn && !obsCache[stn]) loadObs(stn).then(function (o) { dateBounds(o); });
     if (obsCache[stn]) dateBounds(obsCache[stn]);
-    var dn = $('d_note'); if (dn) dn.innerHTML = S.date ? ' <span style="color:#555">지난 시간은 <b>관측값</b>, 앞으로는 <b>예보</b>로 계산 · 하우스 안은 모델 계산값</span>' : '';
+    var dn = $('d_note'); if (dn) dn.innerHTML = dv ? ' <span style="color:#555">지난 시간은 <b>관측값</b>, 앞으로는 <b>예보</b>로 계산 · 하우스 안은 모델 계산값</span>' : '';
     var win = S.date + '|' + S.days; if (win !== lastWin) { keepT = null; old = null; lastWin = win; }
     result = F.run(w, c[0], c[1], S.house, S.crop, S.stage, S.ctrl, opt);
     result.drv = dv;
     if (old) prevSummary = old;
     var r = find(S.region), g = result.geom;
     $('status').innerHTML = esc(r ? r.sido + ' ' + r.name : '') + ' · 바닥 ' + Math.round(g.A).toLocaleString() + 'm² · 부피 ' + Math.round(g.V).toLocaleString() + 'm³ · 피복 표면 ' + Math.round(g.Ac).toLocaleString() + 'm² · ' + result.plants.toLocaleString() + '주'
-      + (S.date ? note : ' · 기상청 ' + String(weather.short_base || '').replace(/^(\d{4})(\d\d)(\d\d) (\d\d).*/, function (m, a, b, c2, d) { return (+b) + '/' + (+c2) + ' ' + d + '시'; }) + ' 발표 예보')
+      + (dv ? note : ' · 기상청 ' + String(weather.short_base || '').replace(/^(\d{4})(\d\d)(\d\d) (\d\d).*/, function (m, a, b, c2, d) { return (+b) + '/' + (+c2) + ' ' + d + '시'; }) + ' 발표 예보' + note)
       + (result.preH ? ' · 직전 ' + result.preH + '시간 바깥 자료로 출발' : '')
       + (activeCal() ? ' · <b style="color:#15803d">실측 보정 적용 중</b>' : '');
     var fr = result.frames;
