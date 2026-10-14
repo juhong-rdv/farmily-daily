@@ -1,12 +1,12 @@
 {
- "started": "2026-10-14T11:43+09:00",
+ "started": "2026-10-14T12:29+09:00",
  "errors": [
-  "1101 서울특별시: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
-  "2101 부산광역시: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
-  "2102 기장군: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
-  "2201 대구광역시: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
-  "2202 달성군: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
-  "연속 실패로 중단 — 키 승인 여부·API 활용신청을 확인하세요."
+  "1101 서울특별시: 단기예보 시간 자료 없음",
+  "2101 부산광역시: 단기예보 시간 자료 없음",
+  "2102 기장군: 단기예보 시간 자료 없음",
+  "2201 대구광역시: 단기예보 시간 자료 없음",
+  "2202 달성군: 단기예보 시간 자료 없음",
+  "연속 실패로 중단 — 접속 실패면 해외(GitHub 서버) 접속 차단, 키 오류면 승인·반영 대기(1~2시간)를 확인하세요."
  ],
  "mid_invalid": [],
  "counts": {
@@ -14,5 +14,6 @@
   "fail": 5,
   "regions": 167
  },
- "finished": "2026-10-14T11:49+09:00"
+ "base": "https://apis.data.go.kr/1360000",
+ "finished": "2026-10-14T12:29+09:00"
 }
