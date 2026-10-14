@@ -26,7 +26,8 @@
     ctrl: Object.assign(F.defaults(saved.crop || 'tomato'), saved.ctrl || {})
   };
   if (!saved.house) { var o = ls('farmily.orient'); if (o === 'ns') S.house.axis = 90; }
-  var regions = null, sido = [], weather = null, result = null, prevSummary = null;
+  S.date = ''; S.days = 2;  // 날짜 선택: '' = 지금부터(예보), 'YYYY-MM-DD' = 그날부터(지난 시간은 관측, 앞으로는 예보)
+  var regions = null, sido = [], weather = null, result = null, prevSummary = null, lastWin = '';
   function save() { ls('farmily.sim', JSON.stringify({ crop: S.crop, stage: S.stage, house: S.house, ctrl: S.ctrl })); }
 
   // ---------- 입력 항목 ----------
@@ -131,8 +132,40 @@
     var r0 = find(S.region);
     $('f-region').innerHTML = '<select id="r_sido" aria-label="시도">' + sido.map(function (s) { return '<option value="' + s.short + '"' + (r0 && r0.sido === s.short ? ' selected' : '') + '>' + esc(s.full) + '</option>'; }).join('') + '</select><select id="r_sigun" aria-label="시군"></select>';
     fillSigun(r0 ? r0.sido : sido[0].short);
+    buildDate();
     $('r_sido').onchange = function () { fillSigun(this.value); var first = regions.filter(function (r) { return r.sido === $('r_sido').value; })[0]; if (first) { S.region = first.code; $('r_sigun').value = first.code; loadWeather(); } };
     $('r_sigun').onchange = function () { S.region = this.value; ls('farmily.region', S.region); loadWeather(); };
+  }
+  function buildDate() {
+    var el = $('f-date'); if (!el || el.dataset.ok) return; el.dataset.ok = 1;
+    el.innerHTML = '<label class="dsel">📅 <input type="date" id="d_date" aria-label="날짜"></label>'
+      + '<select id="d_len" aria-label="기간"><option value="1">1일</option><option value="2" selected>2일</option><option value="3">3일</option></select>'
+      + '<button class="btn ghost sm" id="d_now" type="button">지금부터</button><span id="d_note"></span>';
+    $('d_date').onchange = function () { S.date = this.value || ''; prevSummary = null; simulate(); };
+    $('d_len').onchange = function () { S.days = +this.value; prevSummary = null; simulate(); };
+    $('d_now').onclick = function () { S.date = ''; $('d_date').value = ''; prevSummary = null; simulate(); };
+  }
+  function ymd(ms) { return kst(ms).toISOString().slice(0, 10); }
+  function fcEnd() { var c = COORD[S.region] || [36.5, 127.5]; return Date.parse(weather.h0 + ':00+09:00') + (F.hourlyLen(weather, c[0], c[1]) - 1) * 3600000; }
+  function obsStart(obs) { var k = Object.keys(obs || {}).sort()[0]; return k ? Date.parse(k.replace(' ', 'T') + ':00+09:00') : null; }
+  function dateBounds(obs) {
+    var lo = obsStart(obs), p0 = weather.past && weather.past.h0 ? Date.parse(weather.past.h0 + ':00+09:00') : null;
+    lo = Math.min(lo || Infinity, p0 || Infinity, Date.parse(weather.h0 + ':00+09:00'));
+    var di = $('d_date'); if (di) { di.min = ymd(lo + 86400000); di.max = ymd(fcEnd()); }
+    return { lo: lo, hi: fcEnd() };
+  }
+  // 빈 시간 채우기 (앞뒤 값으로 잇기)
+  function fillGaps(w) {
+    ['T', 'RH', 'G', 'WSD'].forEach(function (k) {
+      var a = w[k], n = a.length, last = -1;
+      for (var i = 0; i < n; i++) if (a[i] != null) {
+        if (last < 0) for (var j = 0; j < i; j++) a[j] = a[i];
+        else for (j = last + 1; j < i; j++) a[j] = a[last] + (a[i] - a[last]) * (j - last) / (i - last);
+        last = i;
+      }
+      if (last >= 0) for (j = last + 1; j < n; j++) a[j] = a[last];
+    });
+    ['VEC', 'SKY', 'PTY', 'R'].forEach(function (k) { var a = w[k], prev = null; for (var i = 0; i < a.length; i++) { if (a[i] == null) a[i] = prev != null ? prev : (k === 'SKY' ? 1 : k === 'VEC' ? 270 : 0); prev = a[i]; } });
   }
   function fillSigun(s) { $('r_sigun').innerHTML = regions.filter(function (r) { return r.sido === s; }).map(function (r) { return '<option value="' + r.code + '"' + (r.code === S.region ? ' selected' : '') + '>' + esc(r.name) + '</option>'; }).join(''); }
   function loadWeather() {
@@ -147,12 +180,28 @@
     if (!weather) return;
     var c = COORD[S.region] || [36.5, 127.5];
     var keepIdx = player.idx, keepT = result && result.frames[Math.floor(keepIdx)] ? result.frames[Math.floor(keepIdx)].t : null;
-    var old = result ? result.summary : null;
-    result = F.run(weather, c[0], c[1], S.house, S.crop, S.stage, S.ctrl, { cal: activeCal() });
+    var old = result ? result.summary : null, w = weather, opt = { cal: activeCal() }, dv = null, note = '';
+    var stn = weather.obs_stn ? weather.obs_stn.id : '';
+    if (S.date) {
+      if (!obsCache[stn]) { $('status').textContent = '관측 자료 불러오는 중…'; loadObs(stn).then(simulate); return; }
+      var obs = obsCache[stn], bd = dateBounds(obs), H = 3600000;
+      var t0 = Date.parse(S.date + 'T00:00:00+09:00'), t1 = Math.min(t0 + S.days * 86400000, bd.hi);
+      if (t1 - t0 < 6 * H) { $('d_note').innerHTML = ' <b style="color:#b91c1c">이 날짜는 예보 범위를 벗어났습니다 (' + ymd(bd.hi) + '까지 가능)</b>'; return; }
+      dv = driverFor(t0 - 24 * H, t1, obs);
+      if (dv.miss > dv.n * 0.3) { $('d_note').innerHTML = ' <b style="color:#b91c1c">이 기간은 바깥 자료가 부족합니다 (관측 자료 ' + ymd(bd.lo + 86400000) + '부터)</b>'; return; }
+      fillGaps(dv.w); w = dv.w; opt.noPast = true; opt.recordFrom = t0;
+      var cnt = { obs: 0, past: 0, fc: 0 }; dv.w.src.forEach(function (x, i) { if (dv.w.h0t + i * H >= t0 && x) cnt[x]++; });
+      note = ' · ' + S.date.slice(5).replace('-', '/') + '부터 ' + S.days + '일: 관측소 관측 ' + cnt.obs + '시간' + (cnt.past ? ' + 지난 자료 ' + cnt.past + '시간' : '') + ' + 예보 ' + cnt.fc + '시간' + (dv.miss ? ' (빈 ' + dv.miss + '시간은 앞뒤 값으로 이음)' : '');
+    } else if (stn && !obsCache[stn]) loadObs(stn).then(function (o) { dateBounds(o); });
+    if (obsCache[stn]) dateBounds(obsCache[stn]);
+    var dn = $('d_note'); if (dn) dn.innerHTML = S.date ? ' <span style="color:#555">지난 시간은 <b>관측값</b>, 앞으로는 <b>예보</b>로 계산 · 하우스 안은 모델 계산값</span>' : '';
+    var win = S.date + '|' + S.days; if (win !== lastWin) { keepT = null; old = null; lastWin = win; }
+    result = F.run(w, c[0], c[1], S.house, S.crop, S.stage, S.ctrl, opt);
+    result.drv = dv;
     if (old) prevSummary = old;
     var r = find(S.region), g = result.geom;
     $('status').innerHTML = esc(r ? r.sido + ' ' + r.name : '') + ' · 바닥 ' + Math.round(g.A).toLocaleString() + 'm² · 부피 ' + Math.round(g.V).toLocaleString() + 'm³ · 피복 표면 ' + Math.round(g.Ac).toLocaleString() + 'm² · ' + result.plants.toLocaleString() + '주'
-      + ' · 기상청 ' + String(weather.short_base || '').replace(/^(\d{4})(\d\d)(\d\d) (\d\d).*/, function (m, a, b, c2, d) { return (+b) + '/' + (+c2) + ' ' + d + '시'; }) + ' 발표 예보'
+      + (S.date ? note : ' · 기상청 ' + String(weather.short_base || '').replace(/^(\d{4})(\d\d)(\d\d) (\d\d).*/, function (m, a, b, c2, d) { return (+b) + '/' + (+c2) + ' ' + d + '시'; }) + ' 발표 예보')
       + (result.preH ? ' · 직전 ' + result.preH + '시간 바깥 자료로 출발' : '')
       + (activeCal() ? ' · <b style="color:#15803d">실측 보정 적용 중</b>' : '');
     var fr = result.frames;
@@ -348,7 +397,8 @@
       ['🔥', f.heat ? '난방 중 (설정 ' + f1(f.hset) + '℃)' : '난방 꺼짐'],
       f.irr ? ['💧', '관수'] : null,
       ['☀', f.el > 0 ? '해 높이 ' + Math.round(f.el) + '° · ' + dir16(f.az) + '쪽' : '해 진 뒤'],
-      ['🎯', '환기 시작 ' + f1(f.vset) + '℃']
+      ['🎯', '환기 시작 ' + f1(f.vset) + '℃'],
+      result.drv ? (function () { var x = result.drv.w.src[Math.round((f.t - result.drv.w.h0t) / 3600000)]; return x === 'fc' ? ['🔮', '바깥 = 예보'] : x === 'obs' ? ['📡', '바깥 = 관측값'] : x ? ['🗂', '바깥 = 지난 자료'] : ['…', '바깥 = 빈 시간(앞뒤 값으로 이음)']; })() : null
     ].filter(Boolean);
     $('chips').innerHTML = chips.map(function (c) { return '<span>' + c[0] + ' ' + c[1] + '</span>'; }).join('');
     // 그래프 재생선
@@ -407,6 +457,13 @@
       }
       if (pi === panels.length - 1) fr.forEach(function (f) { var d = kst(f.t); if (d.getUTCMinutes() === 0 && d.getUTCHours() % (narrow ? 12 : 6) === 0) o += '<text x="' + chartX(f.t) + '" y="' + (p.h - 10) + '" font-size="10" fill="#666" text-anchor="middle">' + (d.getUTCHours() === 0 ? (d.getUTCMonth() + 1) + '/' + d.getUTCDate() : d.getUTCHours() + '시') + '</text>'; });
       fr.forEach(function (f) { var d = kst(f.t); if (d.getUTCMinutes() === 0 && d.getUTCHours() === 0) o += '<line x1="' + chartX(f.t) + '" x2="' + chartX(f.t) + '" y1="' + top + '" y2="' + bot + '" stroke="#9ca3af"/>'; });
+      var nowT = Date.now();
+      if (nowT > t0 && nowT < t1) o += '<line x1="' + chartX(nowT) + '" x2="' + chartX(nowT) + '" y1="' + top + '" y2="' + bot + '" stroke="#0369a1" stroke-dasharray="4 3"/>' + (pi === 0 ? '<text x="' + (+chartX(nowT) + 3) + '" y="' + (top + 10) + '" font-size="10" fill="#0369a1">지금</text>' : '');
+      if (pi === 0 && result.drv) { // 바깥 자료 출처 띠: 회색 = 관측, 하늘색 = 예보
+        var dw = result.drv.w, segS = null, segK = null;
+        fr.forEach(function (f, i) { var k = dw.src[Math.round((f.t - dw.h0t) / 3600000)] === 'fc' ? 'fc' : 'obs'; if (k !== segK || i === fr.length - 1) { if (segK) o += '<rect x="' + chartX(segS) + '" y="' + (top - 5) + '" width="' + Math.max(1, chartX(f.t) - chartX(segS)) + '" height="4" fill="' + (segK === 'fc' ? '#38bdf8' : '#64748b') + '"/>'; segS = f.t; segK = k; } });
+        o += '<text x="' + (CW - CR - 4) + '" y="' + (top - 8) + '" font-size="10" fill="#555" text-anchor="end">위 띠: 회색 = 바깥 관측값 · 하늘색 = 예보</text>';
+      }
       o += '<line class="playhead" x1="0" x2="0" y1="' + top + '" y2="' + p.h + '" stroke="#12341f" stroke-width="2"/>';
       o += '</svg>';
       var leg = (p.series || []).map(function (s) { return '<span><i style="border-top:' + (s.w > 2 ? 3 : 2) + 'px ' + (s.dash ? 'dashed' : 'solid') + ' ' + s.c + '"></i>' + s.name + '</span>'; }).join('');
@@ -468,20 +525,20 @@
     var c = COORD[S.region] || [36.5, 127.5], H = 3600000;
     var a = Math.floor(t0 / H) * H, b = Math.ceil(t1 / H) * H, n = Math.round((b - a) / H) + 1;
     var src = {};
-    function put(t, v) { if (v && v.T != null) src[t] = v; }
-    function fromW(o, h0s, nn) { if (!o || !o.T) return; var h0 = Date.parse(h0s + ':00+09:00'); for (var i = 0; i < Math.min(o.T.length, nn || 1e9); i++) put(h0 + i * H, { T: o.T[i], RH: o.RH && o.RH[i], G: o.G && o.G[i], SKY: o.SKY && o.SKY[i], PTY: o.PTY && o.PTY[i], VEC: o.VEC && o.VEC[i], WSD: o.WSD && o.WSD[i], R: o.R && o.R[i] }); }
-    fromW(weather, weather.h0, F.hourlyLen(weather, c[0], c[1]));
-    if (weather.past) fromW(weather.past, weather.past.h0);
+    function put(t, v, sname) { if (v && v.T != null) { v.src = sname; src[t] = v; } }
+    function fromW(o, h0s, nn, sn) { if (!o || !o.T) return; var h0 = Date.parse(h0s + ':00+09:00'); for (var i = 0; i < Math.min(o.T.length, nn || 1e9); i++) put(h0 + i * H, { T: o.T[i], RH: o.RH && o.RH[i], G: o.G && o.G[i], SKY: o.SKY && o.SKY[i], PTY: o.PTY && o.PTY[i], VEC: o.VEC && o.VEC[i], WSD: o.WSD && o.WSD[i], R: o.R && o.R[i] }, sn); }
+    fromW(weather, weather.h0, F.hourlyLen(weather, c[0], c[1]), 'fc');
+    if (weather.past) fromW(weather.past, weather.past.h0, 0, 'past');
     var nObs = 0;
     for (var i = 0; i < n; i++) {
       var t = a + i * H, r = obs[hkey(t)]; if (!r || num(r.ta) == null) continue;
       var r2 = obs[hkey(t + H)], i1 = num(r.icsr), i2 = r2 ? num(r2.icsr) : null, cl = num(r.dc10Tca), rn = num(r.rn) || 0, G;
       if (i1 != null || i2 != null) G = ((i1 != null ? i1 : i2) + (i2 != null ? i2 : i1)) / 2 * 1e6 / 3600;
       else { var sp = F.sunPos(c[0], c[1], new Date(t)), cz = Math.sin(Math.max(0, sp.el) * Math.PI / 180); G = sp.el > 0 ? 1098 * cz * Math.exp(-0.057 / Math.max(cz, 0.01)) * (rn > 0 ? 0.2 : 1 - 0.75 * Math.pow((cl == null ? 5 : cl) / 10, 3.4)) : 0; }
-      put(t, { T: num(r.ta), RH: num(r.hm), G: G, SKY: cl == null ? 1 : cl <= 5 ? 1 : cl <= 8 ? 3 : 4, PTY: rn > 0 ? 1 : 0, VEC: num(r.wd), WSD: num(r.ws), R: rn }); nObs++;
+      put(t, { T: num(r.ta), RH: num(r.hm), G: G, SKY: cl == null ? 1 : cl <= 5 ? 1 : cl <= 8 ? 3 : 4, PTY: rn > 0 ? 1 : 0, VEC: num(r.wd), WSD: num(r.ws), R: rn }, 'obs'); nObs++;
     }
-    var w = { h0: kst(a).toISOString().slice(0, 16), T: [], RH: [], G: [], SKY: [], PTY: [], VEC: [], WSD: [], R: [] }, miss = 0;
-    for (i = 0; i < n; i++) { var v = src[a + i * H]; if (!v) miss++; ['T', 'RH', 'G', 'SKY', 'PTY', 'VEC', 'WSD', 'R'].forEach(function (k) { w[k].push(v ? (v[k] == null ? null : v[k]) : null); }); }
+    var w = { h0: kst(a).toISOString().slice(0, 16), h0t: a, src: [], T: [], RH: [], G: [], SKY: [], PTY: [], VEC: [], WSD: [], R: [] }, miss = 0;
+    for (i = 0; i < n; i++) { var v = src[a + i * H]; if (!v) miss++; w.src.push(v ? v.src : null); ['T', 'RH', 'G', 'SKY', 'PTY', 'VEC', 'WSD', 'R'].forEach(function (k) { w[k].push(v ? (v[k] == null ? null : v[k]) : null); }); }
     return { w: w, miss: miss, n: n, nObs: nObs };
   }
   function parseCSV(text) {
