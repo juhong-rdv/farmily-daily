@@ -101,16 +101,30 @@
     var g = geom(house), cov = COVERS[house.cover] || COVERS.po1, cur = CURTAINS[house.curtain] || CURTAINS.none;
     var lai = (STAGES[stageKey] || STAGES.flower).lai, fc = 1 - Math.exp(-0.7 * lai);
     var plants = house.plants > 0 ? house.plants : Math.round(g.A * 2.5);
-    var S = sampler(w, hourlyLen(w, lat, lon)), dt = 60;
+    var cal = Object.assign({ kU: 1, kInf: 1, kTau: 1, kVent: 1 }, opt.cal || {});
+    var nF = hourlyLen(w, lat, lon), wd = w, preH = 0;
+    // 직전 시간(관측·지난 예보)이 이어져 있으면 그 시점부터 계산을 시작해 하우스 안 상태를 맞춰 둠
+    if (w.past && w.past.T && !opt.noPast) {
+      var P = w.past, n = P.T.length, st0 = n;
+      while (st0 > 0 && P.T[st0 - 1] != null) st0--;
+      var ph0 = Date.parse(P.h0 + ':00+09:00') + st0 * 3600000;
+      if (n - st0 >= 6 && ph0 + (n - st0) * 3600000 === Date.parse(w.h0 + ':00+09:00')) {
+        preH = n - st0; wd = { h0: '', T: [], RH: [], G: [], SKY: [], PTY: [], VEC: [], WSD: [], R: [] };
+        var d0 = new Date(ph0 + 9 * 3600000); wd.h0 = d0.toISOString().slice(0, 16);
+        ['T', 'RH', 'G', 'SKY', 'PTY', 'VEC', 'WSD', 'R'].forEach(function (k) { wd[k] = (P[k] || []).slice(st0).concat((w[k] || []).slice(0, nF)); });
+      }
+    }
+    var S = sampler(wd, preH + nF), dt = 60;
+    var recFrom = opt.recordFrom != null ? opt.recordFrom : S.start + preH * 3600000;
     var Ca = RHO * CP * g.V + 25000 * g.A, Cs = 1.5e5;
     var meanT = 0, cnt = 0; for (var q = 0; q < w.T.length; q++) if (w.T[q] != null) { meanT += w.T[q]; cnt++; } meanT = cnt ? meanT / cnt : 15;
     var Tdeep = meanT + 5;
-    var Cd = 0.65 * (house.net ? 0.65 : 1), Cw = 0.12;
+    var Cd = 0.65 * (house.net ? 0.65 : 1) * cal.kVent, Cw = 0.12;
     var axis = (house.axis || 0) % 180, nA = (axis + 270) % 360, nB = (axis + 90) % 360;  // 측창 A(왼쪽), B(오른쪽)이 바라보는 방위
     var Lside = g.L * 0.95, roofLen = g.L * 0.85, nRoof = house.roofVent ? g.n : 0;
     var heatCap = (house.heater || 0) * 1.163; // kcal/h → W
     // 상태
-    var t = S.start - 3 * 3600000, o0 = S.get(S.start);
+    var t = S.start - (preH ? 0 : 3 * 3600000), o0 = S.get(S.start);
     var Ti = o0.T + (o0.G > 50 ? 5 : 2), Ts = Tdeep, Xi = xFrom(Ti, o0.G > 50 ? 70 : 88);
     var sideA = 0, sideB = 0, roof = 0, curtain = 0, shade = 0, heatOn = 0, acc = 0, lastIrr = -1e12;
     var out = [], step = 0, cur10 = null;
@@ -160,7 +174,7 @@
       if (house.shade) { if (o.G >= c.shadeRad) shade = 1; else if (o.G < c.shadeRad - 150) shade = 0; } else shade = 0;
       sideA = rate(sideA, tA, 0.25); sideB = rate(sideB, tB, 0.25); roof = rate(roof, tRoof, 0.34);
       // ----- 물리 -----
-      var tau = cov.tau * 0.92 * (shade ? 1 - house.shadePct / 100 : 1) * (curtain ? 0.35 : 1);
+      var tau = cal.kTau * cov.tau * 0.92 * (shade ? 1 - house.shadePct / 100 : 1) * (curtain ? 0.35 : 1);
       var Rin = tau * o.G;                                     // 바닥 1m²당 들어온 햇빛 (W/m²)
       var VPDi = Math.max(0, esat(Ti) * (1 - RHi / 100)) / 1000; // kPa
       var lE = Math.max(0, 0.6 * fc * Rin + 10 * lai * VPDi);   // 증산 잠열 (W/m²)
@@ -168,7 +182,7 @@
       var Qs = Rin - Rsoil - lE;
       var clear = o.pty > 0 ? 0 : (o.sky === 1 ? 0.8 : o.sky === 3 ? 0.35 : 0.1);
       var skyLoss = 28 * cov.sky * clear * (curtain ? cur.sky : 1);
-      var U = cov.U * (curtain ? cur.u : 1);
+      var U = cal.kU * cov.U * (curtain ? cur.u : 1);
       // 환기량
       var hv = house.ventH, AsA = hv * Lside * sideA, AsB = hv * Lside * sideB, Ar = house.roofW * roofLen * nRoof * roof * (curtain ? 0.3 : 1);
       var dT = Math.max(0, Ti - To), Tm = (Ti + To) / 2 + 273.15;
@@ -180,7 +194,7 @@
       var As = AsA + AsB, Gs = Cd / 3 * As * Math.sqrt(G * hv * dT / Tm);
       if (Ar > 0) { var H = g.hr - hv / 2, Aeq = As > 0 ? Ar * As / Math.sqrt(Ar * Ar + As * As) : Ar * 0.5; Gs += Cd * Aeq * Math.sqrt(2 * G * H * dT / Tm); }
       var Gv = Math.sqrt(Gw * Gw + Gs * Gs);
-      var Ginf = g.V * (curtain ? 0.5 : 0.8) / 3600 * (1 + 0.1 * u);
+      var Ginf = cal.kInf * g.V * (curtain ? 0.5 : 0.8) / 3600 * (1 + 0.1 * u);
       var Qheat = heatOn ? heatCap : 0;
       var Tc = Ti - (curtain ? 0.45 : 0.75) * (Ti - To);
       var cond = Math.max(0, RHO * 0.003 * g.Ac * (Xi - xFrom(Tc, 100)));    // kg/s
@@ -192,14 +206,14 @@
       var xs = xFrom(Ti, 100); if (Xi > xs) Xi = xs; if (Xi < 0.0005) Xi = 0.0005;
       // 관수 (일사비례)
       var irr = 0;
-      if (t >= S.start) {
+      if (t >= recFrom) {
         if (day) acc += o.G * dt / 1e4;                       // J/cm²
         var okWin = sday.rise && sday.set && t >= sday.rise + c.irrStart * 60000 && t <= sday.set - c.irrEnd * 60000;
         if (okWin && acc >= c.irrJ) { acc = 0; irr = 1; irrEvents.push(t); }
         if (!day && sp.el < -10) acc = 0;
       }
       // 기록 (10분마다)
-      if (t >= S.start) {
+      if (t >= recFrom) {
         if (!cur10) cur10 = { E: 0, heatS: 0, irr: 0, cond: 0 };
         cur10.E += E * dt; cur10.heatS += heatOn ? dt : 0; cur10.irr += irr; cur10.cond += cond * dt;
         if (step % 10 === 0) {
@@ -212,7 +226,7 @@
       }
       t += dt * 1000;
     }
-    return { frames: out, plants: plants, geom: g, irr: irrEvents, lai: lai, summary: summarize(out, plants, c, cropKey, house, g) };
+    return { frames: out, plants: plants, geom: g, irr: irrEvents, lai: lai, preH: preH, summary: summarize(out, plants, c, cropKey, house, g) };
   }
 
   // ---------- 하루 단위 요약 · 토마토 기준 판정 ----------
@@ -265,9 +279,52 @@
     if (!tips.length) tips.push(['ok', '이 설정이면 예보 기간 동안 큰 문제 없이 적온 범위가 유지될 것으로 보입니다.']);
     return tips;
   }
+  // ---------- 실제 기록으로 보정 ----------
+  // records: [{t: ms, Ti: ℃, RHi: % (선택)}] · w: 그 기간 바깥 시간별 자료 (h0, T, RH, G, SKY, PTY, VEC, WSD, R)
+  var CAL_PARAMS = [
+    { k: 'kU', lo: 0.5, hi: 1.8, step: 0.2, name: '보온력(열 빠짐)' },
+    { k: 'kInf', lo: 0.3, hi: 3.0, step: 0.4, name: '틈새 바람' },
+    { k: 'kTau', lo: 0.7, hi: 1.15, step: 0.08, name: '햇빛 투과' },
+    { k: 'kVent', lo: 0.4, hi: 1.8, step: 0.2, name: '창 환기 효율' }
+  ];
+  function score(fr, recs) {
+    if (!fr.length) return { n: 0, rmse: 99, rmseRH: null, bias: 0 };
+    var t0 = fr[0].t, se = 0, n = 0, seH = 0, nH = 0, b = 0;
+    recs.forEach(function (r) {
+      var i = Math.round((r.t - t0) / 600000); if (i < 0 || i >= fr.length) return;
+      var f = fr[i]; if (Math.abs(f.t - r.t) > 330000) return;
+      var d = f.Ti - r.Ti; se += d * d; b += d; n++;
+      if (r.RHi != null) { var dh = f.RHi - r.RHi; seH += dh * dh; nH++; }
+    });
+    return { n: n, rmse: n ? Math.sqrt(se / n) : 99, rmseRH: nH ? Math.sqrt(seH / nH) : null, bias: n ? b / n : 0 };
+  }
+  function calibrate(w, lat, lon, house, cropKey, stageKey, c, recs, opt) {
+    opt = opt || {};
+    var from = recs[0].t - 6 * 3600000;   // 기록 6시간 전부터 계산을 시작해 출발값 영향을 줄임
+    function cost(cal) {
+      var r = run(w, lat, lon, house, cropKey, stageKey, c, { cal: cal, noPast: true, recordFrom: from });
+      var sc = score(r.frames, recs);
+      return { v: sc.rmse + (sc.rmseRH != null ? 0.04 * sc.rmseRH : 0), sc: sc, r: r };
+    }
+    var cur = { kU: 1, kInf: 1, kTau: 1, kVent: 1 }, base = cost(cur), best = base, steps = {};
+    CAL_PARAMS.forEach(function (p) { steps[p.k] = p.step; });
+    for (var round = 0; round < 5; round++) {
+      CAL_PARAMS.forEach(function (p) {
+        [1, -1].forEach(function (sg) {
+          var tryv = Math.max(p.lo, Math.min(p.hi, cur[p.k] + sg * steps[p.k]));
+          if (tryv === cur[p.k]) return;
+          var cand = Object.assign({}, cur); cand[p.k] = tryv;
+          var r = cost(cand); if (r.v < best.v - 1e-4) { best = r; cur = cand; }
+        });
+        steps[p.k] /= 1.8;
+      });
+    }
+    return { cal: cur, before: base.sc, after: best.sc, beforeRun: base.r, afterRun: best.r };
+  }
+
   function fmtDay(ms) { var d = new Date(ms); return (d.getUTCMonth() + 1) + '/' + d.getUTCDate(); }
 
-  root.FSIM = { run: run, hourlyLen: hourlyLen, sunPos: sunPos, defaults: defaults, houseDefaults: houseDefaults, advice: advice, geom: geom,
+  root.FSIM = { run: run, calibrate: calibrate, score: score, CAL_PARAMS: CAL_PARAMS, hourlyLen: hourlyLen, sunPos: sunPos, defaults: defaults, houseDefaults: houseDefaults, advice: advice, geom: geom,
     CROPS: CROPS, STAGES: STAGES, COVERS: COVERS, CURTAINS: CURTAINS, rhFrom: rhFrom, xFrom: xFrom };
   // 시군 대표 좌표 (scripts/build_regions.py 와 같은 값) — 해 위치 계산용
   root.FSIM_COORDS = {"1101":[37.5665,126.978],"2101":[35.1796,129.0756],"2102":[35.2445,129.2222],"2201":[35.8714,128.6014],"2202":[35.7746,128.4314],"2203":[36.2428,128.5728],"2301":[37.4563,126.7052],"2302":[37.7466,126.488],"2303":[37.254,126.473],"2401":[35.1595,126.8526],"2501":[36.3504,127.3845],"2601":[35.5384,129.3114],"2602":[35.5622,129.1428],"2901":[36.48,127.289],"3101":[37.2636,127.0286],"3102":[37.42,127.1267],"3103":[37.7381,127.0337],"3104":[37.3943,126.9568],"3105":[37.5034,126.766],"3106":[37.4786,126.8646],"3107":[36.9921,127.1129],"3108":[37.9036,127.0606],"3109":[37.3219,126.8309],"3110":[37.6584,126.832],"3111":[37.4292,126.9876],"3112":[37.5943,127.1296],"3113":[37.636,127.2165],"3114":[37.1499,127.0774],"3115":[37.38,126.803],"3116":[37.3617,126.9352],"3117":[37.3448,126.9683],"3118":[37.5393,127.2147],"3119":[37.2411,127.1776],"3120":[37.76,126.78],"3121":[37.272,127.435],"3122":[37.008,127.2797],"3123":[37.6152,126.7156],"3124":[37.1996,126.8312],"3125":[37.4294,127.255],"3126":[37.7853,127.0458],"3127":[37.8949,127.2003],"3128":[37.2984,127.637],"3129":[38.0966,127.0748],"3130":[37.8315,127.5105],"3131":[37.4917,127.4875],"3201":[37.8813,127.7298],"3202":[37.3422,127.9202],"3203":[37.7519,128.8761],"3204":[37.5247,129.1143],"3205":[37.164,128.9856],"3206":[38.207,128.5918],"3207":[37.4499,129.1652],"3208":[37.697,127.8888],"3209":[37.4917,127.985],"3210":[37.1836,128.4617],"3211":[37.3708,128.3903],"3212":[37.3807,128.6608],"3213":[38.1467,127.3133],"3214":[38.1062,127.7082],"3215":[38.11,127.9897],"3216":[38.0697,128.1707],"3217":[38.3806,128.4679],"3218":[38.0754,128.619],"3301":[36.6424,127.489],"3302":[36.991,127.9259],"3303":[37.1326,128.191],"3304":[36.4894,127.7295],"3305":[36.3064,127.5713],"3306":[36.175,127.7834],"3307":[36.7854,127.5815],"3308":[36.8554,127.4356],"3309":[36.8154,127.7866],"3310":[36.9403,127.6905],"3311":[36.9846,128.3655],"3401":[36.8151,127.1139],"3402":[36.4465,127.119],"3403":[36.3333,126.6127],"3404":[36.7898,127.0018],"3405":[36.7848,126.4503],"3406":[36.1872,127.0987],"3407":[36.2745,127.2489],"3408":[36.8898,126.6459],"3409":[36.1088,127.488],"3410":[36.2756,126.9098],"3411":[36.0803,126.6919],"3412":[36.4592,126.8022],"3413":[36.6013,126.6608],"3414":[36.6826,126.8449],"3415":[36.7456,126.2979],"3501":[35.8242,127.148],"3502":[35.9676,126.7369],"3503":[35.9483,126.9577],"3504":[35.5699,126.8559],"3505":[35.4164,127.3905],"3506":[35.8036,126.8809],"3507":[35.9047,127.1622],"3508":[35.7917,127.4249],"3509":[36.0068,127.6608],"3510":[35.6474,127.5212],"3511":[35.6178,127.289],"3512":[35.3744,127.1374],"3513":[35.4358,126.702],"3514":[35.7318,126.733],"3601":[34.8118,126.3922],"3602":[34.7604,127.6622],"3603":[34.9506,127.4872],"3604":[35.016,126.7108],"3605":[34.9407,127.6959],"3606":[35.3211,126.9882],"3607":[35.282,127.292],"3608":[35.2025,127.4629],"3609":[34.6112,127.285],"3610":[34.7715,127.08],"3611":[35.0645,126.9865],"3612":[34.6817,126.9069],"3613":[34.642,126.7671],"3614":[34.5733,126.5989],"3615":[34.8002,126.6969],"3616":[34.9904,126.4817],"3617":[35.0659,126.5165],"3618":[35.2772,126.512],"3619":[35.3018,126.7849],"3620":[34.311,126.7551],"3621":[34.4868,126.2635],"3622":[34.8668,126.3026],"3701":[36.019,129.3435],"3702":[35.8562,129.2247],"3703":[36.1398,128.1136],"3704":[36.5684,128.7294],"3705":[36.1195,128.3446],"3706":[36.8057,128.6241],"3707":[35.9733,128.9386],"3708":[36.4109,128.159],"3709":[36.5865,128.1867],"3710":[35.8251,128.7415],"3711":[36.3527,128.697],"3712":[36.4359,129.0571],"3713":[36.6667,129.1124],"3714":[36.415,129.3653],"3715":[35.6474,128.7341],"3716":[35.726,128.2629],"3717":[35.9192,128.2829],"3718":[35.9955,128.4017],"3719":[36.658,128.4529],"3720":[36.8931,128.7325],"3721":[36.993,129.4004],"3722":[37.4844,130.9057],"3801":[35.2281,128.6811],"3802":[35.18,128.1076],"3803":[34.8544,128.4331],"3804":[35.0037,128.0642],"3805":[35.2285,128.8894],"3806":[35.5037,128.7466],"3807":[34.8806,128.6211],"3808":[35.335,129.0373],"3809":[35.3222,128.2617],"3810":[35.2725,128.4064],"3811":[35.5446,128.4925],"3812":[34.973,128.3223],"3813":[34.8377,127.8924],"3814":[35.0672,127.7513],"3815":[35.4155,127.8734],"3816":[35.5205,127.7251],"3817":[35.6866,127.9095],"3818":[35.5666,128.1658],"3901":[33.4996,126.5312],"3902":[33.2541,126.56]};
