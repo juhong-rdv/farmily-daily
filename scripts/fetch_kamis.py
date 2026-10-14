@@ -32,26 +32,43 @@ def num(v):
     except ValueError:
         return None
 
+URLS = [URL, URL.replace("https://", "http://")]
+DIAG = []  # 응답이 JSON이 아닐 때 원인 확인용 (인증키는 가림)
+
+def _mask(t):
+    for k in ("KAMIS_CERT_KEY", "KAMIS_CERT_ID"):
+        v = os.environ.get(k, "").strip()
+        if v: t = t.replace(v, "***")
+    return t
+
 def fetch(day, cat):
     p = {"action": "dailyPriceByCategoryList", "p_product_cls_code": "02", "p_country_code": "1101",
          "p_regday": day.isoformat(), "p_convert_kg_yn": "N", "p_item_category_code": cat,
          "p_cert_key": os.environ["KAMIS_CERT_KEY"].strip(), "p_cert_id": os.environ["KAMIS_CERT_ID"].strip(),
          "p_returntype": "json"}
     last = None
-    for i in range(3):
-        try:
-            r = requests.get(URL, params=p, timeout=25, headers={"User-Agent": "farmily-daily-data/1.0"})
-            j = r.json()
-            data = j.get("data")
-            if isinstance(data, dict):
-                if str(data.get("error_code", "000")) not in ("000", ""):
-                    return [], "error_code %s" % data.get("error_code")
-                it = data.get("item") or []
-                return (it if isinstance(it, list) else [it]), None
-            return [], "data=%s" % str(data)[:60]  # 자료 없음은 ["001"] 형태로 옴
-        except Exception as e:
-            last = repr(e)[:160]
-            time.sleep(2 * (i + 1))
+    for url in URLS:
+        for i in range(2):
+            try:
+                r = requests.get(url, params=p, timeout=25, headers={"User-Agent": "Mozilla/5.0 (farmily-daily-data)"})
+                try:
+                    j = r.json()
+                except ValueError:
+                    if len(DIAG) < 4:
+                        DIAG.append({"url": url, "http": r.status_code, "type": r.headers.get("content-type"),
+                                     "final": _mask(r.url)[:160], "text": _mask(r.text[:300])})
+                    last = "JSON 아님 (http %s, %s)" % (r.status_code, url.split(":")[0])
+                    break
+                data = j.get("data")
+                if isinstance(data, dict):
+                    if str(data.get("error_code", "000")) not in ("000", ""):
+                        return [], "error_code %s" % data.get("error_code")
+                    it = data.get("item") or []
+                    return (it if isinstance(it, list) else [it]), None
+                return [], "data=%s" % str(data)[:60]  # 자료 없음은 ["001"] 형태로 옴
+            except Exception as e:
+                last = _mask(repr(e))[:160]
+                time.sleep(2 * (i + 1))
     return [], last
 
 def norm(it):
@@ -77,10 +94,12 @@ def main():
             rows += [dict(norm(x), cat=CATS[cat]) for x in its]
             time.sleep(0.3)
         rows = [r for r in rows if r["price"] is not None and r["rank"] in ("상품", "중품")]
+        if DIAG and not rows and back >= 1: break  # 응답 형식 문제면 더 거슬러 가지 않음
         if len(rows) >= 10:
             found = (day, rows); break
     if not found:
         st["result"] = "자료 없음"
+        st["diag"] = DIAG
         json.dump(st, open(os.path.join(ROOT, "data", "kamis_status.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         print(json.dumps(st, ensure_ascii=False, indent=1))
         return 1
