@@ -68,6 +68,8 @@
   #calout p { font-size: 14px; margin: 8px 0; }
   #f-date { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; }
   #f-date input[type=date], #f-date select { font: inherit; font-size: 15px; padding: 5px 8px; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+  /* farmily.ai 페이지 안(iframe)에 들어갈 때: 옆 칸을 따로 스크롤하지 않고 전체 높이로 펼침 */
+  html.embed .side { position: static; max-height: none; overflow: visible; }
   @media (max-width: 900px) {
     .grid { grid-template-columns: 1fr; }
     .side { position: static; max-height: none; }
@@ -140,8 +142,8 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>window.THREE || document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>')</script>
-<script src="/farmily-daily/sim-engine.js?v=20261014b"></script>
-<script src="/farmily-daily/sim3d.js?v=20261014b"></script>
+<script src="/farmily-daily/sim-engine.js?v=20261014c"></script>
+<script src="/farmily-daily/sim3d.js?v=20261014c"></script>
 <script>
   // 좁은 화면에서는 하우스 정보·제어 설정을 접어 두고 그림부터 보이게
   if (window.innerWidth < 900) { var ds = document.querySelectorAll('.side details'); for (var i = 1; i < ds.length; i++) ds[i].open = false; }
@@ -156,6 +158,28 @@
     });
   } catch (e) {}
 </script>
-<script src="/farmily-daily/sim.js?v=20261014b"></script>
+<script src="/farmily-daily/sim.js?v=20261014c"></script>
+<script>
+  // farmily.ai 페이지 안(iframe)에 들어 있을 때 내용 높이를 바깥 페이지에 알려 iframe 높이를 맞춤
+  // (오늘의 농업 소식과 같은 { farmilyHeight: 높이 } 신호)
+  (function () {
+    if (window.parent === window) return;
+    document.documentElement.classList.add('embed');
+    var last = 0, tm = null;
+    function post() {
+      var h = Math.ceil(document.body.getBoundingClientRect().height) + 4;
+      if (Math.abs(h - last) < 2) return;
+      last = h;
+      try { window.parent.postMessage({ farmilyHeight: h }, '*'); } catch (e) {}
+    }
+    function soon() { clearTimeout(tm); tm = setTimeout(post, 80); }
+    window.postHeight = post;
+    window.addEventListener('load', post);
+    window.addEventListener('resize', soon);
+    document.addEventListener('toggle', soon, true);
+    if (window.ResizeObserver) new ResizeObserver(soon).observe(document.body);
+    setTimeout(post, 500); setTimeout(post, 2000);
+  })();
+</script>
 </body>
 </html>
