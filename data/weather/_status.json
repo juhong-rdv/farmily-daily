@@ -1,0 +1,18 @@
+{
+ "started": "2026-10-14T11:43+09:00",
+ "errors": [
+  "1101 서울특별시: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
+  "2101 부산광역시: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
+  "2102 기장군: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
+  "2201 대구광역시: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
+  "2202 달성군: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilage",
+  "연속 실패로 중단 — 키 승인 여부·API 활용신청을 확인하세요."
+ ],
+ "mid_invalid": [],
+ "counts": {
+  "ok": 0,
+  "fail": 5,
+  "regions": 167
+ },
+ "finished": "2026-10-14T11:49+09:00"
+}
