@@ -315,7 +315,7 @@
       var col = { '높음': '#e53935', '보통': '#f9a825', '낮음': '#43a047' };
       tiles += '<div class="lc-tile"><div class="lc-k">🦠 병 발생 위험 신호 (앞으로 ' + rk.hours + '시간)</div><ul class="lc-risk">'
         + rows.map(function (x) { return '<li><span><span class="lc-dot" style="background:' + col[x[2].lv] + '"></span>' + x[0] + ' <span style="color:#999;font-size:12px">' + x[1] + '</span></span><span class="lv-' + x[2].lv + '">' + x[2].lv + ' <span style="font-weight:400;color:#999;font-size:12px">' + x[2].h + '시간</span></span></li>'; }).join('')
-        + '</ul><div class="lc-s">바깥 기온·습도·비로 본 참고 신호입니다(발령 정보 아님). 병이 좋아하는 습하고 알맞은 기온이 이어지는 시간을 셌습니다.</div></div>';
+        + '</ul><div class="lc-s">바깥 기온·습도·비로 본 참고 신호입니다(발령 정보 아님). 병이 좋아하는 습하고 알맞은 기온이 이어지는 시간을 섷습니다.</div></div>';
     }
     // 5) 바람 (앞으로 24시간 + 3시간 단위 풍향 시간표)
     if (w.WSD && w.WSD.some(function (x) { return x != null; })) {
@@ -399,9 +399,10 @@
     var base = String(w.short_base || '');
     var bm = /^(\d{4})(\d\d)(\d\d) (\d\d)/.exec(base);
     body.innerHTML = '<div class="lc-grid">' + tiles + '</div>'
-      + '<a class="lc-sim" href="' + BASE + 'sim.html?region=' + r.code + '" target="_blank" rel="noopener"><div><b>🏠 우리 하우스 시뮬레이션</b><br><span>하우스 크기·방향과 환기·커튼·차광·난방·관수 설정을 넣고, 이 예보로 하우스 안 온도·습도를 시간대별로 재생해 보세요 (토마토)</span></div><em>열기 →</em></a>'
+      + '<a class="lc-sim" href="https://farmily.ai/greenhousesim?region=' + r.code + '" target="_top"><div><b>🏠 우리 하우스 시뮬레이션</b><br><span>하우스 크기·방향과 환기·커튼·차광·난방·관수 설정을 넣고, 이 예보로 하우스 안 온도·습도를 시간대별로 재생해 보세요 (토마토)</span></div><em>열기 →</em></a>'
       + '<div class="lc-foot">' + esc(r.sido + ' ' + r.name) + ' · 자료: 기상청 단기예보'
       + (bm ? '(' + (+bm[2]) + '/' + (+bm[3]) + ' ' + bm[4] + '시 발표)' : '') + '·중기예보·종관기상관측(ASOS) · 바깥 날씨 기준이라 하우스 안 환경과는 다를 수 있습니다.</div>';
+    var simA = body.querySelector('.lc-sim'); if (simA) simA.onclick = function () { ls('farmily.region', r.code); };  // 시뮬레이션 페이지가 같은 지역으로 열리게
     var os_ = document.getElementById('lc-orient');
     if (os_) os_.onchange = function () { orient = this.value; ls('farmily.orient', orient); render(r, w); };
     var sp = document.getElementById('lc-sp');
