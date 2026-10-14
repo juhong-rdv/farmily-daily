@@ -316,7 +316,7 @@ def run_calibration():
     """처음 받는 지점은 이번 실행에 몇 개씩(한 지점 = 기상청 호출 약 10회),
     이미 쌓인 지점은 하루 한 번 새 날짜만(호출 1회) 덧붙여 다시 맞춥니다."""
     from build_regions import ASOS, full_regions
-    per_run = int(os.environ.get("CAL_PER_RUN", "35"))
+    per_run = int(os.environ.get("CAL_PER_RUN", "100"))
     for s in ASOS:
         o = SC.load(ROOT, s[0])
         if o: CAL[s[0]] = o
