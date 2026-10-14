@@ -15,7 +15,7 @@ BASES = ["https://apis.data.go.kr/1360000", "http://apis.data.go.kr/1360000"]
 BASE_OK = {"i": None}
 S = requests.Session()
 S.headers["User-Agent"] = "farmily-daily-data/1.0"
-LOG = {"started": NOW.isoformat(timespec="minutes"), "errors": [], "mid_invalid": [], "counts": {}, "base": None}
+LOG = {"started": NOW.isoformat(timespec="minutes"), "errors": [], "mid_invalid": [], "counts": {}, "base": None, "samples": []}
 
 def key():
     k = os.environ.get("KMA_SERVICE_KEY", "").strip()
@@ -34,6 +34,8 @@ def call(path, params, tries=3):
                 continue
             BASE_OK["i"] = bi
             txt = r.text
+            if len(LOG["samples"]) < 3:  # 진단용: 처음 몇 개 응답 앞부분 (키는 응답에 포함되지 않음)
+                LOG["samples"].append({"path": path, "params": {k: v for k, v in params.items()}, "http": r.status_code, "text": txt[:600]})
             if not txt.lstrip().startswith("{"):
                 m = re.search(r"<returnAuthMsg>([^<]+)|<resultMsg>([^<]+)|<errMsg>([^<]+)", txt)
                 last = "비JSON 응답 HTTP %s %s" % (r.status_code, (m and next(g for g in m.groups() if g)) or txt[:120])
