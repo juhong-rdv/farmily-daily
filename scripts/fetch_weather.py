@@ -154,7 +154,9 @@ def sun_for_station(stn):
     start = end - dt.timedelta(days=12)
     body = call("/AsosDalyInfoService/getWthrDataList", {"pageNo": 1, "numOfRows": 30, "dataCd": "ASOS", "dateCd": "DAY",
                 "startDt": start.strftime("%Y%m%d"), "endDt": end.strftime("%Y%m%d"), "stnIds": stn})
-    rows = [(r.get("tm"), r.get("sumSsHr")) for r in items(body)]
+    raw = items(body)
+    gsr = {r.get("tm"): float(r["sumGsr"]) for r in raw if r.get("sumGsr") not in (None, "")}
+    rows = [(r.get("tm"), r.get("sumSsHr")) for r in raw]
     rows = [(d, float(v)) for d, v in rows if d and v not in (None, "")]
     if len(rows) < 7: return None
     rows.sort()
@@ -175,7 +177,8 @@ def sun_for_station(stn):
     s = round(sum(v for _, v in last7), 1)
     normal = round(sum(sums) / len(sums), 1) if len(sums) >= 3 else None
     return {"start": last7[0][0], "end": last7[-1][0], "sum": s, "avg": round(s / 7, 1), "daily": [v for _, v in last7],
-            "normal": normal, "normal_years": len(sums), "ratio": (round(s / normal * 100) if normal else None)}
+            "normal": normal, "normal_years": len(sums), "ratio": (round(s / normal * 100) if normal else None),
+            "gsr": ([gsr.get(d) for d, _ in last7] if all(gsr.get(d) is not None for d, _ in last7) else None)}
 
 def load_sun():
     p = os.path.join(ROOT, "data", "sun.json")
@@ -187,6 +190,41 @@ def load_sun():
     except Exception:
         pass
     return {"date": today, "note": "ASOS 일조시간 하루 1회 캐시", "stations": {}}, True
+
+# ---------- 예상 일사량 (태양 고도 + 하늘 상태로 추정) ----------
+import math
+def sun_elev(lat, lon, t):
+    """t: KST datetime (그 시각). 태양 고도(도)."""
+    n = t.timetuple().tm_yday
+    g = 2 * math.pi / 365 * (n - 1 + (t.hour - 12) / 24)
+    decl = (0.006918 - 0.399912 * math.cos(g) + 0.070257 * math.sin(g) - 0.006758 * math.cos(2 * g)
+            + 0.000907 * math.sin(2 * g) - 0.002697 * math.cos(3 * g) + 0.00148 * math.sin(3 * g))
+    eot = 229.18 * (0.000075 + 0.001868 * math.cos(g) - 0.032077 * math.sin(g) - 0.014615 * math.cos(2 * g) - 0.040849 * math.sin(2 * g))
+    tst = t.hour * 60 + t.minute + eot + 4 * lon - 540  # 진태양시(분), KST = UTC+9 = 135°E
+    ha = math.radians(tst / 4 - 180)
+    la = math.radians(lat)
+    cz = math.sin(la) * math.sin(decl) + math.cos(la) * math.cos(decl) * math.cos(ha)
+    return math.degrees(math.asin(max(-1, min(1, cz))))
+
+# 하늘상태(SKY) 1 맑음(구름 0~5할) 3 구름많음(6~8할) 4 흐림(9~10할) → 구름양 대표값, Kasten-Czeplak 감쇠
+SKY_CLOUD = {1: 0.25, 3: 0.7, 4: 0.95}
+def cloud_factor(sky, pty):
+    if pty and pty > 0: return 0.2  # 비·눈이 오는 시간
+    c = SKY_CLOUD.get(sky)
+    if c is None: return None
+    return 1 - 0.75 * c ** 3.4
+
+def est_ghi(lat, lon, t, sky, pty):
+    """시각 t 를 가운데로 한 1시간 평균 수평면 일사(W/m²): (맑은 하늘 값, 구름 반영 값, 태양 고도)."""
+    elevs = [sun_elev(lat, lon, t + dt.timedelta(minutes=m)) for m in (-25, -15, -5, 5, 15, 25)]
+    clear = 0.0
+    for e in elevs:
+        if e > 0:
+            cz = math.sin(math.radians(e))
+            clear += 1098 * cz * math.exp(-0.057 / cz)  # Haurwitz 맑은 하늘 모델
+    clear /= len(elevs)
+    f = cloud_factor(sky, pty)
+    return round(clear), (round(clear * f) if f is not None else None), round(sun_elev(lat, lon, t), 1)
 
 # ---------- 병 발생 위험 (바깥 날씨 기준 참고 신호) ----------
 def level(h): return "높음" if h >= 12 else ("보통" if h >= 6 else "낮음")
@@ -206,7 +244,7 @@ def build_region(reg, sun_db, sun_fresh):
     for it in rows:
         d, t, c, v = it["fcstDate"], it["fcstTime"], it["category"], it["fcstValue"]
         key_ = d + t
-        if c in ("TMP", "REH", "PCP", "POP"):
+        if c in ("TMP", "REH", "PCP", "POP", "SKY", "PTY", "VEC", "WSD"):
             by.setdefault(key_, {})[c] = v
         elif c == "TMN": tmn[d] = float(v)
         elif c == "TMX": tmx[d] = float(v)
@@ -217,6 +255,32 @@ def build_region(reg, sun_db, sun_fresh):
     RH = [float(by[k]["REH"]) if "REH" in by[k] else None for k in keys]
     Rr = [pcp_mm(by[k].get("PCP", 0)) for k in keys]
     P = [int(float(by[k]["POP"])) if "POP" in by[k] else None for k in keys]
+    def num(k, c, f=float):
+        try: return f(float(by[k][c]))
+        except Exception: return None
+    SKY = [num(k, "SKY", int) for k in keys]
+    PTY = [num(k, "PTY", int) for k in keys]
+    VEC = [num(k, "VEC", int) for k in keys]
+    WSD = [num(k, "WSD") for k in keys]
+    # 예상 일사량: 정시 예보값을 그 시각 앞뒤 30분 평균으로 봄
+    GC, G, EL = [], [], []
+    for k, sk, pt in zip(keys, SKY, PTY):
+        t = dt.datetime(int(k[:4]), int(k[4:6]), int(k[6:8]), int(k[8:10]), tzinfo=KST)
+        c, g, e = est_ghi(reg["lat"], reg["lon"], t, sk, pt)
+        GC.append(c); G.append(g); EL.append(e)
+    rad_days = {}
+    for k, c, g in zip(keys, GC, G):
+        dd = rad_days.setdefault(k[:8], {"clear": 0.0, "est": 0.0, "n": 0, "miss": 0})
+        dd["n"] += 1; dd["clear"] += c
+        if g is None: dd["miss"] += 1
+        else: dd["est"] += g
+    rad = []
+    for d in sorted(rad_days):
+        v = rad_days[d]
+        if v["n"] < 24 and d != NOW.strftime("%Y%m%d"): continue
+        if v["miss"]: continue
+        rad.append({"d": "%s-%s-%s" % (d[:4], d[4:6], d[6:8]), "est": round(v["est"] * 0.0036, 1), "clear": round(v["clear"] * 0.0036, 1),
+                    "part": v["n"] < 24})
     k0 = keys[0]
     h0 = "%s-%s-%sT%s:00" % (k0[:4], k0[4:6], k0[6:8], k0[8:10])
     # 일별 최저/최고: 단기(TMN/TMX 우선, 없으면 시간값의 최저·최고)
@@ -260,6 +324,7 @@ def build_region(reg, sun_db, sun_fresh):
     return {"code": reg["code"], "sido": reg["sido"], "name": reg["name"],
             "updated": NOW.isoformat(timespec="minutes"), "short_base": base,
             "h0": h0, "T": T, "RH": RH, "R": Rr, "P": P,
+            "SKY": SKY, "PTY": PTY, "VEC": VEC, "WSD": WSD, "G": G, "GC": GC, "EL": EL, "rad": rad,
             "days": out_days[:11], "risk": risk(T, RH, Rr), "sun": sun}
 
 def main():
