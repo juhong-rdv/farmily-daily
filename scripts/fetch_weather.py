@@ -2,7 +2,7 @@
 """기상청 공공데이터로 '우리 지역' 카드 데이터를 만듭니다. GitHub Actions에서 실행.
 필요: 환경변수 KMA_SERVICE_KEY (공공데이터포털 '일반 인증키(Decoding)' — Encoding 키를 넣어도 자동으로 풀어 씁니다)
 활용신청 필요한 API 3종: 기상청_단기예보 조회서비스 / 기상청_중기예보 조회서비스 / 기상청_지상(종관, ASOS) 일자료 조회서비스
-출력: data/weather/<code>.json (시군별), data/sun.json (일조 하루 1회 캐시), data/solar/<지점>.json (10년 일사 보정)·log.json (예보 성적), data/weather/_status.json (실행 기록)"""
+출력: data/weather/<code>.json (시군별), data/sun.json (일조 하루 1회 캐시), data/solar/<지점>.json (일사 보정)·raw/<지점>.csv (관측 누적)·log.json (예보 성적), data/weather/_status.json (실행 기록)"""
 import json, os, re, sys, time, datetime as dt
 from urllib.parse import unquote
 import requests
@@ -313,7 +313,8 @@ def apply_calibration(reg, keys, G, GC, R, SKY, PTY, rad, sun_db):
     return info, score
 
 def run_calibration():
-    """아직 보정 안 된 지점을 이번 실행에 몇 개씩 채웁니다(한 지점 = 기상청 호출 약 10회)."""
+    """처음 받는 지점은 이번 실행에 몇 개씩(한 지점 = 기상청 호출 약 10회),
+    이미 쌓인 지점은 하루 한 번 새 날짜만(호출 1회) 덧붙여 다시 맞춥니다."""
     from build_regions import ASOS, full_regions
     per_run = int(os.environ.get("CAL_PER_RUN", "35"))
     for s in ASOS:
@@ -324,18 +325,25 @@ def run_calibration():
     for rank in range(4):
         for c in cands:
             if rank < len(c) and c[rank][1] not in order: order.append(c[rank][1])
-    done, errs = 0, []
+    full = added = 0
+    errs = []
     for st in order:
-        if done >= per_run: break
-        if not SC.needs(CAL.get(st[0]), NOW): continue
+        o = CAL.get(st[0])
+        if SC.needs_full(o, NOW):
+            if full >= per_run: continue
+            full += 1
+        elif SC.needs_add(o, NOW):
+            added += 1
+        else:
+            continue
         try:
-            o = SC.calibrate(st[0], st[1], st[2], st[3], call, items, NOW, LOG)
-            SC.save(ROOT, o); CAL[st[0]] = o; done += 1
+            o = SC.update(st[0], st[1], st[2], st[3], call, items, NOW, LOG, ROOT, prev=o)
+            SC.save(ROOT, o); CAL[st[0]] = o
         except Exception as e:
-            errs.append("보정 %s %s: %s" % (st[0], st[1], str(e)[:150])); done += 1
-    LOG["calib"] = {"this_run": done, "have_gsr": sum(1 for o in CAL.values() if o.get("gsr")),
-                    "no_gsr": sum(1 for o in CAL.values() if not o.get("gsr")), "pending": sum(1 for st in order if SC.needs(CAL.get(st[0]), NOW)),
-                    "errors": errs[:10]}
+            errs.append("보정 %s %s: %s" % (st[0], st[1], str(e)[:150]))
+    LOG["calib"] = {"first_download": full, "daily_add": added, "have_gsr": sum(1 for o in CAL.values() if o.get("gsr")),
+                    "no_gsr": sum(1 for o in CAL.values() if not o.get("gsr")),
+                    "pending": sum(1 for st in order if SC.needs_full(CAL.get(st[0]), NOW)), "errors": errs[:10]}
 
 def build_region(reg, sun_db, sun_fresh):
     base, rows = get_short(reg["nx"], reg["ny"])
