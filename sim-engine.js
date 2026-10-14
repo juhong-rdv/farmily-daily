@@ -41,9 +41,9 @@
       rainRoofClose: true, coldOut: 10, coldOpen: 30,  // 외기 10℃ 미만이면 측창 최대 30%
       nightDehum: true,                                // 야간 습도 90% 이상이면 측창 5% (외기 8℃ 이상일 때)
       heatDay: 15, heatEve: 13 + a, heatMid: 11 + a, heatDawn: 13 + a, // 주간 / 일몰~+5시간 / 심야 / 일출 2시간 전~일출
-      curtainOut: 15, curtainOpenRad: 30,              // 일몰 후 외기 15℃ 미만이면 커튼 닫음, 일사 30W/㎡ 넘으면 엽
-      shadeRad: 650,                                   // 바깥 일사 650W/㎡ 넘으면 차광
-      irrJ: 70, irrMl: 50,                             // 일사 70J/㠠 쌓일 때마다 1회 50㎖/주
+      curtainOut: 15, curtainOpenRad: 30,              // 일몰 후 외기 15℃ 미만이면 커튼 닫음, 일사 30W/m² 넘으면 연다
+      shadeRad: 650,                                   // 바깥 일사 650W/m² 넘으면 차광
+      irrJ: 70, irrMl: 50,                             // 일사 70J/cm² 쌓일 때마다 1회 50mL/주
       irrStart: 60, irrEnd: 120                        // 일출 60분 뒤부터 일몰 120분 전까지
     };
   }
@@ -149,7 +149,7 @@
       var tA = Math.min(tSide, maxSide), tB = Math.min(tSide, maxSide);
       if (o.ws >= c.windLimit) { if (cA > 0.3) tA = Math.min(tA, c.windOpen / 100); if (cB > 0.3) tB = Math.min(tB, c.windOpen / 100); tRoof = Math.min(tRoof, 0.3); }
       if (o.ws >= c.stormLimit) { tA = 0; tB = 0; tRoof = 0; }
-      // 커튼: 밤에 외기 기준 이하면 닫고, 아침 일사 기준 넘으면 엽
+      // 커튼: 밤에 외기 기준 이하면 닫고, 아침 일사 기준 넘으면 연다
       if (house.curtain !== 'none') {
         if (!day && To < c.curtainOut) curtain = 1;
         else if (day && o.G >= c.curtainOpenRad) curtain = 0;
@@ -161,9 +161,9 @@
       sideA = rate(sideA, tA, 0.25); sideB = rate(sideB, tB, 0.25); roof = rate(roof, tRoof, 0.34);
       // ----- 물리 -----
       var tau = cov.tau * 0.92 * (shade ? 1 - house.shadePct / 100 : 1) * (curtain ? 0.35 : 1);
-      var Rin = tau * o.G;                                     // 바닥 1㎡당 들어온 햇빛 (W/㎡)
+      var Rin = tau * o.G;                                     // 바닥 1m²당 들어온 햇빛 (W/m²)
       var VPDi = Math.max(0, esat(Ti) * (1 - RHi / 100)) / 1000; // kPa
-      var lE = Math.max(0, 0.6 * fc * Rin + 10 * lai * VPDi);   // 증산 잠열 (W/㎡)
+      var lE = Math.max(0, 0.6 * fc * Rin + 10 * lai * VPDi);   // 증산 잠열 (W/m²)
       var Rsoil = (1 - fc) * 0.6 * Rin;
       var Qs = Rin - Rsoil - lE;
       var clear = o.pty > 0 ? 0 : (o.sky === 1 ? 0.8 : o.sky === 3 ? 0.35 : 0.1);
@@ -193,7 +193,7 @@
       // 관수 (일사비례)
       var irr = 0;
       if (t >= S.start) {
-        if (day) acc += o.G * dt / 1e4;                       // J/㠠
+        if (day) acc += o.G * dt / 1e4;                       // J/cm²
         var okWin = sday.rise && sday.set && t >= sday.rise + c.irrStart * 60000 && t <= sday.set - c.irrEnd * 60000;
         if (okWin && acc >= c.irrJ) { acc = 0; irr = 1; irrEvents.push(t); }
         if (!day && sp.el < -10) acc = 0;
