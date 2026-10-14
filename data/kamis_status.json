@@ -1,12 +1,12 @@
 {
- "run": "2026-10-14T22:56+09:00",
+ "run": "2026-10-15T08:27+09:00",
  "errors": [
+  "2026-10-15 100: JSON 아님 (http 406, http)",
+  "2026-10-15 200: JSON 아님 (http 406, http)",
+  "2026-10-15 400: JSON 아님 (http 406, http)",
   "2026-10-14 100: JSON 아님 (http 406, http)",
   "2026-10-14 200: JSON 아님 (http 406, http)",
-  "2026-10-14 400: JSON 아님 (http 406, http)",
-  "2026-10-13 100: JSON 아님 (http 406, http)",
-  "2026-10-13 200: JSON 아님 (http 406, http)",
-  "2026-10-13 400: JSON 아님 (http 406, http)"
+  "2026-10-14 400: JSON 아님 (http 406, http)"
  ],
  "result": "자료 없음",
  "diag": [
@@ -14,28 +14,28 @@
    "url": "https://www.kamis.or.kr/service/price/xml.do",
    "http": 406,
    "type": "text/html",
-   "final": "https://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-14&p_convert_kg_yn=N&p_i",
+   "final": "https://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-15&p_convert_kg_yn=N&p_i",
    "text": "<br>\r\n<br>\r\n<center>\r\n<h2>\r\nThe request / response that are contrary to the Web firewall security policies have been blocked.\r\n</h2>\r\n<table>\r\n<tr>\r\n<td>Detect time</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect client IP</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect URL</td>\r\n<td></td>\r\n</tr>\r\n</table>\r\n</cen"
   },
   {
    "url": "http://www.kamis.or.kr/service/price/xml.do",
    "http": 406,
    "type": "text/html",
-   "final": "http://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-14&p_convert_kg_yn=N&p_it",
+   "final": "http://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-15&p_convert_kg_yn=N&p_it",
    "text": "<br>\r\n<br>\r\n<center>\r\n<h2>\r\nThe request / response that are contrary to the Web firewall security policies have been blocked.\r\n</h2>\r\n<table>\r\n<tr>\r\n<td>Detect time</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect client IP</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect URL</td>\r\n<td></td>\r\n</tr>\r\n</table>\r\n</cen"
   },
   {
    "url": "https://www.kamis.or.kr/service/price/xml.do",
    "http": 406,
    "type": "text/html",
-   "final": "https://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-14&p_convert_kg_yn=N&p_i",
+   "final": "https://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-15&p_convert_kg_yn=N&p_i",
    "text": "<br>\r\n<br>\r\n<center>\r\n<h2>\r\nThe request / response that are contrary to the Web firewall security policies have been blocked.\r\n</h2>\r\n<table>\r\n<tr>\r\n<td>Detect time</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect client IP</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect URL</td>\r\n<td></td>\r\n</tr>\r\n</table>\r\n</cen"
   },
   {
    "url": "http://www.kamis.or.kr/service/price/xml.do",
    "http": 406,
    "type": "text/html",
-   "final": "http://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-14&p_convert_kg_yn=N&p_it",
+   "final": "http://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=02&p_country_code=1101&p_regday=2026-10-15&p_convert_kg_yn=N&p_it",
    "text": "<br>\r\n<br>\r\n<center>\r\n<h2>\r\nThe request / response that are contrary to the Web firewall security policies have been blocked.\r\n</h2>\r\n<table>\r\n<tr>\r\n<td>Detect time</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect client IP</td>\r\n<td></td>\r\n</tr>\r\n<tr>\r\n<td>Detect URL</td>\r\n<td></td>\r\n</tr>\r\n</table>\r\n</cen"
   }
  ]
