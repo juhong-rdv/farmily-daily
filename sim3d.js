@@ -57,28 +57,47 @@
     var sunBall = new T.Mesh(new T.SphereGeometry(5, 24, 16), new T.MeshBasicMaterial({ color: 0xffd54a, fog: false }));
     var sunHalo = new T.Mesh(new T.SphereGeometry(9, 24, 16), new T.MeshBasicMaterial({ color: 0xffe08a, fog: false, transparent: true, opacity: 0.3 }));
     scene.add(sunBall); scene.add(sunHalo);
-    var cmat = new T.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.92 });
-    var clouds = [];
-    for (var i = 0; i < 6; i++) {
-      var cg = new T.Group();
-      [[0, 0, 0, 7], [6, 1, 0, 5], [-6, 0.5, 1, 4.5], [2, 2.5, -1, 4.5]].forEach(function (p) { var m = new T.Mesh(new T.SphereGeometry(p[3], 14, 10), cmat); m.position.set(p[0], p[1], p[2]); m.scale.y = 0.55; cg.add(m); });
+    var cmat = new T.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.93 });
+    var clouds = [], cgeo = new T.SphereGeometry(1, 14, 10);
+    for (var i = 0; i < 12; i++) {
+      var cg = new T.Group(), nb = 5 + (i % 3);
+      for (var b = 0; b < nb; b++) { var m = new T.Mesh(cgeo, cmat), rr = 4 + ((i * 7 + b * 3) % 5); m.position.set((b - nb / 2) * 4.2 + ((i + b) % 2) * 1.5, ((b * 5 + i) % 3) * 0.9, ((b * 3 + i) % 4) - 2); m.scale.set(rr * 1.3, rr * 0.55, rr); cg.add(m); }
       scene.add(cg); clouds.push(cg);
     }
-    var NR = 1500, rp = new Float32Array(NR * 3);
-    for (i = 0; i < NR; i++) { rp[i * 3] = (Math.random() - 0.5) * 90; rp[i * 3 + 1] = Math.random() * 30; rp[i * 3 + 2] = (Math.random() - 0.5) * 90; }
+    // 비 (빗줄기) · 눈 (눈송이)
+    var NR = 1400, rp = new Float32Array(NR * 6), rst = [];
+    for (i = 0; i < NR; i++) rst.push({ x: (Math.random() - 0.5) * 90, y: Math.random() * 32, z: (Math.random() - 0.5) * 90 });
     var rg = new T.BufferGeometry(); rg.setAttribute('position', new T.BufferAttribute(rp, 3));
-    var rain = new T.Points(rg, new T.PointsMaterial({ color: 0xbfdbfe, size: 0.2, transparent: true, opacity: 0.85 })); rain.frustumCulled = false; scene.add(rain);
+    var rain = new T.LineSegments(rg, new T.LineBasicMaterial({ color: 0xc7dcf5, transparent: true, opacity: 0.7 })); rain.frustumCulled = false; scene.add(rain);
+    var NS = 1600, sp0 = new Float32Array(NS * 3), sst = [];
+    for (i = 0; i < NS; i++) sst.push({ x: (Math.random() - 0.5) * 90, y: Math.random() * 32, z: (Math.random() - 0.5) * 90, ph: Math.random() * 6.28 });
+    var sg = new T.BufferGeometry(); sg.setAttribute('position', new T.BufferAttribute(sp0, 3));
+    var snow = new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 0.22, transparent: true, opacity: 0.95 })); snow.frustumCulled = false; scene.add(snow);
+    // 풍향·풍속계 (프로펠러형) + 바람자루(공항식)
+    var metal = new T.MeshLambertMaterial({ color: 0x9ca3af }), dark = new T.MeshLambertMaterial({ color: 0x374151 });
+    var sens = new T.Group(); scene.add(sens);
+    var mast = new T.Mesh(new T.CylinderGeometry(0.05, 0.07, 1, 8), metal); mast.position.y = 0.5; sens.add(mast); mast.castShadow = true;
+    var head = new T.Group(); head.scale.setScalar(2.2); sens.add(head);
+    var body = new T.Mesh(new T.CylinderGeometry(0.09, 0.09, 0.6, 10), dark); body.rotation.z = Math.PI / 2; head.add(body);
+    var nose = new T.Mesh(new T.ConeGeometry(0.09, 0.25, 10), dark); nose.rotation.z = -Math.PI / 2; nose.position.x = 0.42; head.add(nose);
+    var tail = new T.Mesh(new T.BoxGeometry(0.7, 0.4, 0.02), new T.MeshLambertMaterial({ color: 0xf8fafc })); tail.position.x = -0.6; tail.position.y = 0.05; head.add(tail);
+    var prop = new T.Group(); prop.position.x = 0.55; head.add(prop);
+    for (i = 0; i < 4; i++) { var bl = new T.Mesh(new T.BoxGeometry(0.02, 0.42, 0.07), new T.MeshLambertMaterial({ color: 0xf97316 })); bl.position.y = 0.21; var bg2 = new T.Group(); bg2.rotation.x = i * Math.PI / 2; bg2.add(bl); prop.add(bg2); }
+    var sockPole = new T.Mesh(new T.CylinderGeometry(0.05, 0.06, 1, 8), metal); sockPole.castShadow = true; scene.add(sockPole);
+    var sockYaw = new T.Group(), sockPitch = new T.Group(); sockYaw.scale.setScalar(2.2); sockYaw.add(sockPitch); scene.add(sockYaw);
+    var ring = new T.Mesh(new T.TorusGeometry(0.28, 0.025, 6, 16), metal); ring.rotation.y = Math.PI / 2; sockPitch.add(ring);
+    for (i = 0; i < 5; i++) { var r0 = 0.28 - i * 0.04, r1 = r0 - 0.04, seg = new T.Mesh(new T.CylinderGeometry(r1, r0, 0.36, 14, 1, true), new T.MeshLambertMaterial({ color: i % 2 ? 0xffffff : 0xf97316, side: T.DoubleSide })); seg.rotation.z = -Math.PI / 2; seg.position.x = 0.18 + i * 0.36; sockPitch.add(seg); }
     var NW = 280, wp = new Float32Array(NW * 6), wst = [];
     for (i = 0; i < NW; i++) wst.push({ x: 0, y: 0, z: 0, l: 0.7 + Math.random() * 0.8 });
     var wg = new T.BufferGeometry(); wg.setAttribute('position', new T.BufferAttribute(wp, 3));
     var wind = new T.LineSegments(wg, new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })); wind.frustumCulled = false; scene.add(wind);
     var lbs = {};
-    ['in', 'A', 'B', 'R', 'irr', 'N', 'E', 'S', 'W'].forEach(function (k) {
+    ['in', 'A', 'B', 'R', 'irr', 'ws', 'N', 'E', 'S', 'W'].forEach(function (k) {
       var d = document.createElement('div'); d.className = 'lb' + (k === 'in' ? ' in' : 'NESW'.indexOf(k) >= 0 ? ' cp' : ''); ov.appendChild(d); lbs[k] = d;
     });
     lbs.N.textContent = '북'; lbs.E.textContent = '동'; lbs.S.textContent = '남'; lbs.W.textContent = '서';
     G = { wrap: wrap, r: r, cv: cv, ov: ov, scene: scene, cam: cam, hemi: hemi, sun: sun, sunBall: sunBall, sunHalo: sunHalo, clouds: clouds, cmat: cmat,
-      rain: rain, rp: rp, wind: wind, wp: wp, wst: wst, lbs: lbs, hud: ov.querySelector('#o3hud'), house: null, key: '', w: 0,
+      rain: rain, rp: rp, rst: rst, snow: snow, sp0: sp0, sst: sst, sens: sens, head: head, prop: prop, mast: mast, sockPole: sockPole, sockYaw: sockYaw, sockPitch: sockPitch, ground: ground, wind: wind, wp: wp, wst: wst, lbs: lbs, hud: ov.querySelector('#o3hud'), house: null, key: '', w: 0,
       orbit: { az: 0, el: 22, dist: 20, preset: 0, tl: new T.Vector3() } };
     controls();
     resize();
@@ -147,7 +166,7 @@
     // 바닥·멀칭
     var floor = add(new T.Mesh(new T.PlaneGeometry(NW, L), new T.MeshLambertMaterial({ color: 0x5b4636 }))); floor.rotation.x = -Math.PI / 2; floor.position.y = 0.01; floor.receiveShadow = true;
     // 지붕 (천창 자리는 비워 둠)
-    var flaps = [], flapMat = new T.MeshPhongMaterial({ color: 0xd6e8f8, transparent: true, opacity: 0.6, side: T.DoubleSide, depthWrite: false });
+    var flaps = [], flapMat = new T.MeshPhongMaterial({ color: 0xe6f0fa, transparent: true, opacity: 0.38, side: T.DoubleSide, depthWrite: false });
     for (i = 0; i < n; i++) {
       var xs = x0 + i * W, xc = xs + W / 2;
       if (h.roofVent) {
@@ -158,7 +177,7 @@
         var px = xs + (0.5 + du) * W, py = yAt(0.5 + du), len = Math.hypot(px - xc, py - hr), slope = Math.atan2(py - hr, px - xc);
         var pv = new T.Group(); pv.position.set(xc, hr, 0); pv.userData.slope = slope;
         var fm = new T.Mesh(new T.BoxGeometry(len, 0.04, rl), flapMat); fm.position.x = len / 2; pv.add(fm);
-        var fe = new T.LineSegments(new T.EdgesGeometry(fm.geometry), new T.LineBasicMaterial({ color: 0x94a3b8 })); fe.position.x = len / 2; pv.add(fe);
+        var fe = new T.LineSegments(new T.EdgesGeometry(fm.geometry), new T.LineBasicMaterial({ color: 0xcbd5e1, transparent: true, opacity: 0.8 })); fe.position.x = len / 2; pv.add(fe);
         add(pv); flaps.push(pv);
       } else add(new T.Mesh(patch(xs, 0, 1, -L / 2, L / 2), film));
     }
@@ -188,6 +207,15 @@
     for (i = 0; i < n; i++) lp.push(x0 + i * W + W / 2, hr, -L / 2, x0 + i * W + W / 2, hr, L / 2);
     var lg = new T.BufferGeometry(); lg.setAttribute('position', new T.Float32BufferAttribute(lp, 3));
     add(new T.LineSegments(lg, new T.LineBasicMaterial({ color: 0xd8dee6, transparent: true, opacity: 0.75 })));
+    // 양 끝 아치를 굵게 (동 수가 잘 보이도록)
+    var tubeMat = new T.MeshLambertMaterial({ color: 0xf1f5f9 });
+    [-L / 2, L / 2].forEach(function (z) {
+      for (var i2 = 0; i2 < n; i2++) {
+        var pts = []; for (var k2 = 0; k2 <= 16; k2++) { var u2 = k2 / 16; pts.push(new T.Vector3(x0 + i2 * W + u2 * W, yAt(u2), z)); }
+        add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts), 24, 0.05, 6, false), tubeMat));
+      }
+      for (i2 = 0; i2 <= n; i2++) { var po = add(new T.Mesh(new T.CylinderGeometry(0.05, 0.05, hs, 6), tubeMat)); po.position.set(x0 + i2 * W, hs / 2, z); }
+    });
     // 보온커튼
     var curC = null, curO = null;
     if (h.curtain !== 'none') {
@@ -200,7 +228,7 @@
     if (h.shade) {
       var sm = new T.MeshLambertMaterial({ color: 0x111827, transparent: true, opacity: 0.55, side: T.DoubleSide, depthWrite: false });
       for (i = 0; i < n; i++) { var sp = add(new T.Mesh(patch(x0 + i * W, 0, 1, -L / 2, L / 2, 0.3), sm)); sp.castShadow = true; shOn.push(sp); }
-      shOff = add(new T.Mesh(new T.CylinderGeometry(0.12, 0.12, L, 10), new T.MeshLambertMaterial({ color: 0x1f2937 }))); shOff.rotation.x = Math.PI / 2; shOff.position.set(x0 + 0.1, hs + 0.25, 0);
+      shOff = add(new T.Mesh(new T.CylinderGeometry(0.07, 0.07, L, 10), new T.MeshLambertMaterial({ color: 0x6b7280 }))); shOff.rotation.x = Math.PI / 2; shOff.position.set(x0 + 0.15, hs + 0.12, 0);
     }
     // 하우스 안 공기 (온도 색)
     var airMat = new T.MeshBasicMaterial({ color: 0x4ade80, transparent: true, opacity: 0.14, depthWrite: false, side: T.DoubleSide });
@@ -267,6 +295,11 @@
     // 구름 자리
     var spread = Math.max(L, NW) * 0.7 + 30, hc = Math.max(L, NW) * 0.35 + 22;
     G.clouds.forEach(function (c, ci) { c.position.set(Math.cos(ci * 2.1 + 0.4) * spread, hc + (ci % 3) * 4, Math.sin(ci * 1.7 + 1.1) * spread - spread * 0.3); });
+    // 풍향계·바람자루 자리: 가까이 보기 쪽 끝 바깥 모서리
+    var mh = hr + 1.6, sp1 = grp.localToWorld(new T.Vector3(x0 - 2.5, 0, L / 2 - 1.5)), sp2 = grp.localToWorld(new T.Vector3(x0 + NW + 2.5, 0, L / 2 - 1.5));
+    G.sens.position.copy(sp1); G.mast.scale.y = mh; G.mast.position.y = mh / 2; G.head.position.y = mh + 0.2;
+    var sh2 = Math.max(4, hs + 1.5); G.sockPole.scale.y = sh2; G.sockPole.position.set(sp2.x, sh2 / 2, sp2.z); G.sockYaw.position.set(sp2.x, sh2 - 0.1, sp2.z);
+    G.sensTop = new T.Vector3(sp1.x, mh + 2.0, sp1.z);
     preset(G.orbit.preset);
   }
 
@@ -290,7 +323,7 @@
     // 하늘·빛
     var el = f.el, over = f.sky === 4 || f.pty > 0;
     var bg = el > 8 ? 0xa9d6f5 : el > -2 ? 0xf5c08a : el > -8 ? 0x4a4f7d : 0x0d1733;
-    if (over) bg = el > -2 ? 0xb4bcc4 : 0x1c2333;
+    if (over) bg = el > -2 ? (f.pty === 3 || f.pty === 2 ? 0xd3d8de : f.pty > 0 ? 0x9aa3ad : 0xb4bcc4) : 0x1c2333;
     G.scene.background = new T.Color(bg); G.scene.fog.color.setHex(bg);
     var dayF = clamp((el + 2) / 12, 0, 1);
     G.hemi.intensity = 0.3 + 0.45 * dayF; G.hemi.color.setHex(dayF > 0.3 ? 0xeaf4ff : 0x8ea2d8);
@@ -302,12 +335,47 @@
     G.sunBall.visible = G.sunHalo.visible = el > -3;
     G.sunBall.position.copy(sd).multiplyScalar(170).add(tw); G.sunHalo.position.copy(G.sunBall.position);
     G.sunBall.material.color.setHex(el < 8 ? 0xffa94d : 0xffd54a); G.sunHalo.material.opacity = over ? 0.15 : 0.3;
-    var nc = f.pty > 0 ? 6 : f.sky === 4 ? 6 : f.sky === 3 ? 3 : 1;
-    G.cmat.color.setHex(el > -2 ? (over ? 0xd1d5db : 0xffffff) : 0x475569);
-    G.clouds.forEach(function (cl, i) { cl.visible = i < nc; });
-    // 비
-    G.rain.visible = f.pty > 0;
-    if (f.pty > 0) { var rp = G.rp; for (var i = 0; i < rp.length; i += 3) { rp[i + 1] -= 22 * dt; if (rp[i + 1] < 0) rp[i + 1] += 30; } G.rain.position.set(tw.x, 0, tw.z); G.rain.geometry.attributes.position.needsUpdate = true; }
+    // 구름: 맑음 2 · 구름많음 6 · 흐림/비/눈 12 (흐리면 낮고 회색)
+    var nc = over ? 12 : f.sky === 3 ? 6 : 2;
+    G.cmat.color.setHex(el > -2 ? (f.pty > 0 ? 0x9ca3af : over ? 0xc9ced6 : 0xffffff) : 0x3f4a5c);
+    var tw0 = (Math.sin((f.wd + 180) * D2R)), tz0 = -Math.cos((f.wd + 180) * D2R), cs = Math.max(big * 0.8, 45);
+    G.clouds.forEach(function (cl, i) {
+      cl.visible = i < nc; if (!cl.visible) return;
+      var u = cl.userData; if (u.ox == null) { u.ox = Math.cos(i * 2.1 + 0.4) * cs; u.oz = Math.sin(i * 1.7 + 1.1) * cs; }
+      u.ox += tw0 * (0.6 + f.ws * 0.5) * dt; u.oz += tz0 * (0.6 + f.ws * 0.5) * dt;
+      if (u.ox > cs) u.ox -= 2 * cs; if (u.ox < -cs) u.ox += 2 * cs; if (u.oz > cs) u.oz -= 2 * cs; if (u.oz < -cs) u.oz += 2 * cs;
+      // 구름은 늘 카메라보다 위에 (흐리면 조금 낮게)
+      cl.position.set(tw.x + u.ox, Math.max(G.cam.position.y, 20) + (over ? 10 : 18) + (i % 3) * 4, tw.z + u.oz);
+    });
+    // 비 (1 비, 2 비/눈, 4 소나기) · 눈 (2, 3)
+    var isRain = f.pty === 1 || f.pty === 2 || f.pty === 4, isSnow = f.pty === 2 || f.pty === 3;
+    var wx = Math.sin((f.wd + 180) * D2R) * f.ws, wz = -Math.cos((f.wd + 180) * D2R) * f.ws;
+    G.rain.visible = isRain; G.snow.visible = isSnow;
+    if (isRain) {
+      var rp = G.rp, heavy = f.pty === 4 || (f.rain || 0) >= 3, nAct = heavy ? G.rst.length : Math.round(G.rst.length * 0.6), vy = 9;
+      G.rst.forEach(function (q, i) {
+        var j = i * 6; if (i >= nAct) { rp[j] = rp[j + 3] = 0; rp[j + 1] = rp[j + 4] = -5; rp[j + 2] = rp[j + 5] = 0; return; }
+        q.y -= vy * dt; q.x += wx * 0.5 * dt; q.z += wz * 0.5 * dt;
+        if (q.y < 0) { q.y += 32; q.x = (Math.random() - 0.5) * 90; q.z = (Math.random() - 0.5) * 90; }
+        var k = 0.07; rp[j] = q.x; rp[j + 1] = q.y; rp[j + 2] = q.z; rp[j + 3] = q.x - wx * 0.5 * k; rp[j + 4] = q.y + vy * k; rp[j + 5] = q.z - wz * 0.5 * k;
+      });
+      G.rain.position.set(tw.x, 0, tw.z); G.rain.geometry.attributes.position.needsUpdate = true;
+    }
+    if (isSnow) {
+      var spp = G.sp0, tnow = Date.now() / 1000;
+      G.sst.forEach(function (q, i) {
+        q.y -= 1.1 * dt; q.x += (wx * 0.7 + Math.sin(tnow + q.ph) * 0.3) * dt; q.z += (wz * 0.7 + Math.cos(tnow * 0.8 + q.ph) * 0.3) * dt;
+        if (q.y < 0) { q.y += 32; q.x = (Math.random() - 0.5) * 90; q.z = (Math.random() - 0.5) * 90; }
+        spp[i * 3] = q.x; spp[i * 3 + 1] = q.y; spp[i * 3 + 2] = q.z;
+      });
+      G.snow.position.set(tw.x, 0, tw.z); G.snow.geometry.attributes.position.needsUpdate = true;
+    }
+    G.ground.material.color.setHex(f.pty === 3 ? 0xd9dee4 : f.pty === 2 ? 0xa3b38a : isRain ? 0x5f7a40 : 0x7d9a52);
+    // 풍향계: 머리가 바람이 불어오는 쪽을 향함, 프로펠러는 풍속만큼 회전 · 바람자루는 바람 가는 쪽으로 펴짐
+    G.head.rotation.y = (90 - f.wd) * D2R;
+    G.prop.rotation.x += Math.min(25, f.ws * 4) * dt;
+    G.sockYaw.rotation.y = (90 - (f.wd + 180)) * D2R;
+    var droop = (1 - Math.min(1, f.ws / 7)) * 70 * D2R; G.sockPitch.rotation.z = -droop + Math.sin(Date.now() / 300) * 0.04 * Math.min(1, f.ws / 3);
     // 측창·천창·커튼·차광
     function side(s, o) {
       var top = 0.3 + d.vh * o, hh = Math.max(0.001, d.hs - top);
@@ -365,18 +433,20 @@
     place(L.A, lw(-d.NW / 2 - 0.4, 0.3 + d.vh * 0.5, zc), dir8(nA) + ' 측창 ' + Math.round(f.A * 100) + '%');
     place(L.B, lw(d.NW / 2 + 0.4, 0.3 + d.vh * 0.5, zc), dir8(nB) + ' 측창 ' + Math.round(f.B * 100) + '%');
     if (c.house.roofVent) place(L.R, lw(d.x0 + d.W / 2, d.hr + 0.9, zc), '천창 ' + Math.round(f.R * 100) + '%'); else L.R.style.display = 'none';
+    place(L.ws, G.sensTop, '💨 ' + dir16(f.wd) + '풍 ' + f1(f.ws) + 'm/s');
     if (f.irr > 0) place(L.irr, lw(0, 0.4, zc + 2), '💧 관수'); else L.irr.style.display = 'none';
     var rc = big / 2 + 8;
     place(L.N, new T.Vector3(0, 0.2, -rc)); place(L.E, new T.Vector3(rc, 0.2, 0)); place(L.S, new T.Vector3(0, 0.2, rc)); place(L.W, new T.Vector3(-rc, 0.2, 0));
     var taken = [];
     [G.hud, G.ov.querySelector('.bt')].forEach(function (e) { if (e.offsetParent !== null) taken.push(e.getBoundingClientRect()); });
-    ['in', 'R', 'A', 'B', 'irr', 'N', 'E', 'S', 'W'].forEach(function (k) {
+    ['in', 'R', 'A', 'B', 'ws', 'irr', 'N', 'E', 'S', 'W'].forEach(function (k) {
       var e = L[k]; if (e.style.display === 'none') return;
       var r = e.getBoundingClientRect();
       for (var i = 0; i < taken.length; i++) { var t = taken[i]; if (r.left < t.right + 2 && r.right > t.left - 2 && r.top < t.bottom + 2 && r.bottom > t.top - 2) { e.style.display = 'none'; return; } }
       taken.push(r);
     });
-    var hud = '🕒 ' + tlabel(f.t) + '<br>바깥 ' + f1(f.To) + '℃ · ' + Math.round(f.RHo) + '%<br>☀ 일사 ' + Math.round(f.G) + ' W/m²<br>💨 ' + dir16(f.wd) + '풍 ' + f1(f.ws) + ' m/s';
+    var wxn = f.pty === 1 ? '🌧 비' : f.pty === 2 ? '🌨 비/눈' : f.pty === 3 ? '❄ 눈' : f.pty === 4 ? '🌦 소나기' : f.sky === 4 ? '☁ 흐림' : f.sky === 3 ? '⛅ 구름많음' : '☀ 맑음';
+    var hud = '🕒 ' + tlabel(f.t) + ' · ' + wxn + '<br>바깥 ' + f1(f.To) + '℃ · ' + Math.round(f.RHo) + '%<br>☀ 일사 ' + Math.round(f.G) + ' W/m²<br>💨 ' + dir16(f.wd) + '풍 ' + f1(f.ws) + ' m/s';
     if (G.hud.dataset.t !== hud) { G.hud.innerHTML = hud; G.hud.dataset.t = hud; }
   }
   function hide() {
