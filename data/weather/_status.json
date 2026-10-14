@@ -1,5 +1,5 @@
 {
- "started": "2026-10-14T19:14+09:00",
+ "started": "2026-10-14T19:29+09:00",
  "errors": [],
  "mid_invalid": [],
  "counts": {
@@ -10,52 +10,41 @@
  "base": "https://apis.data.go.kr/1360000",
  "samples": [
   {
-   "path": "/AsosHourlyInfoService/getWthrDataList",
+   "path": "/VilageFcstInfoService_2.0/getVilageFcst",
    "params": {
     "pageNo": 1,
-    "numOfRows": 999,
-    "dataCd": "ASOS",
-    "dateCd": "HR",
-    "startDt": "20260909",
-    "startHh": "00",
-    "endDt": "20261013",
-    "endHh": "23",
-    "stnIds": 108
+    "numOfRows": 1000,
+    "base_date": "20261014",
+    "base_time": "1700",
+    "nx": 60,
+    "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"tm\":\"2026-09-09 00:00\",\"rnum\":\"1\",\"stnId\":\"108\",\"stnNm\":\"서울\",\"ta\":\"23.1\",\"taQcflg\":\"\",\"rn\":\"\",\"rnQcflg\":\"\",\"ws\":\"5.5\",\"wsQcflg\":\"\",\"wd\":\"50\",\"wdQcflg\":\"\",\"hm\":\"61\",\"hmQcflg\":\"\",\"pv\":\"17.2\",\"td\":\"15.1\",\"pa\":\"1001.0\",\"paQcflg\":\"\",\"ps\":\"1010.8\",\"psQcflg\":\"\",\"ss\":\"\",\"ssQcflg\":\"9\",\"icsr\":\"\",\"dsnw\":\"\",\"hr3Fhsc\":\"\",\"dc10Tca\":\"3\",\"dc10LmcsCa\":\"3\",\"clfmAbbrCd\":\"\",\"lcsCh\":\"\",\"vs\":\"4390\",\"gndSttCd\":\"\",\"dmstMtphNo\":\"\",\"ts\":\"21.9\",\"tsQcflg\":\"\",\"m005Te\":\"24.6\",\"m01Te\":\"24.7\",\"m02Te\":\"24.9\",\"m0"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261014\",\"fcstTime\":\"1800\",\"fcstValue\":\"16\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"UUU\",\"fcstDate\":\"20261014\",\"fcstTime\":\"1800\",\"fcstValue\":\"0.8\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"VVV\",\"fcstDate\":\"20261014\",\"fcstTime\":\"1800\",\"fcstValue\":\"1.6\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"VEC\",\"fcstDate\":\"20261014\",\"fcst"
   },
   {
-   "path": "/AsosHourlyInfoService/getWthrDataList",
+   "path": "/VilageFcstInfoService_2.0/getVilageFcst",
    "params": {
-    "pageNo": 1,
-    "numOfRows": 999,
-    "dataCd": "ASOS",
-    "dateCd": "HR",
-    "startDt": "20260909",
-    "startHh": "00",
-    "endDt": "20261013",
-    "endHh": "23",
-    "stnIds": 159
+    "pageNo": 2,
+    "numOfRows": 1000,
+    "base_date": "20261014",
+    "base_time": "1700",
+    "nx": 60,
+    "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"tm\":\"2026-09-09 00:00\",\"rnum\":\"1\",\"stnId\":\"159\",\"stnNm\":\"부산\",\"ta\":\"22.8\",\"taQcflg\":\"\",\"rn\":\"\",\"rnQcflg\":\"\",\"ws\":\"2.6\",\"wsQcflg\":\"\",\"wd\":\"90\",\"wdQcflg\":\"\",\"hm\":\"67\",\"hmQcflg\":\"\",\"pv\":\"18.5\",\"td\":\"16.3\",\"pa\":\"1000.0\",\"paQcflg\":\"\",\"ps\":\"1008.0\",\"psQcflg\":\"\",\"ss\":\"\",\"ssQcflg\":\"9\",\"icsr\":\"\",\"dsnw\":\"\",\"hr3Fhsc\":\"\",\"dc10Tca\":\"0\",\"dc10LmcsCa\":\"0\",\"clfmAbbrCd\":\"\",\"lcsCh\":\"\",\"vs\":\"3741\",\"gndSttCd\":\"\",\"dmstMtphNo\":\"\",\"ts\":\"23.8\",\"tsQcflg\":\"\",\"m005Te\":\"25.3\",\"m01Te\":\"25.6\",\"m02Te\":\"25.8\",\"m0"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"PCP\",\"fcstDate\":\"20261018\",\"fcstTime\":\"1200\",\"fcstValue\":\"2\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"REH\",\"fcstDate\":\"20261018\",\"fcstTime\":\"1200\",\"fcstValue\":\"90\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"SNO\",\"fcstDate\":\"20261018\",\"fcstTime\":\"1200\",\"fcstValue\":\"0\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261018\",\"fcstTime"
   },
   {
-   "path": "/AsosHourlyInfoService/getWthrDataList",
+   "path": "/MidFcstInfoService/getMidTa",
    "params": {
     "pageNo": 1,
-    "numOfRows": 999,
-    "dataCd": "ASOS",
-    "dateCd": "HR",
-    "startDt": "20260909",
-    "startHh": "00",
-    "endDt": "20261013",
-    "endHh": "23",
-    "stnIds": 257
+    "numOfRows": 10,
+    "regId": "11B10101",
+    "tmFc": "202610141800"
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"tm\":\"2026-09-09 00:00\",\"rnum\":\"1\",\"stnId\":\"257\",\"stnNm\":\"양산시\",\"ta\":\"23.2\",\"taQcflg\":\"\",\"rn\":\"\",\"rnQcflg\":\"\",\"ws\":\"3.2\",\"wsQcflg\":\"\",\"wd\":\"50\",\"wdQcflg\":\"\",\"hm\":\"75\",\"hmQcflg\":\"\",\"pv\":\"21.3\",\"td\":\"18.5\",\"pa\":\"1008.0\",\"paQcflg\":\"\",\"ps\":\"1008.7\",\"psQcflg\":\"\",\"ss\":\"\",\"ssQcflg\":\"9\",\"icsr\":\"\",\"dsnw\":\"\",\"hr3Fhsc\":\"\",\"dc10Tca\":\"3\",\"dc10LmcsCa\":\"0\",\"clfmAbbrCd\":\"\",\"lcsCh\":\"\",\"vs\":\"2553\",\"gndSttCd\":\"\",\"dmstMtphNo\":\"\",\"ts\":\"23.3\",\"tsQcflg\":\"\",\"m005Te\":\"24.2\",\"m01Te\":\"25.9\",\"m02Te\":\"27.3\",\"m"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"regId\":\"11B10101\",\"taMin5\":14,\"taMin5Low\":3,\"taMin5High\":2,\"taMax5\":20,\"taMax5Low\":1,\"taMax5High\":2,\"taMin6\":10,\"taMin6Low\":2,\"taMin6High\":2,\"taMax6\":19,\"taMax6Low\":2,\"taMax6High\":2,\"taMin7\":8,\"taMin7Low\":3,\"taMin7High\":2,\"taMax7\":18,\"taMax7Low\":3,\"taMax7High\":3,\"taMin8\":7,\"taMin8Low\":0,\"taMin8High\":3,\"taMax8\":17,\"taMax8Low\":0,\"taMax8High\":2,\"taMin9\":7,\"taMin9Low\":0,\"taMin9High\":2,\"taMax9\":19,\"taMax9Low\":0,\"taMax9High\":2,\"taMin10\":8,\"taMin10Low\":0,\"taMin10High\":2,\"taMax10\":19,\"ta"
   }
  ],
  "probe": [
@@ -145,9 +134,9 @@
  },
  "obs": {
   "stations": 87,
-  "rows_added": 73080,
+  "rows_added": 0,
   "fails": 0,
   "error": null
  },
- "finished": "2026-10-14T19:23+09:00"
+ "finished": "2026-10-14T19:35+09:00"
 }
