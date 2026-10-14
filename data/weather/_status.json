@@ -1,5 +1,5 @@
 {
- "started": "2026-10-14T19:29+09:00",
+ "started": "2026-10-14T22:49+09:00",
  "errors": [],
  "mid_invalid": [],
  "counts": {
@@ -15,12 +15,12 @@
     "pageNo": 1,
     "numOfRows": 1000,
     "base_date": "20261014",
-    "base_time": "1700",
+    "base_time": "2000",
     "nx": 60,
     "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261014\",\"fcstTime\":\"1800\",\"fcstValue\":\"16\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"UUU\",\"fcstDate\":\"20261014\",\"fcstTime\":\"1800\",\"fcstValue\":\"0.8\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"VVV\",\"fcstDate\":\"20261014\",\"fcstTime\":\"1800\",\"fcstValue\":\"1.6\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"VEC\",\"fcstDate\":\"20261014\",\"fcst"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"TMP\",\"fcstDate\":\"20261014\",\"fcstTime\":\"2100\",\"fcstValue\":\"14\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"UUU\",\"fcstDate\":\"20261014\",\"fcstTime\":\"2100\",\"fcstValue\":\"0.1\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"VVV\",\"fcstDate\":\"20261014\",\"fcstTime\":\"2100\",\"fcstValue\":\"0.6\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"VEC\",\"fcstDate\":\"20261014\",\"fcst"
   },
   {
    "path": "/VilageFcstInfoService_2.0/getVilageFcst",
@@ -28,12 +28,12 @@
     "pageNo": 2,
     "numOfRows": 1000,
     "base_date": "20261014",
-    "base_time": "1700",
+    "base_time": "2000",
     "nx": 60,
     "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"PCP\",\"fcstDate\":\"20261018\",\"fcstTime\":\"1200\",\"fcstValue\":\"2\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"REH\",\"fcstDate\":\"20261018\",\"fcstTime\":\"1200\",\"fcstValue\":\"90\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"SNO\",\"fcstDate\":\"20261018\",\"fcstTime\":\"1200\",\"fcstValue\":\"0\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261018\",\"fcstTime"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"WAV\",\"fcstDate\":\"20261018\",\"fcstTime\":\"2100\",\"fcstValue\":\"0\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"PCP\",\"fcstDate\":\"20261018\",\"fcstTime\":\"2100\",\"fcstValue\":\"0\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"REH\",\"fcstDate\":\"20261018\",\"fcstTime\":\"2100\",\"fcstValue\":\"90\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"SNO\",\"fcstDate\":\"20261018\",\"fcstTime"
   },
   {
    "path": "/MidFcstInfoService/getMidTa",
@@ -54,12 +54,12 @@
     "pageNo": 1,
     "numOfRows": 10,
     "base_date": "20261014",
-    "base_time": "1700",
+    "base_time": "2000",
     "nx": 60,
     "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261014\",\"fcstTime\":\"1800\",\"fcstValue\":\"16\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"1700\",\"category\":\""
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\"TMP\",\"fcstDate\":\"20261014\",\"fcstTime\":\"2100\",\"fcstValue\":\"14\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"2000\",\"category\":\""
   },
   {
    "test": "단기예보 어제23시",
@@ -80,12 +80,12 @@
     "pageNo": 1,
     "numOfRows": 10,
     "base_date": "20261014",
-    "base_time": "1800",
+    "base_time": "2100",
     "nx": 60,
     "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"1800\",\"category\":\"PTY\",\"nx\":60,\"ny\":127,\"obsrValue\":\"0\"},{\"baseDate\":\"20261014\",\"baseTime\":\"1800\",\"category\":\"REH\",\"nx\":60,\"ny\":127,\"obsrValue\":\"44\"},{"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"2100\",\"category\":\"PTY\",\"nx\":60,\"ny\":127,\"obsrValue\":\"0\"},{\"baseDate\":\"20261014\",\"baseTime\":\"2100\",\"category\":\"REH\",\"nx\":60,\"ny\":127,\"obsrValue\":\"61\"},{"
   },
   {
    "test": "예보버전",
@@ -93,7 +93,7 @@
     "pageNo": 1,
     "numOfRows": 10,
     "ftype": "SHRT",
-    "basedatetime": "202610141700"
+    "basedatetime": "202610142000"
    },
    "http": 200,
    "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"filetype\":\"SHRT\",\"version\":\"19700101090000\"}]},\"pageNo\":1,\"numOfRows\":10,\"totalCount\":1}}}"
@@ -138,5 +138,5 @@
   "fails": 0,
   "error": null
  },
- "finished": "2026-10-14T19:35+09:00"
+ "finished": "2026-10-14T22:56+09:00"
 }
