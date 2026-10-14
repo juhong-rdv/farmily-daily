@@ -20,6 +20,45 @@
     for (var i = 1; i < st.length; i++) if (t <= st[i][0]) { var a = st[i - 1], b = st[i], f = (t - a[0]) / (b[0] - a[0]); return [0, 1, 2].map(function (k) { return a[1][k] + (b[1][k] - a[1][k]) * f; }); }
     return st[st.length - 1][1];
   }
+  // 해·달 위치 (저정밀 천문 계산, 오차 1~2°) — 3D 하늘 표시용
+  function COORD() { var r = document.getElementById('r_sigun'), c = root.FSIM_COORDS && r && root.FSIM_COORDS[r.value]; return c || [36.5, 127.5]; }
+  function eqToHor(lat, lon, ra, dec, ms) {
+    var n = ms / 86400000 + 2440587.5 - 2451545.0, gmst = (18.697374558 + 24.06570982441908 * n) % 24;
+    var ha = (gmst * 15 + lon) * D2R - ra, la = lat * D2R;
+    var el = Math.asin(Math.sin(la) * Math.sin(dec) + Math.cos(la) * Math.cos(dec) * Math.cos(ha));
+    var az = Math.atan2(-Math.sin(ha), Math.tan(dec) * Math.cos(la) - Math.sin(la) * Math.cos(ha));
+    return { el: el / D2R, az: (az / D2R + 360) % 360 };
+  }
+  function moonPos(lat, lon, ms) {
+    var d = ms / 86400000 + 2440587.5 - 2451543.5;
+    var N = (125.1228 - 0.0529538083 * d) * D2R, inc = 5.1454 * D2R, w = (318.0634 + 0.1643573223 * d) * D2R, e = 0.0549;
+    var M = ((115.3654 + 13.0649929509 * d) % 360) * D2R, E = M + e * Math.sin(M) * (1 + e * Math.cos(M));
+    for (var k = 0; k < 4; k++) E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+    var xv = Math.cos(E) - e, yv = Math.sqrt(1 - e * e) * Math.sin(E), v = Math.atan2(yv, xv);
+    var xh = Math.cos(N) * Math.cos(v + w) - Math.sin(N) * Math.sin(v + w) * Math.cos(inc);
+    var yh = Math.sin(N) * Math.cos(v + w) + Math.cos(N) * Math.sin(v + w) * Math.cos(inc);
+    var zh = Math.sin(v + w) * Math.sin(inc);
+    var lonE = Math.atan2(yh, xh), latE = Math.atan2(zh, Math.sqrt(xh * xh + yh * yh)), ep = 23.4393 * D2R;
+    var xe = Math.cos(latE) * Math.cos(lonE), ye = Math.cos(latE) * Math.sin(lonE) * Math.cos(ep) - Math.sin(latE) * Math.sin(ep), ze = Math.cos(latE) * Math.sin(lonE) * Math.sin(ep) + Math.sin(latE) * Math.cos(ep);
+    var p = eqToHor(lat, lon, Math.atan2(ye, xe), Math.atan2(ze, Math.sqrt(xe * xe + ye * ye)), ms);
+    var n2 = ms / 86400000 + 2440587.5 - 2451545.0, gS = ((357.528 + 0.9856003 * n2) % 360) * D2R;
+    var sunLon = (280.46 + 0.9856474 * n2 + 1.915 * Math.sin(gS) + 0.02 * Math.sin(2 * gS)) % 360;
+    var elong = (((lonE / D2R) - sunLon) % 360 + 360) % 360;
+    p.illum = (1 - Math.cos(elong * D2R)) / 2; p.waxing = elong < 180;
+    p.name = elong < 20 || elong > 340 ? '그믐·삭' : elong < 70 ? '초승달' : elong < 110 ? '상현달' : elong < 165 ? '보름 전' : elong < 195 ? '보름달' : elong < 250 ? '보름 뒤' : elong < 290 ? '하현달' : '그믐달';
+    return p;
+  }
+  function moonTexture(illum, waxing) {
+    var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d');
+    x.fillStyle = 'rgba(70,80,110,0.55)'; x.beginPath(); x.arc(64, 64, 58, 0, Math.PI * 2); x.fill();
+    // 밝은 부분 = 바깥 반원 + 위상만큼의 타원 (상현 쪽은 오른쪽이 밝음)
+    var k = 1 - 2 * illum, right = waxing;
+    x.fillStyle = '#f8f5e6'; x.beginPath();
+    x.ellipse(64, 64, 58, 58, 0, -Math.PI / 2, Math.PI / 2, !right);
+    x.ellipse(64, 64, Math.max(0.5, Math.abs(k) * 58), 58, 0, Math.PI / 2, -Math.PI / 2, right ? k > 0 : k < 0);
+    x.fill();
+    return new T.CanvasTexture(c);
+  }
   var G = null;
 
   // ---------- 화면 준비 ----------
@@ -43,21 +82,27 @@
     var ov = document.createElement('div'); ov.id = 'ov3d';
     ov.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;display:none;overflow:hidden';
     ov.innerHTML = '<div class="hud" id="o3hud"></div><div class="bt"><button type="button" id="o3l" aria-label="왼쪽으로 돌리기">↺</button><button type="button" id="o3r" aria-label="오른쪽으로 돌리기">↻</button>'
-      + '<button type="button" id="o3i" aria-label="확대">＋</button><button type="button" id="o3o" aria-label="축소">－</button><button type="button" id="o3p">시점</button></div>'
+      + '<button type="button" id="o3i" aria-label="확대">＋</button><button type="button" id="o3o" aria-label="축소">－</button><button type="button" id="o3p">시점</button><button type="button" id="o3b" title="밤에도 구조물이 잘 보이게 조명을 밝힘">💡 밝게</button></div>'
       + '<div class="hint">끌어서 돌려 보기 · ＋/－ 확대 · 시점 바꾸기</div>';
     wrap.appendChild(ov);
     var scene = new T.Scene();
     scene.fog = new T.Fog(0xa9d6f5, 200, 600);
-    var cam = new T.PerspectiveCamera(42, 16 / 9, 0.2, 3000);
+    var cam = new T.PerspectiveCamera(50, 16 / 9, 0.2, 3000);
     var hemi = new T.HemisphereLight(0xeaf4ff, 0x6b5a3a, 0.6); scene.add(hemi);
     var sun = new T.DirectionalLight(0xffffff, 1); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006;
     scene.add(sun); scene.add(sun.target);
+    var moon = new T.DirectionalLight(0xc7d2fe, 0); moon.position.set(-60, 90, 50); scene.add(moon);
     var ground = new T.Mesh(new T.PlaneGeometry(2000, 2000), new T.MeshLambertMaterial({ color: 0x7d9a52 }));
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
     var sunBall = new T.Mesh(new T.SphereGeometry(5, 24, 16), new T.MeshBasicMaterial({ color: 0xffd54a, fog: false }));
     var sunHalo = new T.Mesh(new T.SphereGeometry(9, 24, 16), new T.MeshBasicMaterial({ color: 0xffe08a, fog: false, transparent: true, opacity: 0.3 }));
     scene.add(sunBall); scene.add(sunHalo);
-    var cmat = new T.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.93 });
+    var moonSpr = new T.Sprite(new T.SpriteMaterial({ map: moonTexture(0.5, true), fog: false, transparent: true, depthWrite: false })); moonSpr.scale.set(16, 16, 1); scene.add(moonSpr);
+    var NSt = 500, stp = new Float32Array(NSt * 3);
+    for (var si = 0; si < NSt; si++) { var th = Math.random() * Math.PI * 2, ph2 = Math.asin(Math.random() * 0.98 + 0.02); stp[si * 3] = Math.cos(ph2) * Math.cos(th) * 700; stp[si * 3 + 1] = Math.sin(ph2) * 700; stp[si * 3 + 2] = Math.cos(ph2) * Math.sin(th) * 700; }
+    var stg = new T.BufferGeometry(); stg.setAttribute('position', new T.BufferAttribute(stp, 3));
+    var stars = new T.Points(stg, new T.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.85 })); stars.frustumCulled = false; scene.add(stars);
+    var cmat = new T.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.93, fog: false });
     var clouds = [], cgeo = new T.SphereGeometry(1, 14, 10);
     for (var i = 0; i < 12; i++) {
       var cg = new T.Group(), nb = 5 + (i % 3);
@@ -92,11 +137,11 @@
     var wg = new T.BufferGeometry(); wg.setAttribute('position', new T.BufferAttribute(wp, 3));
     var wind = new T.LineSegments(wg, new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })); wind.frustumCulled = false; scene.add(wind);
     var lbs = {};
-    ['in', 'A', 'B', 'R', 'irr', 'ws', 'N', 'E', 'S', 'W'].forEach(function (k) {
+    ['in', 'A', 'B', 'R', 'irr', 'ws', 'sun', 'mo', 'N', 'E', 'S', 'W'].forEach(function (k) {
       var d = document.createElement('div'); d.className = 'lb' + (k === 'in' ? ' in' : 'NESW'.indexOf(k) >= 0 ? ' cp' : ''); ov.appendChild(d); lbs[k] = d;
     });
     lbs.N.textContent = '북'; lbs.E.textContent = '동'; lbs.S.textContent = '남'; lbs.W.textContent = '서';
-    G = { wrap: wrap, r: r, cv: cv, ov: ov, scene: scene, cam: cam, hemi: hemi, sun: sun, sunBall: sunBall, sunHalo: sunHalo, clouds: clouds, cmat: cmat,
+    G = { moon: moon, moonSpr: moonSpr, stars: stars, moonKey: '', bright: ls('farmily.sim.bright') === '1', wrap: wrap, r: r, cv: cv, ov: ov, scene: scene, cam: cam, hemi: hemi, sun: sun, sunBall: sunBall, sunHalo: sunHalo, clouds: clouds, cmat: cmat,
       rain: rain, rp: rp, rst: rst, snow: snow, sp0: sp0, sst: sst, sens: sens, head: head, prop: prop, mast: mast, sockPole: sockPole, sockYaw: sockYaw, sockPitch: sockPitch, ground: ground, wind: wind, wp: wp, wst: wst, lbs: lbs, hud: ov.querySelector('#o3hud'), house: null, key: '', w: 0,
       orbit: { az: 0, el: 22, dist: 20, preset: 0, tl: new T.Vector3() } };
     controls();
@@ -129,6 +174,8 @@
     G.ov.querySelector('#o3r').onclick = function () { G.orbit.az -= 30; };
     G.ov.querySelector('#o3i').onclick = function () { zoom(1 / 1.25); };
     G.ov.querySelector('#o3o').onclick = function () { zoom(1.25); };
+    var bb = G.ov.querySelector('#o3b'); function bl() { bb.textContent = G.bright ? '💡 실제 밝기' : '💡 밝게'; } bl();
+    bb.onclick = function () { G.bright = !G.bright; ls('farmily.sim.bright', G.bright ? '1' : '0'); bl(); };
     G.ov.querySelector('#o3p').onclick = function () { if (G.dims) preset((G.orbit.preset + 1) % 3); };
   }
   function zoom(k) { if (!G.dims) return; G.orbit.dist = clamp(G.orbit.dist * k, 3, Math.max(G.dims.L, G.dims.NW) * 3 + 40); }
@@ -136,8 +183,10 @@
   function preset(p) {
     var d = G.dims, o = G.orbit, big = Math.max(d.L, d.NW);
     o.preset = p;
-    if (p === 0) { o.zc = d.L / 2 - Math.min(d.L / 2, d.NW * 0.9 + 4); o.tl.set(0, d.hr * 0.4, o.zc); o.az = d.axis + 180 + 40; o.el = 28; o.dist = Math.max(d.NW * 2.6, d.hr * 6, 16); }
-    else if (p === 1) { o.zc = 0; o.tl.set(0, d.hr * 0.3, 0); o.az = d.axis + 180 + 55; o.el = 26; o.dist = big * 1.05 + 10; }
+    // 늘 북쪽에서 남쪽(한낮의 해 쪽)을 바라봄 — 하우스의 북쪽 끝을 가까이
+    var ca0 = Math.cos(d.axis * D2R), es = ca0 >= 0 ? -1 : 1;
+    if (p === 0) { o.zc = es * (d.L / 2 - Math.min(d.L / 2, d.NW * 0.9 + 4)) * Math.abs(ca0); o.tl.set(0, d.hr * 0.75, o.zc); o.az = 5; o.el = 15; o.dist = Math.max(d.NW * 2.4, d.hr * 6, 16); }
+    else if (p === 1) { o.zc = 0; o.tl.set(0, d.hr * 0.6, 0); o.az = 15; o.el = 18; o.dist = big * 1.05 + 10; }
     else { o.zc = 0; o.tl.set(0, 0, 0); o.az = d.axis + 180 + 1; o.el = 82; o.dist = big * 1.15 + 8; }
     G.ov.querySelector('#o3p').textContent = '시점: ' + PRESETS[p];
   }
@@ -237,7 +286,7 @@
     // 작물 줄·점적
     var rowsPer = Math.max(2, Math.round(W / 1.6)), ph = Math.min(hs * 0.95, 0.5 + lai * 0.55), xsRow = [];
     for (i = 0; i < n; i++) for (k = 0; k < rowsPer; k++) xsRow.push(x0 + i * W + (k + 0.5) * W / rowsPer);
-    var step = 0.6, perRow = Math.max(1, Math.floor((L - 2) / step)), np = xsRow.length * perRow;
+    var step = Math.max(0.6, xsRow.length * (L - 2) / 2400), perRow = Math.max(1, Math.floor((L - 2) / step)), np = xsRow.length * perRow;
     var mulch = new T.MeshLambertMaterial({ color: 0x1f2937 }), dripMat = new T.MeshBasicMaterial({ color: 0x334155 });
     xsRow.forEach(function (x) {
       var m = add(new T.Mesh(new T.PlaneGeometry(0.7, L - 1.4), mulch)); m.rotation.x = -Math.PI / 2; m.position.set(x, 0.02, 0); m.receiveShadow = true;
@@ -296,7 +345,7 @@
     var spread = Math.max(L, NW) * 0.7 + 30, hc = Math.max(L, NW) * 0.35 + 22;
     G.clouds.forEach(function (c, ci) { c.position.set(Math.cos(ci * 2.1 + 0.4) * spread, hc + (ci % 3) * 4, Math.sin(ci * 1.7 + 1.1) * spread - spread * 0.3); });
     // 풍향계·바람자루 자리: 가까이 보기 쪽 끝 바깥 모서리
-    var mh = hr + 1.6, sp1 = grp.localToWorld(new T.Vector3(x0 - 2.5, 0, L / 2 - 1.5)), sp2 = grp.localToWorld(new T.Vector3(x0 + NW + 2.5, 0, L / 2 - 1.5));
+    var mh = hr + 1.6, es0 = Math.cos(axis * D2R) >= 0 ? -1 : 1, sp1 = grp.localToWorld(new T.Vector3(x0 + NW + 2.5, 0, es0 * (L / 2 - 1.5))), sp2 = grp.localToWorld(new T.Vector3(x0 - 2.5, 0, es0 * (L / 2 - 1.5)));
     G.sens.position.copy(sp1); G.mast.scale.y = mh; G.mast.position.y = mh / 2; G.head.position.y = mh + 0.2;
     var sh2 = Math.max(4, hs + 1.5); G.sockPole.scale.y = sh2; G.sockPole.position.set(sp2.x, sh2 / 2, sp2.z); G.sockYaw.position.set(sp2.x, sh2 - 0.1, sp2.z);
     G.sensTop = new T.Vector3(sp1.x, mh + 2.0, sp1.z);
@@ -317,35 +366,35 @@
     var svg = document.getElementById('stage'); if (svg) svg.style.display = 'none';
     if (Math.abs((G.wrap.clientWidth || 900) - G.w) > 2) resize();
     var h = c.house, g = c.geom, dt = c.dt || 0;
-    var key = JSON.stringify([h.type, h.spans, h.width, h.length, h.sideH, h.ridgeH, h.axis, h.cover, h.curtain, h.shade, h.roofVent, h.roofW, h.ventH, h.net, h.heater, c.lai, c.stage, c.crop]);
+    // 계산 결과(g)의 크기로 만든다 — 입력 직후 계산 전의 옛 크기로 그려지는 것을 막음
+    var key = JSON.stringify([g.n, g.W, g.L, g.hs, g.hr, h.axis, h.cover, h.curtain, h.shade, h.roofVent, h.roofW, h.ventH, h.net, h.heater, c.lai, c.stage, c.crop]);
     if (key !== G.key) { G.key = key; build(h, g, c.lai, c.stage, c.crop); }
     var d = G.dims, P = G.parts, a = d.axis * D2R, ca = Math.cos(a), sa = Math.sin(a);
     // 하늘·빛
     var el = f.el, over = f.sky === 4 || f.pty > 0;
     var bg = el > 8 ? 0xa9d6f5 : el > -2 ? 0xf5c08a : el > -8 ? 0x4a4f7d : 0x0d1733;
     if (over) bg = el > -2 ? (f.pty === 3 || f.pty === 2 ? 0xd3d8de : f.pty > 0 ? 0x9aa3ad : 0xb4bcc4) : 0x1c2333;
+    if (el < 2 && G.bright) bg = over ? 0x4b5568 : 0x34497a;
     G.scene.background = new T.Color(bg); G.scene.fog.color.setHex(bg);
     var dayF = clamp((el + 2) / 12, 0, 1);
-    G.hemi.intensity = 0.3 + 0.45 * dayF; G.hemi.color.setHex(dayF > 0.3 ? 0xeaf4ff : 0x8ea2d8);
+    // 밤: 달빛 정도로 은은하게, '밝게'를 누르면 구조물 확인용으로 환하게
+    G.moon.intensity = el < 2 ? (G.bright ? 0.7 : 0.35) : 0;
+    G.hemi.intensity = Math.max(0.3 + 0.45 * dayF, el < 4 ? (G.bright ? 1.0 : 0.55) : 0); G.hemi.color.setHex(dayF > 0.3 ? 0xeaf4ff : 0x8ea2d8);
     var ce = Math.cos(Math.max(el, -3) * D2R), sd = new T.Vector3(ce * Math.sin(f.az * D2R), Math.sin(Math.max(el, -3) * D2R), -ce * Math.cos(f.az * D2R));
     var big = Math.max(d.L, d.NW), R = big + 40;
     if (el > 0) { G.sun.visible = true; G.sun.intensity = 0.15 + 0.95 * Math.min(1, (f.G || 0) / 750); G.sun.color.setHex(el < 8 ? 0xffc58a : 0xffffff); G.sun.position.copy(sd).multiplyScalar(R); G.sun.target.position.set(0, 0, 0); }
     else G.sun.visible = false;
     var tw = G.house.localToWorld(G.orbit.tl.clone());
-    G.sunBall.visible = G.sunHalo.visible = el > -3;
-    G.sunBall.position.copy(sd).multiplyScalar(170).add(tw); G.sunHalo.position.copy(G.sunBall.position);
-    G.sunBall.material.color.setHex(el < 8 ? 0xffa94d : 0xffd54a); G.sunHalo.material.opacity = over ? 0.15 : 0.3;
     // 구름: 맑음 2 · 구름많음 6 · 흐림/비/눈 12 (흐리면 낮고 회색)
     var nc = over ? 12 : f.sky === 3 ? 6 : 2;
     G.cmat.color.setHex(el > -2 ? (f.pty > 0 ? 0x9ca3af : over ? 0xc9ced6 : 0xffffff) : 0x3f4a5c);
-    var tw0 = (Math.sin((f.wd + 180) * D2R)), tz0 = -Math.cos((f.wd + 180) * D2R), cs = Math.max(big * 0.8, 45);
+    var tw0 = (Math.sin((f.wd + 180) * D2R)), tz0 = -Math.cos((f.wd + 180) * D2R), cs = 220;
     G.clouds.forEach(function (cl, i) {
       cl.visible = i < nc; if (!cl.visible) return;
       var u = cl.userData; if (u.ox == null) { u.ox = Math.cos(i * 2.1 + 0.4) * cs; u.oz = Math.sin(i * 1.7 + 1.1) * cs; }
       u.ox += tw0 * (0.6 + f.ws * 0.5) * dt; u.oz += tz0 * (0.6 + f.ws * 0.5) * dt;
       if (u.ox > cs) u.ox -= 2 * cs; if (u.ox < -cs) u.ox += 2 * cs; if (u.oz > cs) u.oz -= 2 * cs; if (u.oz < -cs) u.oz += 2 * cs;
-      // 구름은 늘 카메라보다 위에 (흐리면 조금 낮게)
-      cl.position.set(tw.x + u.ox, Math.max(G.cam.position.y, 20) + (over ? 10 : 18) + (i % 3) * 4, tw.z + u.oz);
+      u.alt = (over ? 1.5 : 3) + (i % 4) * (over ? 1.2 : 1.8);  // 화면 하늘 띠 안에 보이도록 고도(°)
     });
     // 비 (1 비, 2 비/눈, 4 소나기) · 눈 (2, 3)
     var isRain = f.pty === 1 || f.pty === 2 || f.pty === 4, isSnow = f.pty === 2 || f.pty === 3;
@@ -425,6 +474,21 @@
     var o = G.orbit, ce2 = Math.cos(o.el * D2R);
     G.cam.position.set(tw.x + o.dist * ce2 * Math.sin(o.az * D2R), tw.y + o.dist * Math.sin(o.el * D2R), tw.z - o.dist * ce2 * Math.cos(o.az * D2R));
     G.cam.lookAt(tw); G.cam.updateMatrixWorld();
+    // 하늘: 해·달·구름·별은 카메라 기준 먼 곳에 둠. 방위는 실제, 높이는 화면 하늘 띠에 보이도록 줄여서 그림
+    var cp = G.cam.position, SKYR = 260;
+    function skyAt(az, alt, rr) { var ce3 = Math.cos(alt * D2R); return new T.Vector3(cp.x + rr * ce3 * Math.sin(az * D2R), cp.y + rr * Math.sin(alt * D2R), cp.z - rr * ce3 * Math.cos(az * D2R)); }
+    // 화면 위 끝이 카메라 수평선 위 약 10° 이므로, 실제 0~90°를 1.5~7.5°로 줄여 늘 보이게
+    function dispAlt(e) { var top = 25 - G.orbit.el; return Math.max(1.5, Math.min(top - 2.5, 1.5 + Math.max(0, Math.min(90, e)) / 90 * (top - 4))); }
+    G.sunBall.visible = G.sunHalo.visible = el > -1;
+    if (el > -1) { G.sunBall.position.copy(skyAt(f.az, dispAlt(el), SKYR)); G.sunHalo.position.copy(G.sunBall.position); }
+    G.sunBall.material.color.setHex(el < 8 ? 0xffa94d : 0xffd54a); G.sunHalo.material.opacity = over ? 0.12 : 0.3;
+    var cc = COORD(), mp = moonPos(cc[0], cc[1], f.t), mk = Math.round(mp.illum * 20) + (mp.waxing ? 'w' : 'n');
+    if (mk !== G.moonKey) { G.moonKey = mk; G.moonSpr.material.map.dispose(); G.moonSpr.material.map = moonTexture(mp.illum, mp.waxing); G.moonSpr.material.needsUpdate = true; }
+    G.moonSpr.visible = mp.el > -1 && mp.illum > 0.03;
+    if (G.moonSpr.visible) { G.moonSpr.position.copy(skyAt(mp.az, dispAlt(mp.el), SKYR)); G.moonSpr.material.opacity = el > 5 ? 0.5 : over ? 0.6 : 1; }
+    G.stars.visible = el < -6 && !over; G.stars.position.set(cp.x, 0, cp.z);
+    G.clouds.forEach(function (cl) { if (!cl.visible) return; var u = cl.userData, rr = Math.max(130, Math.hypot(u.ox, u.oz) + 110); cl.position.copy(skyAt(Math.atan2(u.ox, -u.oz) / D2R, u.alt, rr)); cl.scale.setScalar(rr / 80); });
+    G.sky = { mp: mp };
     G.r.render(G.scene, G.cam);
     // 글자
     var nA = (d.axis + 270) % 360, nB = (d.axis + 90) % 360, L = G.lbs, H = G.house;
@@ -433,20 +497,22 @@
     place(L.A, lw(-d.NW / 2 - 0.4, 0.3 + d.vh * 0.5, zc), dir8(nA) + ' 측창 ' + Math.round(f.A * 100) + '%');
     place(L.B, lw(d.NW / 2 + 0.4, 0.3 + d.vh * 0.5, zc), dir8(nB) + ' 측창 ' + Math.round(f.B * 100) + '%');
     if (c.house.roofVent) place(L.R, lw(d.x0 + d.W / 2, d.hr + 0.9, zc), '천창 ' + Math.round(f.R * 100) + '%'); else L.R.style.display = 'none';
+    if (G.sunBall.visible) place(L.sun, G.sunBall.position.clone().add(new T.Vector3(0, -13, 0)), '☀ 해 ' + dir8(f.az) + ' ' + Math.round(el) + '°'); else L.sun.style.display = 'none';
+    if (G.moonSpr.visible) place(L.mo, G.moonSpr.position.clone().add(new T.Vector3(0, -15, 0)), '🌙 ' + G.sky.mp.name + ' ' + Math.round(G.sky.mp.el) + '°'); else L.mo.style.display = 'none';
     place(L.ws, G.sensTop, '💨 ' + dir16(f.wd) + '풍 ' + f1(f.ws) + 'm/s');
     if (f.irr > 0) place(L.irr, lw(0, 0.4, zc + 2), '💧 관수'); else L.irr.style.display = 'none';
     var rc = big / 2 + 8;
     place(L.N, new T.Vector3(0, 0.2, -rc)); place(L.E, new T.Vector3(rc, 0.2, 0)); place(L.S, new T.Vector3(0, 0.2, rc)); place(L.W, new T.Vector3(-rc, 0.2, 0));
     var taken = [];
     [G.hud, G.ov.querySelector('.bt')].forEach(function (e) { if (e.offsetParent !== null) taken.push(e.getBoundingClientRect()); });
-    ['in', 'R', 'A', 'B', 'ws', 'irr', 'N', 'E', 'S', 'W'].forEach(function (k) {
+    ['in', 'R', 'A', 'B', 'ws', 'sun', 'mo', 'irr', 'N', 'E', 'S', 'W'].forEach(function (k) {
       var e = L[k]; if (e.style.display === 'none') return;
       var r = e.getBoundingClientRect();
       for (var i = 0; i < taken.length; i++) { var t = taken[i]; if (r.left < t.right + 2 && r.right > t.left - 2 && r.top < t.bottom + 2 && r.bottom > t.top - 2) { e.style.display = 'none'; return; } }
       taken.push(r);
     });
     var wxn = f.pty === 1 ? '🌧 비' : f.pty === 2 ? '🌨 비/눈' : f.pty === 3 ? '❄ 눈' : f.pty === 4 ? '🌦 소나기' : f.sky === 4 ? '☁ 흐림' : f.sky === 3 ? '⛅ 구름많음' : '☀ 맑음';
-    var hud = '🕒 ' + tlabel(f.t) + ' · ' + wxn + '<br>바깥 ' + f1(f.To) + '℃ · ' + Math.round(f.RHo) + '%<br>☀ 일사 ' + Math.round(f.G) + ' W/m²<br>💨 ' + dir16(f.wd) + '풍 ' + f1(f.ws) + ' m/s';
+    var hud = '🕒 ' + tlabel(f.t) + ' · ' + wxn + '<br>바깥 ' + f1(f.To) + '℃ · ' + Math.round(f.RHo) + '%<br>☀ 일사 ' + Math.round(f.G) + ' W/m²' + (el > 0 ? ' · 해 ' + dir8(f.az) + ' ' + Math.round(el) + '°' : '') + (G.sky.mp.el > 0 ? '<br>🌙 ' + G.sky.mp.name + ' ' + dir8(G.sky.mp.az) + ' ' + Math.round(G.sky.mp.el) + '°' : '') + '<br>💨 ' + dir16(f.wd) + '풍 ' + f1(f.ws) + ' m/s';
     if (G.hud.dataset.t !== hud) { G.hud.innerHTML = hud; G.hud.dataset.t = hud; }
   }
   function hide() {
