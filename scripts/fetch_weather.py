@@ -68,29 +68,54 @@ def pcp_mm(v):
     return float(nums[0]) if nums else 0.0
 
 # ---------- 단기예보 ----------
-def short_base():
+def short_bases(n=4):
+    """가장 최근 발표 시각부터 거꾸로 n개 (발표 직후 자료가 늦게 올라오는 경우 대비)."""
     t = NOW - dt.timedelta(minutes=15)
-    for h in (23, 20, 17, 14, 11, 8, 5, 2):
-        if t.hour >= h:
-            return t.strftime("%Y%m%d"), "%02d00" % h
-    y = t - dt.timedelta(days=1)
-    return y.strftime("%Y%m%d"), "2300"
+    out = []
+    while len(out) < n:
+        for h in (23, 20, 17, 14, 11, 8, 5, 2):
+            if t.hour >= h and (t.strftime("%Y%m%d"), "%02d00" % h) not in out:
+                out.append((t.strftime("%Y%m%d"), "%02d00" % h))
+                if len(out) >= n: break
+        t = (t - dt.timedelta(days=1)).replace(hour=23, minute=59)
+    return out
 
 _short_cache = {}
 def get_short(nx, ny):
     if (nx, ny) in _short_cache: return _short_cache[(nx, ny)]
-    bd, bt = short_base()
-    out, page = [], 1
-    while True:
-        body = call("/VilageFcstInfoService_2.0/getVilageFcst",
-                    {"pageNo": page, "numOfRows": 1000, "base_date": bd, "base_time": bt, "nx": nx, "ny": ny})
-        out += items(body)
-        total = int((body or {}).get("totalCount", 0) or 0)
-        if not body or page * 1000 >= total: break
-        page += 1
+    for bd, bt in short_bases():
+        out, page = [], 1
+        while True:
+            body = call("/VilageFcstInfoService_2.0/getVilageFcst",
+                        {"pageNo": page, "numOfRows": 1000, "base_date": bd, "base_time": bt, "nx": nx, "ny": ny})
+            out += items(body)
+            total = int((body or {}).get("totalCount", 0) or 0)
+            if not body or page * 1000 >= total: break
+            page += 1
+        if out: break
     _short_cache[(nx, ny)] = (bd + " " + bt, out)
     time.sleep(0.05)
     return _short_cache[(nx, ny)]
+
+def probe():
+    """진단: 기상청 API 몇 가지를 한 번씩 불러 응답 앞부분을 기록합니다."""
+    y = (NOW - dt.timedelta(days=1)).strftime("%Y%m%d")
+    tests = [
+        ("단기예보 최신", "/VilageFcstInfoService_2.0/getVilageFcst", dict(pageNo=1, numOfRows=10, base_date=short_bases()[0][0], base_time=short_bases()[0][1], nx=60, ny=127)),
+        ("단기예보 어제23시", "/VilageFcstInfoService_2.0/getVilageFcst", dict(pageNo=1, numOfRows=10, base_date=y, base_time="2300", nx=60, ny=127)),
+        ("초단기실황", "/VilageFcstInfoService_2.0/getUltraSrtNcst", dict(pageNo=1, numOfRows=10, base_date=(NOW - dt.timedelta(minutes=50)).strftime("%Y%m%d"), base_time=(NOW - dt.timedelta(minutes=50)).strftime("%H00"), nx=60, ny=127)),
+        ("예보버전", "/VilageFcstInfoService_2.0/getFcstVersion", dict(pageNo=1, numOfRows=10, ftype="SHRT", basedatetime=short_bases()[0][0] + short_bases()[0][1])),
+        ("중기기온 서울", "/MidFcstInfoService/getMidTa", dict(pageNo=1, numOfRows=10, regId="11B10101", tmFc=mid_tmfc())),
+        ("ASOS 서울 어제", "/AsosDalyInfoService/getWthrDataList", dict(pageNo=1, numOfRows=10, dataCd="ASOS", dateCd="DAY", startDt=y, endDt=y, stnIds=108)),
+    ]
+    out = []
+    for name, path, prm in tests:
+        try:
+            r = S.get(BASES[BASE_OK["i"] or 0] + path, params=dict(prm, serviceKey=key(), dataType="JSON"), timeout=(8, 25))
+            out.append({"test": name, "params": prm, "http": r.status_code, "text": r.text[:300]})
+        except Exception as e:
+            out.append({"test": name, "params": prm, "error": repr(e)[:200]})
+    LOG["probe"] = out
 
 # ---------- 중기기온 ----------
 def mid_tmfc():
@@ -243,6 +268,10 @@ def main():
     if only: regions = [r for r in regions if r["code"] in only.split(",")]
     os.makedirs(os.path.join(ROOT, "data", "weather"), exist_ok=True)
     sun_db, sun_fresh = load_sun()
+    try:
+        probe()
+    except Exception as e:
+        LOG["probe"] = repr(e)[:200]
     ok = fail = 0
     for reg in regions:
         try:
