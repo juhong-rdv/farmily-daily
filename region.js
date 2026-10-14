@@ -41,6 +41,16 @@
     + '#local-app .lc-sunrow b{display:block;font-size:16px;color:#12341f}'
     + '#local-app .lc-meter{height:6px;background:#eceae2;border-radius:3px;margin-top:4px;overflow:hidden}'
     + '#local-app .lc-meter span{display:block;height:100%;background:#f2b33d;border-radius:3px}'
+    + '#local-app .lc-wtab{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-top:8px}'
+    + '#local-app .lc-wc{background:#fff;border:1px solid #e3ebe3;border-radius:6px;text-align:center;padding:4px 0 3px;font-size:11px;line-height:1.35;color:#555}'
+    + '#local-app .lc-wc b{display:block;font-size:12px;color:#12341f}'
+    + '#local-app .lc-wc.st{border-color:#e57373;background:#fdecea}'
+    + '#local-app .lc-wc .ws{display:inline-block;margin-top:1px;padding:0 3px;border-radius:3px;background:#eef2ee;font-size:10px;color:#2f4f3a}'
+    + '#local-app .lc-wday{font-size:12px;color:#666;font-weight:700;margin-top:8px}'
+    + '#local-app .lc-chg{margin:8px 0 0;padding:0;list-style:none;font-size:13px;color:#444;line-height:1.6}'
+    + '#local-app .lc-orient{font-size:13px;color:#666;margin-top:8px}'
+    + '#local-app .lc-orient select{font-size:13px;padding:3px 6px}'
+    + '#local-app .lc-range{font-size:11px;color:#888;display:block}'
     + '.lc-mark{background:#fff4c2;border-radius:3px;padding:0 2px}'
     + '@media (max-width:600px){#local-app .lc-grid{grid-template-columns:1fr}}';
   var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
@@ -71,6 +81,15 @@
   function skyWord(sky, pty) {
     if (pty === 1) return '비'; if (pty === 2) return '비/눈'; if (pty === 3) return '눈'; if (pty === 4) return '소나기';
     return sky === 1 ? '맑음' : sky === 3 ? '구름많음' : sky === 4 ? '흐림' : '';
+  }
+  var DIR8 = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
+  function dir8(v) { return v == null ? '' : DIR8[Math.round(v / 45) % 8]; }
+  // 바람받이(바람이 불어오는 쪽) 측창
+  function windward(v, o) {
+    if (v == null || !o) return '';
+    var a = v * Math.PI / 180, ex = Math.sin(a), ny = Math.cos(a);
+    if (o === 'ew') return ex > 0.38 ? '동' : ex < -0.38 ? '서' : '옆';
+    return ny > 0.38 ? '북' : ny < -0.38 ? '남' : '옆';
   }
   function windWord(v) { return v >= 14 ? '매우 강함' : v >= 9 ? '강함' : v >= 4 ? '보통' : '약함'; }
   var WIND_WARN = 9;
@@ -191,6 +210,7 @@
   var regions = null, sido = [];
   var cur = ls('farmily.region') || '';
   var setpoint = +(ls('farmily.setpoint') || 15);
+  var orient = ls('farmily.orient') || '';  // 'ew' = 측창이 동·서를 향함(남북으로 긴 하우스), 'ns' = 측창이 남·북을 향함(동서로 긴 하우스)
   if (!(setpoint >= 0 && setpoint <= 30)) setpoint = 15;
 
   fetch(BASE + 'data/regions.json').then(function (r) { return r.json(); }).then(function (d) {
@@ -295,7 +315,7 @@
         + rows.map(function (x) { return '<li><span><span class="lc-dot" style="background:' + col[x[2].lv] + '"></span>' + x[0] + ' <span style="color:#999;font-size:12px">' + x[1] + '</span></span><span class="lv-' + x[2].lv + '">' + x[2].lv + ' <span style="font-weight:400;color:#999;font-size:12px">' + x[2].h + '시간</span></span></li>'; }).join('')
         + '</ul><div class="lc-s">바깥 기온·습도·비로 본 참고 신호입니다(발령 정보 아님). 병이 좋아하는 습하고 알맞은 기온이 이어지는 시간을 셌습니다.</div></div>';
     }
-    // 5) 바람 (앞으로 24시간)
+    // 5) 바람 (앞으로 24시간 + 3시간 단위 풍향 시간표)
     if (w.WSD && w.WSD.some(function (x) { return x != null; })) {
       var n24 = Math.min(24, w.WSD.length), im = 0;
       for (var a = 0; a < n24; a++) if ((w.WSD[a] || 0) > (w.WSD[im] || 0)) im = a;
@@ -304,20 +324,69 @@
       var dial = '<svg width="74" height="74" viewBox="0 0 74 74" aria-hidden="true"><circle cx="37" cy="37" r="30" fill="#fff" stroke="#cfd8cf"/>'
         + ['북', '동', '남', '서'].map(function (d, q) { var ang = q * Math.PI / 2; return '<text x="' + (37 + Math.sin(ang) * 24).toFixed(1) + '" y="' + (41 - Math.cos(ang) * 24).toFixed(1) + '" font-size="10" fill="#888" text-anchor="middle">' + d + '</text>'; }).join('')
         + (vnow != null ? arrow(37, 37, 30, vnow, (w.WSD[0] || 0) >= WIND_WARN ? '#c62828' : '#12341f', 3) : '') + '</svg>';
-      tiles += '<div class="lc-tile"><div class="lc-k">💨 바람 (앞으로 24시간)</div><div class="lc-wind">' + dial + '<div>'
+      // 3시간 단위 블록 (정시 3·6·9…에 맞춤): 그 3시간 중 가장 센 바람과 평균 풍향
+      var blocks = [], k0 = 0;
+      while (k0 < w.WSD.length && (h0.getHours() + k0) % 3 !== 0) k0++;
+      for (var k = k0; k + 2 < w.WSD.length && blocks.length < 16; k += 3) {
+        var sx = 0, sy = 0, mxw = 0;
+        for (var q = k; q < k + 3; q++) { var vv = w.VEC ? w.VEC[q] : null, ww = w.WSD[q] || 0; if (vv != null) { sx += Math.sin(vv * Math.PI / 180) * (ww + 0.1); sy += Math.cos(vv * Math.PI / 180) * (ww + 0.1); } mxw = Math.max(mxw, ww); }
+        var vb = (sx || sy) ? (Math.atan2(sx, sy) * 180 / Math.PI + 360) % 360 : null;
+        blocks.push({ t: new Date(h0.getTime() + k * 3600000), v: vb, s: mxw });
+      }
+      function cell(bk) {
+        var side = windward(bk.v, orient);
+        return '<div class="lc-wc' + (bk.s >= WIND_WARN ? ' st' : '') + '" title="' + md(bk.t) + ' ' + bk.t.getHours() + '~' + (bk.t.getHours() + 3) + '시 ' + dir16(bk.v) + '풍 최대 ' + f1(bk.s) + 'm/s">'
+          + '<b>' + bk.t.getHours() + '시</b>'
+          + (bk.v != null ? '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">' + arrow(10, 10, 15, bk.v, bk.s >= WIND_WARN ? '#c62828' : '#334155', 2) + '</svg>' : '')
+          + '<div>' + dir8(bk.v) + '</div><div>' + f1(bk.s) + '</div>'
+          + (side ? '<span class="ws">' + (side === '옆' ? '양쪽' : side + '측') + '</span>' : '') + '</div>';
+      }
+      var tab = '', row = [];
+      blocks.forEach(function (bk, q) {
+        if (q % 8 === 0) { if (row.length) tab += '<div class="lc-wtab">' + row.join('') + '</div>'; row = []; tab += '<div class="lc-wday">' + md(bk.t) + ' ' + bk.t.getHours() + '시부터</div>'; }
+        row.push(cell(bk));
+      });
+      if (row.length) tab += '<div class="lc-wtab">' + row.join('') + '</div>';
+      // 직전에 알려 준 풍향(기준)에서 67.5° 이상 돌아가면 '바뀜'으로 알림 (천천히 도는 경우도 잡힘, 약한 바람은 제외)
+      var chg = [], anc = null;
+      for (k = 0; k < blocks.length && chg.length < 5; k++) {
+        var bk2 = blocks[k]; if (bk2.v == null || bk2.s < 1.5) continue;
+        if (anc == null) { anc = bk2.v; continue; }
+        var dlt = Math.abs(((bk2.v - anc) + 540) % 360 - 180);
+        if (dlt >= 67.5) { chg.push(md(bk2.t) + ' ' + bk2.t.getHours() + '시경 <b>' + dir8(anc) + '풍 → ' + dir8(bk2.v) + '풍</b>'); anc = bk2.v; }
+      }
+      var osel = '<div class="lc-orient">우리 하우스 측창 방향 <select id="lc-orient"><option value=""' + (orient ? '' : ' selected') + '>선택 안 함</option>'
+        + '<option value="ew"' + (orient === 'ew' ? ' selected' : '') + '>동쪽·서쪽 측창 (남북으로 긴 하우스)</option>'
+        + '<option value="ns"' + (orient === 'ns' ? ' selected' : '') + '>남쪽·북쪽 측창 (동서로 긴 하우스)</option></select>'
+        + (orient ? ' — 칸 아래 표시는 <b>바람이 들이치는 쪽 측창</b>입니다(“양쪽”은 하우스 길이 방향으로 부는 바람).' : ' — 고르시면 시간대별로 바람이 들이치는 쪽 측창을 표시합니다.') + '</div>';
+      tiles += '<div class="lc-tile lc-wide"><div class="lc-k">💨 바람 · 풍향 시간표 (자동제어기 설정용)</div><div class="lc-wind">' + dial + '<div>'
         + '<div class="lc-v">지금 ' + dir16(vnow) + '풍 ' + f1(w.WSD[0] || 0) + ' m/s</div>'
-        + '<div class="lc-s">가장 셀 때 ' + md(tm) + ' ' + tm.getHours() + '시 ' + dir16(w.VEC && w.VEC[im]) + '풍 <b>' + f1(wmax) + ' m/s</b> (' + windWord(wmax) + ')</div></div></div>'
-        + '<div class="lc-s">' + (strong ? '⚠️ 초속 ' + WIND_WARN + 'm 이상 바람이 약 ' + strong + '시간 예상됩니다. 하우스 비닐·차광막 고정끈을 점검하고, 바람 부는 쪽 측창은 닫아 두세요.'
-          : wmax >= 4 ? '환기할 때 바람이 불어오는 쪽 측창은 조금만 열어 찬바람이 작물에 바로 닿지 않게 하세요.' : '바람이 약해 환기가 잘 안 될 수 있습니다. 습도가 높으면 순환팬을 돌려 주세요.') + '</div></div>';
+        + '<div class="lc-s">24시간 안에 가장 셀 때 ' + md(tm) + ' ' + tm.getHours() + '시 ' + dir16(w.VEC && w.VEC[im]) + '풍 <b>' + f1(wmax) + ' m/s</b> (' + windWord(wmax) + ')</div></div></div>'
+        + (chg.length ? '<ul class="lc-chg">' + chg.map(function (x) { return '<li>🔄 풍향 바뀜: ' + x + '</li>'; }).join('') + '</ul>' : '<div class="lc-s">이 기간 풍향이 크게 바뀌는 때는 없습니다.</div>')
+        + tab + osel
+        + '<div class="lc-s">칸마다 3시간 동안의 <b>대표 풍향</b>(화살표는 바람이 불어가는 쪽)과 <b>가장 센 풍속(m/s)</b>입니다. 빨간 칸은 초속 ' + WIND_WARN + 'm 이상. '
+        + (strong ? '⚠️ 24시간 안에 강한 바람이 약 ' + strong + '시간 예상됩니다. 비닐·차광막 고정끈을 점검하고 바람받이 측창은 닫아 두세요. ' : '')
+        + '기상청 단기예보(5km 격자) 값이라 산·건물 때문에 하우스 자리 바람은 다를 수 있으니, 자동제어기 풍향 센서 값과 함께 보세요.</div></div>';
     }
-    // 6) 예상 일사량 (오늘·내일)
+    // 6) 예상 일사량 (오늘·내일·모레)
     if (w.rad && w.rad.length) {
-      var rd = w.rad.slice(0, 3), noon = null;
+      var rd = w.rad.slice(0, 3), noon = null, cal = rd.some(function (x) { return x.cal; });
       if (w.EL) for (var b = 0; b < Math.min(24, w.EL.length); b++) if (noon == null || w.EL[b] > noon) noon = w.EL[b];
-      tiles += '<div class="lc-tile"><div class="lc-k">🌤 예상 일사량 (하루 합계)</div><div class="lc-sunrow">'
+      var so = w.solar, ts = so && so.test, sc = w.solar_score;
+      tiles += '<div class="lc-tile lc-wide"><div class="lc-k">🌤 예상 일사량 (하루 합계)' + (cal ? ' · 10년 관측으로 보정' : '') + '</div><div class="lc-sunrow">'
         + rd.map(function (x, q) { var dd = parseIso(x.d), pc = x.clear ? Math.round(x.est / x.clear * 100) : 0;
-            return '<div>' + (q === 0 ? '오늘' : q === 1 ? '내일' : '모레') + ' ' + (dd.getMonth() + 1) + '/' + dd.getDate() + (x.part ? ' (남은 시간)' : '') + '<b>' + f1(x.est) + ' MJ/m²</b>맑은 날의 ' + pc + '%<div class="lc-meter"><span style="width:' + Math.min(100, pc) + '%"></span></div></div>'; }).join('')
-        + '</div><div class="lc-s">태양 높이(요즘 한낮 약 ' + (noon != null ? Math.round(noon) : '-') + '°)로 맑은 날 일사량을 계산하고, 기상청 하늘 상태(맑음·구름많음·흐림·비)로 줄인 추정값입니다. 하우스 안은 피복재 때문에 보통 이보다 20~40% 적습니다.</div></div>';
+            return '<div>' + (q === 0 ? '오늘' : q === 1 ? '내일' : '모레') + ' ' + (dd.getMonth() + 1) + '/' + dd.getDate() + (x.part ? ' (남은 시간)' : '')
+              + '<b>' + f1(x.est) + ' MJ/m²</b>'
+              + (x.cal && x.lo != null ? '<span class="lc-range">대략 ' + f1(x.lo) + '~' + f1(x.hi) + '</span>' : '')
+              + '맑은 날의 ' + pc + '%<div class="lc-meter"><span style="width:' + Math.min(100, pc) + '%"></span></div>'
+              + (x.clim != null && !x.part ? '<span class="lc-range">평년 ' + f1(x.clim) + ' (' + (x.est >= x.clim ? '+' : '') + Math.round((x.est / x.clim - 1) * 100) + '%)</span>' : '') + '</div>'; }).join('')
+        + '</div><div class="lc-s">'
+        + (cal && so
+          ? '태양 높이(요즘 한낮 약 ' + (noon != null ? Math.round(noon) : '-') + '°)로 맑은 날 일사량을 계산한 뒤, <b>' + esc(so.name) + ' 관측소(' + so.km + 'km)의 ' + so.first.slice(0, 4) + '~' + so.last.slice(0, 4) + '년 일사 관측 ' + Number(so.n).toLocaleString() + '일</b>에서 구름 양·비에 따라 실제로 줄어든 비율을 찾아 적용했습니다. “대략”은 같은 조건이던 날 중 가운데 절반이 들어간 범위, “평년”은 지난 10년 같은 날짜 앞뒤 1주 평균입니다.'
+            + (ts ? '<br>📏 검증: 마지막 2년(' + ts.from.slice(0, 7).replace('-', '.') + '~' + ts.to.slice(0, 7).replace('-', '.') + ')을 빼고 맞춘 뒤 그 2년에 대 보니 하루 평균 오차 <b>±' + f1(ts.mae) + ' MJ/m²(' + ts.pct + '%)</b>, 보정 전 단순 계산은 ±' + f1(ts.naive_mae) + '(' + ts.naive_pct + '%)였습니다. 이 검증은 실제 구름 양을 안다고 본 값이라, 구름 예보가 빗나가면 오차가 더 커집니다.' : '')
+            + (sc && sc.n >= 5 ? '<br>🎯 실제 예보 성적: 최근 ' + sc.n + '일 전날 예보와 관측을 비교하면 평균 오차 <b>±' + f1(sc.mae) + ' MJ/m²</b>(' + Math.round(sc.mae / sc.mean * 100) + '%), “대략” 범위 안에 든 날 ' + sc.inside + '%.' : '<br>🎯 매일 전날 예보와 실제 관측을 맞춰 보는 성적표를 쌓고 있습니다(5일 이상 모이면 여기 표시).')
+          : '태양 높이(요즘 한낮 약 ' + (noon != null ? Math.round(noon) : '-') + '°)로 맑은 날 일사량을 계산하고, 기상청 하늘 상태로 줄인 추정값입니다. 가까운 관측소의 10년 일사 관측으로 보정하는 작업이 진행 중이며, 끝나면 보정값과 오차가 표시됩니다.')
+        + ' 하우스 안은 피복재 때문에 보통 이보다 20~40% 적습니다.</div></div>';
     }
     // 7) 48시간 그래프
     var hasChart = w.T && w.T.length >= 12;
@@ -329,6 +398,8 @@
     var bm = /^(\d{4})(\d\d)(\d\d) (\d\d)/.exec(base);
     body.innerHTML = '<div class="lc-grid">' + tiles + '</div><div class="lc-foot">' + esc(r.sido + ' ' + r.name) + ' · 자료: 기상청 단기예보'
       + (bm ? '(' + (+bm[2]) + '/' + (+bm[3]) + ' ' + bm[4] + '시 발표)' : '') + '·중기예보·종관기상관측(ASOS) · 바깥 날씨 기준이라 하우스 안 환경과는 다를 수 있습니다.</div>';
+    var os_ = document.getElementById('lc-orient');
+    if (os_) os_.onchange = function () { orient = this.value; ls('farmily.orient', orient); render(r, w); };
     var sp = document.getElementById('lc-sp');
     if (sp) sp.onchange = function () { var v = +this.value; if (v >= 0 && v <= 30) { setpoint = v; ls('farmily.setpoint', String(v)); render(r, w); } };
     var ch = document.getElementById('lc-chart');
