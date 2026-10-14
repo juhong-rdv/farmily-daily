@@ -33,6 +33,8 @@ def num(v):
         return None
 
 URLS = [URL, URL.replace("https://", "http://")]
+HDR = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+       "Accept": "application/json, text/javascript, */*; q=0.01", "Accept-Language": "ko-KR,ko;q=0.9", "Referer": "https://www.kamis.or.kr/customer/reference/openapi_list.do"}
 DIAG = []  # 응답이 JSON이 아닐 때 원인 확인용 (인증키는 가림)
 
 def _mask(t):
@@ -50,7 +52,7 @@ def fetch(day, cat):
     for url in URLS:
         for i in range(2):
             try:
-                r = requests.get(url, params=p, timeout=25, headers={"User-Agent": "Mozilla/5.0 (farmily-daily-data)"})
+                r = requests.get(url, params=p, timeout=25, headers=HDR)
                 try:
                     j = r.json()
                 except ValueError:
