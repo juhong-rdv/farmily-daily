@@ -8,7 +8,7 @@
 <link rel="canonical" href="https://juhong-rdv.github.io/farmily-daily/sim.html">
 <style>
   * { box-sizing: border-box; }
-  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #222; line-height: 1.6; margin: 0; background: #f4f6f4; }
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #222; line-height: 1.6; margin: 0; background: #fff; }
   a { color: #12341f; }
   .wrap { max-width: 1280px; margin: 0 auto; padding: 16px; }
   header h1 { font-size: 24px; margin: 4px 0 2px; color: #12341f; }
@@ -17,7 +17,7 @@
   .top select { font: inherit; font-size: 15px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
   #status { font-size: 13px; color: #666; }
   .grid { display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start; }
-  .card { background: #fff; border: 1px solid #e5e9e5; border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+  .card { background: #fff; border: 1px solid #e3e7e3; border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
   .card h2 { font-size: 17px; margin: 0 0 10px; color: #12341f; }
   .side { position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow: auto; }
   details > summary { cursor: pointer; font-weight: 700; color: #12341f; font-size: 16px; margin-bottom: 8px; }
@@ -78,7 +78,6 @@
 <body>
 <div class="wrap">
   <header>
-    <p><a href="https://farmily.ai/daily">← 오늘의 농업 소식</a></p>
     <h1>🏠 우리 하우스 시뮬레이션 <small style="font-size:14px;color:#666;font-weight:600">토마토 · 방울토마토</small></h1>
     <p>하우스 크기·방향과 자동제어기 설정을 넣으면, 기상청 예보로 앞으로 2~3일 하우스 안 온도·습도와 창·커튼·차광·난방·관수가 어떻게 움직일지 시간대별로 보여 드립니다.</p>
   </header>
@@ -141,12 +140,22 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>window.THREE || document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>')</script>
-<script src="/farmily-daily/sim-engine.js"></script>
-<script src="/farmily-daily/sim3d.js"></script>
+<script src="/farmily-daily/sim-engine.js?v=20261014b"></script>
+<script src="/farmily-daily/sim3d.js?v=20261014b"></script>
 <script>
   // 좁은 화면에서는 하우스 정보·제어 설정을 접어 두고 그림부터 보이게
   if (window.innerWidth < 900) { var ds = document.querySelectorAll('.side details'); for (var i = 1; i < ds.length; i++) ds[i].open = false; }
 </script>
-<script src="/farmily-daily/sim.js"></script>
+<script>
+  // 오늘의 농업 소식에서 고른 지역을 먼저 씀 (farmily.ai 페이지의 iframe 주소에 고정된 region보다 우선)
+  try {
+    var rg = localStorage.getItem('farmily.region'), u = new URL(location.href);
+    if (rg && u.searchParams.get('region') !== rg) { u.searchParams.set('region', rg); history.replaceState(null, '', u.href); }
+    document.addEventListener('change', function (e) {
+      if (e.target && (e.target.id === 'r_sido' || e.target.id === 'r_sigun')) setTimeout(function () { var s = document.getElementById('r_sigun'); if (s && s.value) localStorage.setItem('farmily.region', s.value); }, 0);
+    });
+  } catch (e) {}
+</script>
+<script src="/farmily-daily/sim.js?v=20261014b"></script>
 </body>
 </html>
