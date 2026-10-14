@@ -208,6 +208,10 @@
     if (narrowS) { var vx = x0 - 100, vw = nW * sx + 200, vy = Math.max(0, ground - hrP - 70); FS = Math.max(1, vw / cwS * 0.85); vb = vx.toFixed(0) + ' ' + vy.toFixed(0) + ' ' + vw.toFixed(0) + ' ' + (ground + 48 * FS - vy).toFixed(0); }
     else FS = Math.max(1, Math.min(1.6, 900 / cwS * 0.75));
     var axis = h.axis % 180, nA = (axis + 270) % 360, nB = (axis + 90) % 360;
+    var to = (f.wd + 180) % 360, along = Math.abs(Math.sin((to - nB) * Math.PI / 180));
+    var d3 = !!(window.FSIM3D && window.FSIM3D.active());
+    if (d3) window.FSIM3D.draw(f, { house: h, geom: g, lai: result.lai, stage: S.stage, crop: S.crop, dt: still ? 0.016 : (dt || 0.016) });
+    else {
     var svg = '';
     // 하늘
     var el = f.el, sky1, sky2;
@@ -332,6 +336,7 @@
     }
     $('stage').setAttribute('viewBox', vb);
     $('stage').innerHTML = svg;
+    }
     // 상태 칩
     var chips = [
       ['🕒', tlabel(f.t)],
