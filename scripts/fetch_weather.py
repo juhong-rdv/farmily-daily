@@ -10,10 +10,12 @@ import requests
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 KST = dt.timezone(dt.timedelta(hours=9))
 NOW = dt.datetime.now(KST)
-BASE = "https://apis.data.go.kr/1360000"
+# https가 해외(GitHub 서버)에서 막히는 경우가 있어 http도 차례로 시도하고, 되는 쪽을 계속 씁니다.
+BASES = ["https://apis.data.go.kr/1360000", "http://apis.data.go.kr/1360000"]
+BASE_OK = {"i": None}
 S = requests.Session()
 S.headers["User-Agent"] = "farmily-daily-data/1.0"
-LOG = {"started": NOW.isoformat(timespec="minutes"), "errors": [], "mid_invalid": [], "counts": {}}
+LOG = {"started": NOW.isoformat(timespec="minutes"), "errors": [], "mid_invalid": [], "counts": {}, "base": None}
 
 def key():
     k = os.environ.get("KMA_SERVICE_KEY", "").strip()
@@ -23,25 +25,30 @@ def call(path, params, tries=3):
     p = dict(params, serviceKey=key(), dataType="JSON")
     last = None
     for i in range(tries):
-        try:
-            r = S.get(BASE + path, params=p, timeout=20)
+        order = [BASE_OK["i"]] if BASE_OK["i"] is not None else list(range(len(BASES)))
+        for bi in order:
+            try:
+                r = S.get(BASES[bi] + path, params=p, timeout=(8, 25))
+            except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError) as e:
+                last = "접속 실패(%s): %s" % (BASES[bi].split(":")[0], repr(e)[:120])
+                continue
+            BASE_OK["i"] = bi
             txt = r.text
             if not txt.lstrip().startswith("{"):
                 m = re.search(r"<returnAuthMsg>([^<]+)|<resultMsg>([^<]+)|<errMsg>([^<]+)", txt)
                 last = "비JSON 응답 HTTP %s %s" % (r.status_code, (m and next(g for g in m.groups() if g)) or txt[:120])
                 if "SERVICE_KEY" in last or "SERVICE ERROR" in last or r.status_code in (401, 403):
-                    break
-            else:
-                j = r.json()
-                hd = j.get("response", {}).get("header", {})
-                code = hd.get("resultCode")
-                if code == "00":
-                    return j["response"]["body"]
-                last = "resultCode %s %s" % (code, hd.get("resultMsg"))
-                if code in ("03",):  # NO_DATA
-                    return None
-        except Exception as e:  # 네트워크 오류
-            last = repr(e)[:160]
+                    raise RuntimeError(last)
+                break
+            j = r.json()
+            hd = j.get("response", {}).get("header", {})
+            code = hd.get("resultCode")
+            if code == "00":
+                return j["response"]["body"]
+            last = "resultCode %s %s" % (code, hd.get("resultMsg"))
+            if code in ("03",):  # NO_DATA
+                return None
+            break
         time.sleep(1.5 * (i + 1))
     raise RuntimeError(last)
 
@@ -245,11 +252,12 @@ def main():
             fail += 1
             LOG["errors"].append("%s %s: %s" % (reg["code"], reg["name"], str(e)[:200]))
             if fail >= 5 and ok == 0:
-                LOG["errors"].append("연속 실패로 중단 — 키 승인 여부·API 활용신청을 확인하세요.")
+                LOG["errors"].append("연속 실패로 중단 — 접속 실패면 해외(GitHub 서버) 접속 차단, 키 오류면 승인·반영 대기(1~2시간)를 확인하세요.")
                 break
     with open(os.path.join(ROOT, "data", "sun.json"), "w", encoding="utf-8") as f:
         json.dump(sun_db, f, ensure_ascii=False, separators=(",", ":"))
     LOG["counts"] = {"ok": ok, "fail": fail, "regions": len(regions)}
+    LOG["base"] = BASES[BASE_OK["i"]] if BASE_OK["i"] is not None else "접속 안 됨"
     LOG["finished"] = dt.datetime.now(KST).isoformat(timespec="minutes")
     LOG["errors"] = LOG["errors"][:40]
     with open(os.path.join(ROOT, "data", "weather", "_status.json"), "w", encoding="utf-8") as f:
