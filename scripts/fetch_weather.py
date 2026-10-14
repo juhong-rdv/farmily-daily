@@ -198,6 +198,7 @@ def risk(T, RH, R):
     return {"hours": n, "gray": {"h": gray, "lv": level(gray)}, "downy": {"h": downy, "lv": level(downy)},
             "anth": {"h": anth, "lv": level(anth)}}
 
+_sun_tried = set()
 def build_region(reg, sun_db, sun_fresh):
     base, rows = get_short(reg["nx"], reg["ny"])
     by = {}
@@ -230,6 +231,9 @@ def build_region(reg, sun_db, sun_fresh):
         iso = "%s-%s-%s" % (d[:4], d[4:6], d[6:8])
         mn = tmn.get(d, days.get(d, {}).get("min")); mx = tmx.get(d, days.get(d, {}).get("max"))
         if mn is None: continue
+        hrs = sum(1 for k in keys if k[:8] == d)
+        if d not in tmn and hrs < 18 and d != NOW.strftime("%Y%m%d"):
+            continue  # 하루 일부만 있는 날(예보 끝자락)은 최저기온이 틀어지므로 버리고 중기예보로 채움
         out_days.append({"d": iso, "min": mn, "max": mx, "src": "단기"})
     have = {x["d"] for x in out_days}
     for m in reg["mid"]:
@@ -244,7 +248,8 @@ def build_region(reg, sun_db, sun_fresh):
     sun = None
     for s in reg["asos"]:
         sid = str(s["id"])
-        if sid not in sun_db["stations"] and sun_fresh:
+        if sid not in _sun_tried and (sid not in sun_db["stations"] or sun_db["stations"][sid] is None):
+            _sun_tried.add(sid)
             try:
                 sun_db["stations"][sid] = sun_for_station(s["id"])
             except Exception as e:
