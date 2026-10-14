@@ -359,7 +359,7 @@
         + '<option value="ew"' + (orient === 'ew' ? ' selected' : '') + '>동쪽·서쪽 측창 (남북으로 긴 하우스)</option>'
         + '<option value="ns"' + (orient === 'ns' ? ' selected' : '') + '>남쪽·북쪽 측창 (동서로 긴 하우스)</option></select>'
         + (orient ? ' — 칸 아래 표시는 <b>바람이 들이치는 쪽 측창</b>입니다(“양쪽”은 하우스 길이 방향으로 부는 바람).' : ' — 고르시면 시간대별로 바람이 들이치는 쪽 측창을 표시합니다.') + '</div>';
-      tiles += '<div class="lc-tile lc-wide"><div class="lc-k">💨 바람 · 풍향 시간표 (자동제어기 설정용)</div><div class="lc-wind">' + dial + '<div>'
+      tiles += '<div class="lc-tile lc-wide"><div class="lc-k">💨 바람 · 풍향 시간표</div><div class="lc-wind">' + dial + '<div>'
         + '<div class="lc-v">지금 ' + dir16(vnow) + '풍 ' + f1(w.WSD[0] || 0) + ' m/s</div>'
         + '<div class="lc-s">24시간 안에 가장 셀 때 ' + md(tm) + ' ' + tm.getHours() + '시 ' + dir16(w.VEC && w.VEC[im]) + '풍 <b>' + f1(wmax) + ' m/s</b> (' + windWord(wmax) + ')</div></div></div>'
         + (chg.length ? '<ul class="lc-chg">' + chg.map(function (x) { return '<li>🔄 풍향 바뀜: ' + x + '</li>'; }).join('') + '</ul>' : '<div class="lc-s">이 기간 풍향이 크게 바뀌는 때는 없습니다.</div>')
