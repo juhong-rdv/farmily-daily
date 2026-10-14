@@ -2,12 +2,13 @@
 """기상청 공공데이터로 '우리 지역' 카드 데이터를 만듭니다. GitHub Actions에서 실행.
 필요: 환경변수 KMA_SERVICE_KEY (공공데이터포털 '일반 인증키(Decoding)' — Encoding 키를 넣어도 자동으로 풀어 씁니다)
 활용신청 필요한 API 3종: 기상청_단기예보 조회서비스 / 기상청_중기예보 조회서비스 / 기상청_지상(종관, ASOS) 일자료 조회서비스
-출력: data/weather/<code>.json (시군별), data/sun.json (일조 하루 1회 캐시), data/solar/<지점>.json (일사 보정)·raw/<지점>.csv (관측 누적)·log.json (예보 성적), data/weather/_status.json (실행 기록)"""
+출력: data/weather/<code>.json (시군별), data/sun.json (일조 하루 1회 캐시), data/solar/<지점>.json (일사 보정)·raw/<지점>.csv (관측 누적)·log.json (예보 성적), data/obs/<지점>.csv (ASOS 시간자료), data/weather/_status.json (실행 기록)"""
 import json, os, re, sys, time, datetime as dt
 from urllib.parse import unquote
 import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import solar_calib as SC
+import asos_hourly as AH
 from kma_common import haversine
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
@@ -345,7 +346,82 @@ def run_calibration():
                     "no_gsr": sum(1 for o in CAL.values() if not o.get("gsr")),
                     "pending": sum(1 for st in order if SC.needs_full(CAL.get(st[0]), NOW)), "errors": errs[:10]}
 
-def build_region(reg, sun_db, sun_fresh):
+# ---------- 지난 30시간 (시뮬레이션 출발점용): ASOS 시간 관측 > 직전 실행의 예보 ----------
+OBS = {}   # 지점번호 → {"YYYY-MM-DD HH:MM": row}
+PAST_H = 30
+
+def run_obs():
+    """시군마다 가장 가까운 관측소의 시간자료를 하루 한 번 덧붙임 (활용신청 전이면 기록만 남기고 넘어감)."""
+    from build_regions import full_regions
+    stns = []
+    for r in full_regions():
+        sid = r["asos"][0]["id"]
+        if sid not in stns: stns.append(sid)
+    got = fails = 0; err = None
+    for sid in stns:
+        try:
+            got += AH.update(sid, call, items, NOW, ROOT, LOG)
+        except Exception as e:
+            fails += 1; err = str(e)[:200]
+            if fails >= 3 and got == 0: break   # 미승인·키 오류면 더 부르지 않음
+        OBS[sid] = AH.load(ROOT, sid)
+    LOG["obs"] = {"stations": len(stns), "rows_added": got, "fails": fails, "error": err}
+
+def _f(v):
+    try: return float(v)
+    except Exception: return None
+
+def build_past(reg, old, new_h0):
+    """new_h0 직전 PAST_H시간의 시간별 바깥 값. 관측이 있으면 관측, 없으면 직전 실행에서 받아 둔 예보."""
+    t_end = dt.datetime.strptime(new_h0, "%Y-%m-%dT%H:%M").replace(tzinfo=KST)
+    hours = [t_end - dt.timedelta(hours=PAST_H - i) for i in range(PAST_H)]
+    vals = {}
+    if old:
+        try:  # 이전 파일의 past
+            op = old.get("past") or {}
+            p0 = dt.datetime.strptime(op["h0"], "%Y-%m-%dT%H:%M").replace(tzinfo=KST)
+            for i in range(len(op.get("T", []))):
+                vals[p0 + dt.timedelta(hours=i)] = {k: op[k][i] for k in ("T", "RH", "G", "SKY", "PTY", "VEC", "WSD", "R") if k in op} | {"src": op.get("src", ["f"] * 999)[i]}
+        except Exception:
+            pass
+        try:  # 이전 파일의 예보 앞부분(1시간 간격으로 이어지는 곳까지)
+            o0 = dt.datetime.strptime(old["h0"], "%Y-%m-%dT%H:%M").replace(tzinfo=KST)
+            for i in range(len(old.get("T", []))):
+                t = o0 + dt.timedelta(hours=i)
+                if old.get("EL") and old["EL"][i] is not None and abs(sun_elev(reg["lat"], reg["lon"], t) - old["EL"][i]) > 3: break
+                if t >= t_end: break
+                vals[t] = {"T": old["T"][i], "RH": old["RH"][i], "G": (old.get("G") or [None] * 999)[i], "SKY": (old.get("SKY") or [None] * 999)[i],
+                           "PTY": (old.get("PTY") or [None] * 999)[i], "VEC": (old.get("VEC") or [None] * 999)[i], "WSD": (old.get("WSD") or [None] * 999)[i],
+                           "R": (old.get("R") or [None] * 999)[i], "src": "f"}
+        except Exception:
+            pass
+    rows = OBS.get(reg["asos"][0]["id"]) or {}
+    for t in hours:
+        k = t.strftime("%Y-%m-%d %H:%M"); r = rows.get(k)
+        if not r or _f(r.get("ta")) is None: continue
+        rn = _f(r.get("rn")) or 0.0; cl = _f(r.get("dc10Tca"))
+        sky = None if cl is None else (1 if cl <= 5 else 3 if cl <= 8 else 4)
+        i1 = _f(r.get("icsr")); r2 = rows.get((t + dt.timedelta(hours=1)).strftime("%Y-%m-%d %H:%M")); i2 = _f(r2.get("icsr")) if r2 else None
+        if i1 is not None or i2 is not None:
+            G = ((i1 if i1 is not None else i2) + (i2 if i2 is not None else i1)) / 2 * 1e6 / 3600
+        else:
+            elev = sun_elev(reg["lat"], reg["lon"], t)
+            G = None
+            if elev > 0 and cl is not None:
+                c, _, _ = est_ghi(reg["lat"], reg["lon"], t, 1, 0)
+                G = c * (0.2 if rn > 0 else 1 - 0.75 * (cl / 10) ** 3.4)
+            elif elev <= 0: G = 0
+        prev = vals.get(t, {})
+        vals[t] = {"T": _f(r.get("ta")), "RH": _f(r.get("hm")), "G": round(G) if G is not None else prev.get("G"),
+                   "SKY": sky if sky is not None else prev.get("SKY"), "PTY": 1 if rn > 0 else 0,
+                   "VEC": _f(r.get("wd")), "WSD": _f(r.get("ws")), "R": rn, "src": "o"}
+    out = {"h0": hours[0].strftime("%Y-%m-%dT%H:%M")}
+    for k in ("T", "RH", "G", "SKY", "PTY", "VEC", "WSD", "R", "src"):
+        out[k] = [vals.get(t, {}).get(k) for t in hours]
+    if sum(1 for v in out["T"] if v is not None) < 6: return None
+    return out
+
+def build_region(reg, sun_db, sun_fresh, old=None):
     base, rows = get_short(reg["nx"], reg["ny"])
     by = {}
     tmn, tmx = {}, {}
@@ -432,7 +508,14 @@ def build_region(reg, sun_db, sun_fresh):
             "h0": h0, "T": T, "RH": RH, "R": Rr, "P": P,
             "SKY": SKY, "PTY": PTY, "VEC": VEC, "WSD": WSD, "G": G, "GC": GC, "EL": EL, "rad": rad,
             "days": out_days[:11], "risk": risk(T, RH, Rr), "sun": sun,
-            "solar": solar, "solar_score": solar_score}
+            "solar": solar, "solar_score": solar_score,
+            "past": _safe_past(reg, old, h0), "obs_stn": {"id": reg["asos"][0]["id"], "name": reg["asos"][0]["name"], "km": reg["asos"][0]["km"]}}
+
+def _safe_past(reg, old, h0):
+    try:
+        return build_past(reg, old, h0)
+    except Exception as e:
+        LOG["errors"].append("지난 시간 %s: %s" % (reg["code"], str(e)[:150])); return None
 
 def main():
     if not key():
@@ -452,6 +535,10 @@ def main():
         run_calibration()
     except Exception as e:
         LOG["calib"] = {"error": repr(e)[:200]}
+    try:
+        run_obs()
+    except Exception as e:
+        LOG["obs"] = {"error": repr(e)[:200]}
     lp = os.path.join(ROOT, "data", "solar", "log.json")
     try:
         SOLAR_LOG.update(json.load(open(lp, encoding="utf-8")))
@@ -460,8 +547,13 @@ def main():
     ok = fail = 0
     for reg in regions:
         try:
-            data = build_region(reg, sun_db, sun_fresh)
-            with open(os.path.join(ROOT, "data", "weather", reg["code"] + ".json"), "w", encoding="utf-8") as f:
+            wp = os.path.join(ROOT, "data", "weather", reg["code"] + ".json")
+            try:
+                old = json.load(open(wp, encoding="utf-8"))
+            except Exception:
+                old = None
+            data = build_region(reg, sun_db, sun_fresh, old)
+            with open(wp, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
             ok += 1
         except Exception as e:
