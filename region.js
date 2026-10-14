@@ -315,7 +315,7 @@
       var col = { '높음': '#e53935', '보통': '#f9a825', '낮음': '#43a047' };
       tiles += '<div class="lc-tile"><div class="lc-k">🦠 병 발생 위험 신호 (앞으로 ' + rk.hours + '시간)</div><ul class="lc-risk">'
         + rows.map(function (x) { return '<li><span><span class="lc-dot" style="background:' + col[x[2].lv] + '"></span>' + x[0] + ' <span style="color:#999;font-size:12px">' + x[1] + '</span></span><span class="lv-' + x[2].lv + '">' + x[2].lv + ' <span style="font-weight:400;color:#999;font-size:12px">' + x[2].h + '시간</span></span></li>'; }).join('')
-        + '</ul><div class="lc-s">바깥 기온·습도·비로 본 참고 신호입니다(발령 정보 아님). 병이 좋아하는 습하고 알맞은 기온이 이어지는 시간을 섷습니다.</div></div>';
+        + '</ul><div class="lc-s">바깥 기온·습도·비로 본 참고 신호입니다(발령 정보 아님). 병이 좋아하는 습하고 알맞은 기온이 이어지는 시간을 셌습니다.</div></div>';
     }
     // 5) 바람 (앞으로 24시간 + 3시간 단위 풍향 시간표)
     if (w.WSD && w.WSD.some(function (x) { return x != null; })) {
