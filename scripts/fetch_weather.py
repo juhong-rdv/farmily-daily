@@ -2,10 +2,13 @@
 """기상청 공공데이터로 '우리 지역' 카드 데이터를 만듭니다. GitHub Actions에서 실행.
 필요: 환경변수 KMA_SERVICE_KEY (공공데이터포털 '일반 인증키(Decoding)' — Encoding 키를 넣어도 자동으로 풀어 씁니다)
 활용신청 필요한 API 3종: 기상청_단기예보 조회서비스 / 기상청_중기예보 조회서비스 / 기상청_지상(종관, ASOS) 일자료 조회서비스
-출력: data/weather/<code>.json (시군별), data/sun.json (일조 하루 1회 캐시), data/weather/_status.json (실행 기록)"""
+출력: data/weather/<code>.json (시군별), data/sun.json (일조 하루 1회 캐시), data/solar/<지점>.json (10년 일사 보정)·log.json (예보 성적), data/weather/_status.json (실행 기록)"""
 import json, os, re, sys, time, datetime as dt
 from urllib.parse import unquote
 import requests
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import solar_calib as SC
+from kma_common import haversine
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 KST = dt.timezone(dt.timedelta(hours=9))
@@ -237,6 +240,103 @@ def risk(T, RH, R):
             "anth": {"h": anth, "lv": level(anth)}}
 
 _sun_tried = set()
+def station_sun(sid, sun_db):
+    sid = str(sid)
+    if sid not in _sun_tried and (sid not in sun_db["stations"] or sun_db["stations"][sid] is None):
+        _sun_tried.add(sid)
+        try:
+            sun_db["stations"][sid] = sun_for_station(int(sid))
+        except Exception as e:
+            LOG["errors"].append("ASOS %s: %s" % (sid, e)); sun_db["stations"][sid] = None
+    return sun_db["stations"].get(sid)
+
+CAL = {}          # 지점번호 → 일사 보정 자료
+SOLAR_LOG = {}    # 시군코드 → {날짜: {f: 전날 예보, o: 관측}}
+CAL_KM = 60
+
+def cal_candidates(lat, lon):
+    from build_regions import ASOS
+    c = [(haversine(lat, lon, s[2], s[3]), s) for s in ASOS]
+    return [(round(d), s) for d, s in sorted(c) if d <= CAL_KM][:4]
+
+def apply_calibration(reg, keys, G, GC, R, SKY, PTY, rad, sun_db):
+    """10년 관측으로 맞춘 비율로 하루 예상 일사량과 시간별 값을 고칩니다."""
+    pick = None
+    for km, st in cal_candidates(reg["lat"], reg["lon"]):
+        o = CAL.get(st[0])
+        if o and o.get("gsr"):
+            pick = (km, st, o); break
+    if not pick: return None, None
+    km, st, model = pick
+    for r in rad:
+        dkey = r["d"].replace("-", "")
+        idx = [i for i, k in enumerate(keys) if k[:8] == dkey]
+        csum = sum(GC[i] for i in idx)
+        if csum <= 0 or any(SKY[i] is None for i in idx if GC[i] > 0): continue
+        tenths = sum(GC[i] * (10.0 if (PTY[i] or 0) > 0 else SC.SKY_TENTHS.get(SKY[i], 7.0)) for i in idx) / csum
+        rain = sum(R[i] or 0 for i in idx) >= 1.0
+        month = int(dkey[4:6])
+        f = SC.factor(model, month, tenths, rain)
+        if not f: continue
+        clear = csum * 0.0036
+        est, lo, hi = clear * f[0], clear * f[1], clear * f[2]
+        ksum = sum(G[i] or 0 for i in idx) * 0.0036
+        if ksum > 0:
+            sc = est / ksum
+            for i in idx:
+                if G[i] is not None: G[i] = int(round(min(GC[i] * 1.05, G[i] * sc)))
+        doy = dt.date.fromisoformat(r["d"]).timetuple().tm_yday
+        r.update(est=round(est, 1), lo=round(lo, 1), hi=round(hi, 1), cloud=round(tenths, 1), rain=rain, cal=True,
+                 clim=(model.get("clim") or [None] * 367)[doy])
+    info = {"stn": model["stn"], "name": model["name"], "km": km, "first": model.get("first"), "last": model.get("last"),
+            "n": model.get("n"), "test": model.get("test")}
+    # 예보 성적 기록: 내일 예보를 남겨 두고, 관측이 들어오면 맞춰 봄
+    lg = SOLAR_LOG.setdefault(reg["code"], {})
+    tmr = (NOW.date() + dt.timedelta(days=1)).isoformat()
+    for r in rad:
+        if r["d"] == tmr and r.get("cal"):
+            e = lg.get(tmr, {}); e.update(f=r["est"], lo=r["lo"], hi=r["hi"], stn=model["stn"]); lg[tmr] = e
+    obs = station_sun(model["stn"], sun_db)
+    if obs and obs.get("gsr"):
+        d0 = dt.date.fromisoformat(obs["start"])
+        for j, g in enumerate(obs["gsr"]):
+            dd = (d0 + dt.timedelta(days=j)).isoformat()
+            if dd in lg and lg[dd].get("stn") == model["stn"]: lg[dd]["o"] = g
+    for dd in [x for x in lg if x < (NOW.date() - dt.timedelta(days=60)).isoformat()]: del lg[dd]
+    pairs = [v for v in lg.values() if "o" in v and "f" in v]
+    score = None
+    if pairs:
+        mae = sum(abs(v["f"] - v["o"]) for v in pairs) / len(pairs)
+        mean = sum(v["o"] for v in pairs) / len(pairs)
+        score = {"n": len(pairs), "mae": round(mae, 2), "mean": round(mean, 2),
+                 "inside": round(sum(1 for v in pairs if v["lo"] <= v["o"] <= v["hi"]) / len(pairs) * 100)}
+    return info, score
+
+def run_calibration():
+    """아직 보정 안 된 지점을 이번 실행에 몇 개씩 채웁니다(한 지점 = 기상청 호출 약 10회)."""
+    from build_regions import ASOS, full_regions
+    per_run = int(os.environ.get("CAL_PER_RUN", "35"))
+    for s in ASOS:
+        o = SC.load(ROOT, s[0])
+        if o: CAL[s[0]] = o
+    order = []
+    cands = [cal_candidates(r["lat"], r["lon"]) for r in full_regions()]
+    for rank in range(4):
+        for c in cands:
+            if rank < len(c) and c[rank][1] not in order: order.append(c[rank][1])
+    done, errs = 0, []
+    for st in order:
+        if done >= per_run: break
+        if not SC.needs(CAL.get(st[0]), NOW): continue
+        try:
+            o = SC.calibrate(st[0], st[1], st[2], st[3], call, items, NOW, LOG)
+            SC.save(ROOT, o); CAL[st[0]] = o; done += 1
+        except Exception as e:
+            errs.append("보정 %s %s: %s" % (st[0], st[1], str(e)[:150])); done += 1
+    LOG["calib"] = {"this_run": done, "have_gsr": sum(1 for o in CAL.values() if o.get("gsr")),
+                    "no_gsr": sum(1 for o in CAL.values() if not o.get("gsr")), "pending": sum(1 for st in order if SC.needs(CAL.get(st[0]), NOW)),
+                    "errors": errs[:10]}
+
 def build_region(reg, sun_db, sun_fresh):
     base, rows = get_short(reg["nx"], reg["ny"])
     by = {}
@@ -311,27 +411,25 @@ def build_region(reg, sun_db, sun_fresh):
     # 일조
     sun = None
     for s in reg["asos"]:
-        sid = str(s["id"])
-        if sid not in _sun_tried and (sid not in sun_db["stations"] or sun_db["stations"][sid] is None):
-            _sun_tried.add(sid)
-            try:
-                sun_db["stations"][sid] = sun_for_station(s["id"])
-            except Exception as e:
-                LOG["errors"].append("ASOS %s: %s" % (sid, e)); sun_db["stations"][sid] = None
-        v = sun_db["stations"].get(sid)
+        v = station_sun(s["id"], sun_db)
         if v:
             sun = dict(v, stn=s["name"], km=s["km"]); break
+    solar, solar_score = None, None
+    try:
+        solar, solar_score = apply_calibration(reg, keys, G, GC, Rr, SKY, PTY, rad, sun_db)
+    except Exception as e:
+        LOG["errors"].append("일사 보정 %s: %s" % (reg["code"], str(e)[:150]))
     return {"code": reg["code"], "sido": reg["sido"], "name": reg["name"],
             "updated": NOW.isoformat(timespec="minutes"), "short_base": base,
             "h0": h0, "T": T, "RH": RH, "R": Rr, "P": P,
             "SKY": SKY, "PTY": PTY, "VEC": VEC, "WSD": WSD, "G": G, "GC": GC, "EL": EL, "rad": rad,
-            "days": out_days[:11], "risk": risk(T, RH, Rr), "sun": sun}
+            "days": out_days[:11], "risk": risk(T, RH, Rr), "sun": sun,
+            "solar": solar, "solar_score": solar_score}
 
 def main():
     if not key():
         print("KMA_SERVICE_KEY 없음 — 건너뜁니다 (GitHub 저장소 Settings → Secrets에 등록하면 다음 실행부터 수집합니다).")
         return 0
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from build_regions import full_regions
     regions = full_regions()
     only = os.environ.get("ONLY_REGIONS")
@@ -342,6 +440,15 @@ def main():
         probe()
     except Exception as e:
         LOG["probe"] = repr(e)[:200]
+    try:
+        run_calibration()
+    except Exception as e:
+        LOG["calib"] = {"error": repr(e)[:200]}
+    lp = os.path.join(ROOT, "data", "solar", "log.json")
+    try:
+        SOLAR_LOG.update(json.load(open(lp, encoding="utf-8")))
+    except Exception:
+        pass
     ok = fail = 0
     for reg in regions:
         try:
@@ -357,6 +464,9 @@ def main():
                 break
     with open(os.path.join(ROOT, "data", "sun.json"), "w", encoding="utf-8") as f:
         json.dump(sun_db, f, ensure_ascii=False, separators=(",", ":"))
+    os.makedirs(os.path.dirname(lp), exist_ok=True)
+    with open(lp, "w", encoding="utf-8") as f:
+        json.dump(SOLAR_LOG, f, ensure_ascii=False, separators=(",", ":"))
     LOG["counts"] = {"ok": ok, "fail": fail, "regions": len(regions)}
     LOG["base"] = BASES[BASE_OK["i"]] if BASE_OK["i"] is not None else "접속 안 됨"
     LOG["finished"] = dt.datetime.now(KST).isoformat(timespec="minutes")
