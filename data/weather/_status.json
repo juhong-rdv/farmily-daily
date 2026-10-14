@@ -1,5 +1,5 @@
 {
- "started": "2026-10-14T12:29+09:00",
+ "started": "2026-10-14T14:17+09:00",
  "errors": [
   "1101 서울특별시: 단기예보 시간 자료 없음",
   "2101 부산광역시: 단기예보 시간 자료 없음",
@@ -15,5 +15,46 @@
   "regions": 167
  },
  "base": "https://apis.data.go.kr/1360000",
- "finished": "2026-10-14T12:29+09:00"
+ "samples": [
+  {
+   "path": "/VilageFcstInfoService_2.0/getVilageFcst",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 1000,
+    "base_date": "20261014",
+    "base_time": "1400",
+    "nx": 60,
+    "ny": 127
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"03\",\"resultMsg\":\"NO_DATA\"}}}"
+  },
+  {
+   "path": "/VilageFcstInfoService_2.0/getVilageFcst",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 1000,
+    "base_date": "20261014",
+    "base_time": "1400",
+    "nx": 98,
+    "ny": 76
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"03\",\"resultMsg\":\"NO_DATA\"}}}"
+  },
+  {
+   "path": "/VilageFcstInfoService_2.0/getVilageFcst",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 1000,
+    "base_date": "20261014",
+    "base_time": "1400",
+    "nx": 100,
+    "ny": 77
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"03\",\"resultMsg\":\"NO_DATA\"}}}"
+  }
+ ],
+ "finished": "2026-10-14T14:17+09:00"
 }
