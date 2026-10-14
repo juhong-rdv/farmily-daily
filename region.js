@@ -51,6 +51,8 @@
     + '#local-app .lc-orient{font-size:13px;color:#666;margin-top:8px}'
     + '#local-app .lc-orient select{font-size:13px;padding:3px 6px}'
     + '#local-app .lc-range{font-size:11px;color:#888;display:block}'
+    + '#local-app .lc-sim{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;background:#12341f;color:#fff;border-radius:10px;padding:12px 16px;text-decoration:none}'
+    + '#local-app .lc-sim b{font-size:16px}#local-app .lc-sim span{font-size:13px;opacity:.85}#local-app .lc-sim em{font-style:normal;background:#fff;color:#12341f;border-radius:16px;padding:4px 12px;font-weight:700;font-size:14px}'
     + '.lc-mark{background:#fff4c2;border-radius:3px;padding:0 2px}'
     + '@media (max-width:600px){#local-app .lc-grid{grid-template-columns:1fr}}';
   var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
@@ -396,7 +398,9 @@
       + '<div class="lc-s">그래프를 누르거나 손가락으로 훑으면 그 시각의 하늘·일사·기온·습도·강수·바람이 함께 나옵니다.</div></div>';
     var base = String(w.short_base || '');
     var bm = /^(\d{4})(\d\d)(\d\d) (\d\d)/.exec(base);
-    body.innerHTML = '<div class="lc-grid">' + tiles + '</div><div class="lc-foot">' + esc(r.sido + ' ' + r.name) + ' · 자료: 기상청 단기예보'
+    body.innerHTML = '<div class="lc-grid">' + tiles + '</div>'
+      + '<a class="lc-sim" href="' + BASE + 'sim.html?region=' + r.code + '" target="_blank" rel="noopener"><div><b>🏠 우리 하우스 시뮬레이션</b><br><span>하우스 크기·방향과 환기·커튼·차광·난방·관수 설정을 넣고, 이 예보로 하우스 안 온도·습도를 시간대별로 재생해 보세요 (토마토)</span></div><em>열기 →</em></a>'
+      + '<div class="lc-foot">' + esc(r.sido + ' ' + r.name) + ' · 자료: 기상청 단기예보'
       + (bm ? '(' + (+bm[2]) + '/' + (+bm[3]) + ' ' + bm[4] + '시 발표)' : '') + '·중기예보·종관기상관측(ASOS) · 바깥 날씨 기준이라 하우스 안 환경과는 다를 수 있습니다.</div>';
     var os_ = document.getElementById('lc-orient');
     if (os_) os_.onchange = function () { orient = this.value; ls('farmily.orient', orient); render(r, w); };
