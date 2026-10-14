@@ -1,17 +1,10 @@
 {
- "started": "2026-10-14T14:17+09:00",
- "errors": [
-  "1101 서울특별시: 단기예보 시간 자료 없음",
-  "2101 부산광역시: 단기예보 시간 자료 없음",
-  "2102 기장군: 단기예보 시간 자료 없음",
-  "2201 대구광역시: 단기예보 시간 자료 없음",
-  "2202 달성군: 단기예보 시간 자료 없음",
-  "연속 실패로 중단 — 접속 실패면 해외(GitHub 서버) 접속 차단, 키 오류면 승인·반영 대기(1~2시간)를 확인하세요."
- ],
+ "started": "2026-10-14T14:22+09:00",
+ "errors": [],
  "mid_invalid": [],
  "counts": {
-  "ok": 0,
-  "fail": 5,
+  "ok": 167,
+  "fail": 0,
   "regions": 167
  },
  "base": "https://apis.data.go.kr/1360000",
@@ -35,9 +28,9 @@
     "pageNo": 1,
     "numOfRows": 1000,
     "base_date": "20261014",
-    "base_time": "1400",
-    "nx": 98,
-    "ny": 76
+    "base_time": "1100",
+    "nx": 60,
+    "ny": 127
    },
    "http": 200,
    "text": "{\"response\":{\"header\":{\"resultCode\":\"03\",\"resultMsg\":\"NO_DATA\"}}}"
@@ -48,13 +41,90 @@
     "pageNo": 1,
     "numOfRows": 1000,
     "base_date": "20261014",
+    "base_time": "0800",
+    "nx": 60,
+    "ny": 127
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"0800\",\"category\":\"TMP\",\"fcstDate\":\"20261014\",\"fcstTime\":\"0900\",\"fcstValue\":\"13\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"0800\",\"category\":\"UUU\",\"fcstDate\":\"20261014\",\"fcstTime\":\"0900\",\"fcstValue\":\"2\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"0800\",\"category\":\"VVV\",\"fcstDate\":\"20261014\",\"fcstTime\":\"0900\",\"fcstValue\":\"-2.3\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261014\",\"baseTime\":\"0800\",\"category\":\"VEC\",\"fcstDate\":\"20261014\",\"fcstT"
+  }
+ ],
+ "probe": [
+  {
+   "test": "단기예보 최신",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 10,
+    "base_date": "20261014",
     "base_time": "1400",
-    "nx": 100,
-    "ny": 77
+    "nx": 60,
+    "ny": 127
    },
    "http": 200,
    "text": "{\"response\":{\"header\":{\"resultCode\":\"03\",\"resultMsg\":\"NO_DATA\"}}}"
+  },
+  {
+   "test": "단기예보 어제23시",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 10,
+    "base_date": "20261013",
+    "base_time": "2300",
+    "nx": 60,
+    "ny": 127
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261013\",\"baseTime\":\"2300\",\"category\":\"TMP\",\"fcstDate\":\"20261014\",\"fcstTime\":\"0000\",\"fcstValue\":\"14\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261013\",\"baseTime\":\"2300\",\"category\":\""
+  },
+  {
+   "test": "초단기실황",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 10,
+    "base_date": "20261014",
+    "base_time": "1300",
+    "nx": 60,
+    "ny": 127
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261014\",\"baseTime\":\"1300\",\"category\":\"PTY\",\"nx\":60,\"ny\":127,\"obsrValue\":\"0\"},{\"baseDate\":\"20261014\",\"baseTime\":\"1300\",\"category\":\"REH\",\"nx\":60,\"ny\":127,\"obsrValue\":\"24\"},{"
+  },
+  {
+   "test": "예보버전",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 10,
+    "ftype": "SHRT",
+    "basedatetime": "202610141400"
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"filetype\":\"SHRT\",\"version\":\"19700101090000\"}]},\"pageNo\":1,\"numOfRows\":10,\"totalCount\":1}}}"
+  },
+  {
+   "test": "중기기온 서울",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 10,
+    "regId": "11B10101",
+    "tmFc": "202610140600"
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"regId\":\"11B10101\",\"taMin4\":17,\"taMin4Low\":1,\"taMin4High\":1,\"taMax4\":22,\"taMax4Low\":1,\"taMax4High\":1,\"taMin5\":14,\"taMin5Low\":1,\"taMin5High\":1,\"taMax5\":20,\"taMax5Low\":1,\"taMax5High\":1,\"t"
+  },
+  {
+   "test": "ASOS 서울 어제",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 10,
+    "dataCd": "ASOS",
+    "dateCd": "DAY",
+    "startDt": "20261013",
+    "endDt": "20261013",
+    "stnIds": 108
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"108\",\"stnNm\":\"서울\",\"tm\":\"2026-10-13\",\"avgTa\":\"17.8\",\"minTa\":\"14.6\",\"minTaHrmt\":\"2358\",\"maxTa\":\"22.4\",\"maxTaHrmt\":\"0001\",\"mi10MaxRn\":\"2.1\",\"mi10MaxRnHrmt\":\"603\",\"hr1MaxRn\":\"5.6\","
   }
  ],
- "finished": "2026-10-14T14:17+09:00"
+ "finished": "2026-10-14T14:26+09:00"
 }
