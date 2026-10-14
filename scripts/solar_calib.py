@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 """예상 일사량 보정: 종관기상관측(ASOS) 일자료 10년치(일사량 sumGsr·평균 전운량 avgTca·강수량 sumRn)로
 지점별 '맑은 날 대비 실제 일사 비율'을 구름 양·비 여부에 따라 맞추고, 최근 2년은 떼어 두고 시험해 오차를 기록합니다.
-출력: data/solar/<지점번호>.json  (fetch_weather.py 가 하루 몇 개 지점씩 채워 나갑니다)"""
-import json, math, os, datetime as dt
+한 번 받은 관측은 data/solar/raw/<지점번호>.csv 에 쌓아 두고, 이후에는 새로 생긴 날만 받아 덧붙인 뒤
+쌓인 전체 자료로 다시 맞춥니다(해가 갈수록 자료가 10년보다 길어짐).
+출력: data/solar/<지점번호>.json (보정 결과), data/solar/raw/<지점번호>.csv (일별 관측 누적)"""
+import csv, json, math, os, datetime as dt
 
 KST = dt.timezone(dt.timedelta(hours=9))
 EDGES = [0, 2, 4, 6, 8, 9, 10.01]          # 평균 전운량(할) 구간
 SKY_TENTHS = {1: 2.0, 3: 7.0, 4: 9.5}      # 단기예보 하늘상태 → 대표 전운량(맑음 0~5, 구름많음 6~8, 흐림 9~10할)
-STALE_DAYS = 180
+NOGSR_RECHECK_DAYS = 30
+COLS = ["tm", "sumGsr", "avgTca", "sumRn", "sumSsHr", "avgTa", "minTa", "maxTa", "avgRhm", "avgWs"]
 
 def _elev(lat, lon, doy, minutes):
     g = 2 * math.pi / 365 * (doy - 1 + (minutes / 60 - 12) / 24)
@@ -73,27 +76,73 @@ def factor(model, month, tenths, rain):
     if b["med"] is None: return None
     return kk * b["med"], kk * b["p25"], kk * b["p75"]
 
-def calibrate(stn, name, lat, lon, call, items, now, log):
-    end = (now - dt.timedelta(days=1)).date()
-    first = end.replace(year=end.year - 10) + dt.timedelta(days=1)
-    raw, seen_gsr = [], False
-    y = end.year
-    while y >= first.year:
-        a = max(first, dt.date(y, 1, 1)); b = min(end, dt.date(y, 12, 31))
+def raw_path(root, stn):
+    return os.path.join(root, "data", "solar", "raw", "%s.csv" % stn)
+
+def load_raw(root, stn):
+    out = {}
+    try:
+        with open(raw_path(root, stn), encoding="utf-8", newline="") as f:
+            for r in csv.DictReader(f):
+                if r.get("tm"): out[r["tm"]] = r
+    except FileNotFoundError:
+        pass
+    return out
+
+def save_raw(root, stn, raw):
+    os.makedirs(os.path.dirname(raw_path(root, stn)), exist_ok=True)
+    with open(raw_path(root, stn), "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=COLS, extrasaction="ignore", lineterminator="\n")
+        w.writeheader()
+        for d in sorted(raw):
+            w.writerow({c: (raw[d].get(c) if raw[d].get(c) is not None else "") for c in COLS})
+
+def _fetch(call, items, stn, a, b):
+    """a~b 기간 일자료를 1년 단위로 받아 목록으로."""
+    out, y = [], b.year
+    while y >= a.year:
+        s0 = max(a, dt.date(y, 1, 1)); e0 = min(b, dt.date(y, 12, 31))
         body = call("/AsosDalyInfoService/getWthrDataList", {"pageNo": 1, "numOfRows": 400, "dataCd": "ASOS", "dateCd": "DAY",
-                    "startDt": a.strftime("%Y%m%d"), "endDt": b.strftime("%Y%m%d"), "stnIds": stn})
-        it = items(body)
-        if it and "sumGsr" not in it[0] and not log.get("calib_keys"):
-            log["calib_keys"] = sorted(it[0].keys())  # 진단: 항목 이름이 다를 때 확인용
-        got = [r for r in it if r.get("sumGsr") not in (None, "")]
-        if got: seen_gsr = True
-        raw += it
-        if y == end.year - 1 and not seen_gsr:  # 올해·작년 모두 일사 관측이 없으면 일사 관측 안 하는 지점
-            return {"stn": stn, "name": name, "gsr": False, "updated": now.date().isoformat()}
+                    "startDt": s0.strftime("%Y%m%d"), "endDt": e0.strftime("%Y%m%d"), "stnIds": stn})
+        out.append((y, items(body)))
         y -= 1
+    return out
+
+def update(stn, name, lat, lon, call, items, now, log, root, prev=None):
+    """관측 누적 파일을 채우고(처음엔 10년, 그다음부터는 새 날짜만) 전체로 다시 맞춥니다."""
+    end = (now - dt.timedelta(days=1)).date()
+    raw = load_raw(root, stn)
+    if raw:
+        last = dt.date.fromisoformat(max(raw))
+        start = min(last, end) - dt.timedelta(days=3)  # 최근 며칠은 늦게 고쳐지는 값이 있어 다시 받음
+        for _, it in _fetch(call, items, stn, start, end):
+            for r in it:
+                if r.get("tm"): raw[r["tm"]] = {c: r.get(c, "") for c in COLS}
+    else:
+        first = end.replace(year=end.year - 10) + dt.timedelta(days=1)
+        seen, y = False, end.year
+        while y >= first.year:
+            s0 = max(first, dt.date(y, 1, 1)); e0 = min(end, dt.date(y, 12, 31))
+            body = call("/AsosDalyInfoService/getWthrDataList", {"pageNo": 1, "numOfRows": 400, "dataCd": "ASOS", "dateCd": "DAY",
+                        "startDt": s0.strftime("%Y%m%d"), "endDt": e0.strftime("%Y%m%d"), "stnIds": stn})
+            it = items(body)
+            if it and "sumGsr" not in it[0] and not log.get("calib_keys"):
+                log["calib_keys"] = sorted(it[0].keys())  # 진단: 항목 이름이 다를 때 확인용
+            if any(r.get("sumGsr") not in (None, "") for r in it): seen = True
+            for r in it:
+                if r.get("tm"): raw[r["tm"]] = {c: r.get(c, "") for c in COLS}
+            if y == end.year - 1 and not seen:  # 올해·작년 모두 일사 관측이 없으면 일사 관측 안 하는 지점
+                return {"stn": stn, "name": name, "gsr": False, "updated": now.date().isoformat()}
+            y -= 1
+    save_raw(root, stn, raw)
+    res = build_model(stn, name, lat, lon, raw, end, now)
+    res["fetched"] = "추가" if prev and prev.get("gsr") else "처음 10년"
+    return res
+
+def build_model(stn, name, lat, lon, raw, end, now):
     CL = clear_day_table(lat, lon)
     rows = []
-    for r in raw:
+    for r in raw.values():
         try:
             d = dt.date.fromisoformat(r["tm"]); g = float(r["sumGsr"]); t = float(r["avgTca"])
         except Exception:
@@ -128,7 +177,7 @@ def calibrate(stn, name, lat, lon, call, items, now, log):
                         "naive_mae": round(sum(naive) / len(naive), 2), "naive_pct": round(sum(naive) / len(naive) / mean * 100),
                         "inside": round(inside / len(err) * 100)}
     model = fit([(r[1], r[2], r[3], r[4]) for r in rows])
-    # 평년(지난 10년) 같은 날짜 ±7일 평균 일사량
+    # 평년: 쌓인 전체 해의 같은 날짜 ±7일 평균 일사량
     by = {}
     for r in rows: by.setdefault(r[7], []).append(r[5])
     clim = [None]
@@ -152,10 +201,15 @@ def save(root, obj):
     with open(os.path.join(root, "data", "solar", "%s.json" % obj["stn"]), "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
 
-def needs(obj, now):
+def needs_full(obj, now):
+    """처음 받기(또는 '일사 관측 없음' 판정 한 달 뒤 재확인)."""
     if not obj: return True
+    if obj.get("gsr"): return False
     try:
-        age = (now.date() - dt.date.fromisoformat(obj["updated"])).days
-        return age > (STALE_DAYS if obj.get("gsr") else 30)  # 일사 관측 없음 판정은 한 달 뒤 다시 확인
+        return (now.date() - dt.date.fromisoformat(obj["updated"])).days > NOGSR_RECHECK_DAYS
     except Exception:
         return True
+
+def needs_add(obj, now):
+    """이미 쌓인 지점: 하루 한 번 새 날짜만 덧붙이고 다시 맞춤."""
+    return bool(obj and obj.get("gsr") and obj.get("updated") != now.date().isoformat())
