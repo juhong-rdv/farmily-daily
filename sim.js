@@ -148,11 +148,13 @@
     var c = COORD[S.region] || [36.5, 127.5];
     var keepIdx = player.idx, keepT = result && result.frames[Math.floor(keepIdx)] ? result.frames[Math.floor(keepIdx)].t : null;
     var old = result ? result.summary : null;
-    result = F.run(weather, c[0], c[1], S.house, S.crop, S.stage, S.ctrl);
+    result = F.run(weather, c[0], c[1], S.house, S.crop, S.stage, S.ctrl, { cal: activeCal() });
     if (old) prevSummary = old;
     var r = find(S.region), g = result.geom;
     $('status').innerHTML = esc(r ? r.sido + ' ' + r.name : '') + ' · 바닥 ' + Math.round(g.A).toLocaleString() + 'm² · 부피 ' + Math.round(g.V).toLocaleString() + 'm³ · 피복 표면 ' + Math.round(g.Ac).toLocaleString() + 'm² · ' + result.plants.toLocaleString() + '주'
-      + ' · 기상청 ' + String(weather.short_base || '').replace(/^(\d{4})(\d\d)(\d\d) (\d\d).*/, function (m, a, b, c2, d) { return (+b) + '/' + (+c2) + ' ' + d + '시'; }) + ' 발표 예보';
+      + ' · 기상청 ' + String(weather.short_base || '').replace(/^(\d{4})(\d\d)(\d\d) (\d\d).*/, function (m, a, b, c2, d) { return (+b) + '/' + (+c2) + ' ' + d + '시'; }) + ' 발표 예보'
+      + (result.preH ? ' · 직전 ' + result.preH + '시간 바깥 자료로 출발' : '')
+      + (activeCal() ? ' · <b style="color:#15803d">실측 보정 적용 중</b>' : '');
     var fr = result.frames;
     player.idx = 0;
     if (keepT != null) for (var i = 0; i < fr.length; i++) if (fr[i].t >= keepT) { player.idx = i; break; }
@@ -441,9 +443,158 @@
       + (prevSummary ? '<p class="note">작은 글씨 숫자는 바로 전 설정과 비교한 변화입니다(초록 = 좋아짐).</p>' : '');
   }
 
+
+  // ---------- 실제 기록으로 보정 ----------
+  function savedCal() { try { var o = JSON.parse(ls('farmily.sim.cal') || 'null'); return o && o.cal ? o : null; } catch (e) { return null; } }
+  function activeCal() { var o = savedCal(); return o && o.on ? o.cal : null; }
+  var obsCache = {};
+  function loadObs(stn) {
+    if (obsCache[stn]) return Promise.resolve(obsCache[stn]);
+    return fetch(BASE + 'data/obs/' + stn + '.csv', { cache: 'no-store' }).then(function (x) { if (!x.ok) throw 0; return x.text(); }).then(function (t) {
+      var lines = t.trim().split(/\r?\n/), head = lines[0].split(','), m = {};
+      for (var i = 1; i < lines.length; i++) { var v = lines[i].split(','), r = {}; head.forEach(function (h, j) { r[h] = v[j]; }); m[r.tm] = r; }
+      obsCache[stn] = m; return m;
+    }).catch(function () { obsCache[stn] = {}; return {}; });
+  }
+  function num(v) { var x = parseFloat(v); return isNaN(x) ? null : x; }
+  function hkey(ms) { var d = kst(ms); return d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + d.getUTCDate()).slice(-2) + ' ' + ('0' + d.getUTCHours()).slice(-2) + ':00'; }
+  // 기록 기간의 바깥 시간별 자료: ASOS 관측 > 지난 시간 자료 > 예보
+  function driverFor(t0, t1, obs) {
+    var c = COORD[S.region] || [36.5, 127.5], H = 3600000;
+    var a = Math.floor(t0 / H) * H, b = Math.ceil(t1 / H) * H, n = Math.round((b - a) / H) + 1;
+    var src = {};
+    function put(t, v) { if (v && v.T != null) src[t] = v; }
+    function fromW(o, h0s, nn) { if (!o || !o.T) return; var h0 = Date.parse(h0s + ':00+09:00'); for (var i = 0; i < Math.min(o.T.length, nn || 1e9); i++) put(h0 + i * H, { T: o.T[i], RH: o.RH && o.RH[i], G: o.G && o.G[i], SKY: o.SKY && o.SKY[i], PTY: o.PTY && o.PTY[i], VEC: o.VEC && o.VEC[i], WSD: o.WSD && o.WSD[i], R: o.R && o.R[i] }); }
+    fromW(weather, weather.h0, F.hourlyLen(weather, c[0], c[1]));
+    if (weather.past) fromW(weather.past, weather.past.h0);
+    var nObs = 0;
+    for (var i = 0; i < n; i++) {
+      var t = a + i * H, r = obs[hkey(t)]; if (!r || num(r.ta) == null) continue;
+      var r2 = obs[hkey(t + H)], i1 = num(r.icsr), i2 = r2 ? num(r2.icsr) : null, cl = num(r.dc10Tca), rn = num(r.rn) || 0, G;
+      if (i1 != null || i2 != null) G = ((i1 != null ? i1 : i2) + (i2 != null ? i2 : i1)) / 2 * 1e6 / 3600;
+      else { var sp = F.sunPos(c[0], c[1], new Date(t)), cz = Math.sin(Math.max(0, sp.el) * Math.PI / 180); G = sp.el > 0 ? 1098 * cz * Math.exp(-0.057 / Math.max(cz, 0.01)) * (rn > 0 ? 0.2 : 1 - 0.75 * Math.pow((cl == null ? 5 : cl) / 10, 3.4)) : 0; }
+      put(t, { T: num(r.ta), RH: num(r.hm), G: G, SKY: cl == null ? 1 : cl <= 5 ? 1 : cl <= 8 ? 3 : 4, PTY: rn > 0 ? 1 : 0, VEC: num(r.wd), WSD: num(r.ws), R: rn }); nObs++;
+    }
+    var w = { h0: kst(a).toISOString().slice(0, 16), T: [], RH: [], G: [], SKY: [], PTY: [], VEC: [], WSD: [], R: [] }, miss = 0;
+    for (i = 0; i < n; i++) { var v = src[a + i * H]; if (!v) miss++; ['T', 'RH', 'G', 'SKY', 'PTY', 'VEC', 'WSD', 'R'].forEach(function (k) { w[k].push(v ? (v[k] == null ? null : v[k]) : null); }); }
+    return { w: w, miss: miss, n: n, nObs: nObs };
+  }
+  function parseCSV(text) {
+    var lines = text.replace(/^﻿/, '').split(/\r?\n/).filter(function (l) { return l.trim(); });
+    if (lines.length < 3) throw '기록이 너무 적습니다.';
+    var dl = [',', '\t', ';'].sort(function (x, y) { return lines[0].split(y).length - lines[0].split(x).length; })[0];
+    var head = lines[0].split(dl).map(function (h) { return h.replace(/"/g, '').trim(); });
+    function col(re, not) { for (var i = 0; i < head.length; i++) if (re.test(head[i]) && !(not && not.test(head[i]))) return i; return -1; }
+    var cDT = col(/일시|시각|datetime|timestamp/i), cD = col(/날짜|date|일자/i), cT = col(/^시간$|^time$|시간\(|시:분/i);
+    if (cDT < 0 && cD >= 0 && cT < 0) cDT = cD;
+    var cTi = col(/(안|내부|실내|하우스|in).*(온도|temp)|^온도|temp/i, /외부|바깥|외기|out|지온|토양|습도/i);
+    var cRH = col(/(안|내부|실내|하우스|in)?.*(습도|hum|rh)/i, /외부|바깥|외기|out/i);
+    if (cTi < 0) throw '온도 열을 찾지 못했습니다. 첫 줄 제목에 "안온도"를 넣어 주세요.';
+    if (cDT < 0 && cD < 0) throw '시각 열을 찾지 못했습니다. 첫 줄 제목에 "시각"을 넣어 주세요.';
+    var recs = [];
+    for (var i = 1; i < lines.length; i++) {
+      var v = lines[i].split(dl).map(function (x) { return x.replace(/"/g, '').trim(); });
+      var ds = cDT >= 0 ? v[cDT] : v[cD] + ' ' + (cT >= 0 ? v[cT] : '');
+      var m = /(\d{4})[-./년 ]\s*(\d{1,2})[-./월 ]\s*(\d{1,2})[^\d]+(\d{1,2})[:시]\s*(\d{1,2})?/.exec(ds);
+      if (!m) continue;
+      var t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +(m[5] || 0)) - 9 * 3600000;
+      var Ti = num(v[cTi]); if (Ti == null || Ti < -20 || Ti > 60) continue;
+      var RHi = cRH >= 0 ? num(v[cRH]) : null; if (RHi != null && (RHi < 5 || RHi > 100)) RHi = null;
+      recs.push({ t: t, Ti: Ti, RHi: RHi });
+    }
+    recs.sort(function (a, b) { return a.t - b.t; });
+    if (recs.length < 6) throw '읽을 수 있는 기록이 6개 미만입니다. 시각 형식(예: 2026-10-13 14:00)을 확인해 주세요.';
+    return recs;
+  }
+  function readFile(file) {
+    return file.arrayBuffer().then(function (buf) {
+      try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch (e) { return new TextDecoder('euc-kr').decode(buf); }
+    });
+  }
+  function describe(k, v) {
+    var pct = Math.round((v - 1) * 100); if (Math.abs(pct) < 4) return '예상과 비슷';
+    var up = pct > 0, a = Math.abs(pct) + '%';
+    if (k === 'kU') return up ? '열이 예상보다 ' + a + ' 잘 빠짐 (피복 노후·이음매 확인)' : '보온이 예상보다 ' + a + ' 좋음';
+    if (k === 'kInf') return up ? '틈새 바람이 예상보다 ' + a + ' 많음 (출입문·측창 밑 틈 확인)' : '밀폐가 예상보다 ' + a + ' 좋음';
+    if (k === 'kTau') return up ? '햇빛이 예상보다 ' + a + ' 잘 들어옴' : '햇빛이 예상보다 ' + a + ' 덜 들어옴 (필름 오염·노후)';
+    return up ? '창을 열면 환기가 예상보다 ' + a + ' 잘 됨' : '환기가 예상보다 ' + a + ' 덜 됨 (방충망 막힘·주변 장애물)';
+  }
+  function calChart(recs, rb, ra) {
+    var Wc = Math.max(320, Math.round($('calout').clientWidth || 800)), Hc = 200, L = 40, R = 10, T = 14, B = 26;
+    var t0 = recs[0].t, t1 = recs[recs.length - 1].t, vals = recs.map(function (r) { return r.Ti; });
+    function pick(fr) { return fr.filter(function (f) { return f.t >= t0 && f.t <= t1; }); }
+    var fb = pick(rb.frames), fa = pick(ra.frames);
+    fb.concat(fa).forEach(function (f) { vals.push(f.Ti); });
+    var lo = Math.floor(Math.min.apply(null, vals) / 5) * 5, hi = Math.ceil(Math.max.apply(null, vals) / 5) * 5; if (hi - lo < 10) hi = lo + 10;
+    function X(t) { return (L + (t - t0) / Math.max(1, t1 - t0) * (Wc - L - R)).toFixed(1); } function Y(v) { return (Hc - B - (v - lo) / (hi - lo) * (Hc - B - T)).toFixed(1); }
+    var o = '<svg viewBox="0 0 ' + Wc + ' ' + Hc + '" style="width:100%;height:auto;display:block">';
+    for (var v = lo; v <= hi; v += 5) o += '<line x1="' + L + '" x2="' + (Wc - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="#e5e7eb"/><text x="' + (L - 5) + '" y="' + (+Y(v) + 4) + '" font-size="10" fill="#888" text-anchor="end">' + v + '</text>';
+    function line(fr, col, w, dash) { var d = ''; fr.forEach(function (f, i) { d += (i ? 'L' : 'M') + X(f.t) + ' ' + Y(f.Ti); }); return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
+    o += line(fb, '#94a3b8', 1.5, '5 4') + line(fa, '#c2410c', 2.5);
+    var every = Math.max(1, Math.round(recs.length / 300));
+    recs.forEach(function (r, i) { if (i % every === 0) o += '<circle cx="' + X(r.t) + '" cy="' + Y(r.Ti) + '" r="2.4" fill="#0f172a" opacity=".55"/>'; });
+    var d0 = kst(t0); o += '<text x="' + L + '" y="' + (Hc - 8) + '" font-size="10" fill="#666">' + tlabel(t0) + '</text><text x="' + (Wc - R) + '" y="' + (Hc - 8) + '" font-size="10" fill="#666" text-anchor="end">' + tlabel(t1) + '</text></svg>';
+    return '<div class="leg"><span><i style="border-top:3px solid #0f172a;opacity:.6"></i>실측(점)</span><span><i style="border-top:2px dashed #94a3b8"></i>보정 전 모델</span><span><i style="border-top:3px solid #c2410c"></i>보정 후 모델</span></div>' + o;
+  }
+  function runCal(recs, demo) {
+    var c = COORD[S.region] || [36.5, 127.5], out = $('calout');
+    out.innerHTML = '<p class="note">계산 중…</p>';
+    var t0 = recs[0].t, t1 = recs[recs.length - 1].t;
+    if (t1 - t0 < 12 * 3600000) { out.innerHTML = '<p class="warnbox">기록이 12시간 이상이어야 맞출 수 있습니다(가능하면 낮·밤이 들어간 2~3일).</p>'; return; }
+    var pre = demo ? Promise.resolve({}) : loadObs(weather.obs_stn ? weather.obs_stn.id : '');
+    pre.then(function (obs) {
+      var dv;
+      if (demo) { dv = { w: Object.assign({}, weather, { past: null }), miss: 0, n: 1, nObs: 0 }; }
+      else { dv = driverFor(t0 - 6 * 3600000, t1 + 3600000, obs); }
+      if (dv.miss > dv.n * 0.2) { out.innerHTML = '<p class="warnbox">이 기간의 바깥 날씨 자료가 부족합니다(' + dv.miss + '/' + dv.n + '시간 없음). 관측소 시간자료는 최근 35일부터 쌓이고 있으니, 그 안의 기록을 올려 주세요. (관측소: ' + esc(weather.obs_stn ? weather.obs_stn.name : '-') + ')</p>'; return; }
+      setTimeout(function () {
+        var res = F.calibrate(dv.w, c[0], c[1], S.house, S.crop, S.stage, S.ctrl, recs);
+        var rows = F.CAL_PARAMS.map(function (p) { return '<tr><th>' + p.name + '</th><td>× ' + res.cal[p.k].toFixed(2) + (demo && demo[p.k] ? ' <small style="color:#888">(가상 정답 × ' + demo[p.k].toFixed(2) + ')</small>' : '') + '</td><td>' + describe(p.k, res.cal[p.k]) + '</td></tr>'; }).join('')
+          + (demo ? '<tr><td colspan="3" class="note">창을 연 시간이 짧은 기간이면 환기 효율처럼 잘 드러나지 않는 항목이 생깁니다. 기록이 길고 날씨가 다양할수록 정확해집니다.</td></tr>' : '');
+        out.innerHTML = (demo ? '<p class="warnbox">🧪 <b>가상 예시입니다 — 실제 측정값이 아닙니다.</b> 이 예보 기간에 "보온 30% 나쁨·틈새 80% 많음·햇빛 10% 적음·환기 25% 덜 됨"인 가상의 하우스를 만들어 30분마다 온도·습도를 기록했다고 치고(측정 오차 ±0.4℃ 포함), 보정이 그 차이를 얼마나 찾아내는지 보여 줍니다.</p>' : '')
+          + '<p>기록 <b>' + recs.length + '개</b> (' + tlabel(t0) + ' ~ ' + tlabel(t1) + ')' + (demo ? '' : ' · 바깥 자료: ' + esc(weather.obs_stn.name) + ' 관측소 ' + dv.nObs + '시간 + 예보·지난 자료') + '</p>'
+          + '<p>하우스 안 온도 평균 오차: 보정 전 <b>±' + f1(res.before.rmse) + '℃</b> → 보정 후 <b style="color:#15803d">±' + f1(res.after.rmse) + '℃</b>'
+          + (res.after.rmseRH != null ? ' · 습도 ±' + Math.round(res.before.rmseRH) + '% → ±' + Math.round(res.after.rmseRH) + '%' : '') + '</p>'
+          + '<table class="sumt calt">' + rows + '</table>' + calChart(recs, res.beforeRun, res.afterRun)
+          + (demo ? '<p class="note">가상 예시라 적용 버튼은 없습니다. 실제 기록 파일을 올리면 이 하우스에 맞춘 값을 예보 시뮬레이션에 적용할 수 있습니다.</p>'
+            : '<p><button class="btn" id="calapply" type="button">이 보정을 예보 시뮬레이션에 적용</button></p><p class="note">기록 기간의 자동제어 설정은 지금 입력된 값과 같다고 보고 맞췄습니다. 그동안 설정을 바꿨다면 결과가 달라질 수 있습니다.</p>');
+        var ap = $('calapply');
+        if (ap) ap.onclick = function () { ls('farmily.sim.cal', JSON.stringify({ on: true, cal: res.cal, rmse: res.after.rmse, n: recs.length, from: t0, to: t1, made: Date.now() })); showCalState(); simulate(); };
+      }, 30);
+    });
+  }
+  function showCalState() {
+    var o = savedCal(), el = $('calstate'); if (!el) return;
+    if (!o) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="okbox">' + (o.on ? '✅ 실측 보정 적용 중' : '⏸ 저장된 보정(꺼짐)') + ' · 기록 ' + o.n + '개(' + tlabel(o.from) + '~' + tlabel(o.to) + ') · 맞춘 뒤 오차 ±' + f1(o.rmse) + '℃ '
+      + '<button class="btn ghost sm" id="caltoggle" type="button">' + (o.on ? '끄기' : '켜기') + '</button> <button class="btn ghost sm" id="caldel" type="button">지우기</button></div>';
+    $('caltoggle').onclick = function () { o.on = !o.on; ls('farmily.sim.cal', JSON.stringify(o)); showCalState(); simulate(); };
+    $('caldel').onclick = function () { try { localStorage.removeItem('farmily.sim.cal'); } catch (e) {} showCalState(); simulate(); };
+  }
+  function initCal() {
+    showCalState();
+    $('calfile').onchange = function () {
+      var f = this.files && this.files[0]; if (!f) return;
+      readFile(f).then(function (txt) { var recs = parseCSV(txt); runCal(recs, false); }).catch(function (e) { $('calout').innerHTML = '<p class="warnbox">' + esc(typeof e === 'string' ? e : '파일을 읽지 못했습니다.') + '</p>'; });
+      this.value = '';
+    };
+    $('caltpl').onclick = function () {
+      var blob = new Blob(['﻿시각,안온도,안습도\n2026-10-13 06:00,,\n2026-10-13 06:10,,\n'], { type: 'text/csv' });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '하우스_온도기록_양식.csv'; document.body.appendChild(a); a.click(); a.remove();
+    };
+    $('caldemo').onclick = function () {
+      if (!weather) return;
+      var c = COORD[S.region] || [36.5, 127.5], hidden = { kU: 1.3, kInf: 1.8, kTau: 0.9, kVent: 0.75 };
+      var truth = F.run(Object.assign({}, weather, { past: null }), c[0], c[1], S.house, S.crop, S.stage, S.ctrl, { cal: hidden, noPast: true });
+      var seed = 7; function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+      var recs = truth.frames.filter(function (f, i) { return i % 3 === 0 && i > 36; }).map(function (f) { return { t: f.t, Ti: Math.round((f.Ti + (rnd() - 0.5) * 0.8) * 10) / 10, RHi: Math.round(f.RHi + (rnd() - 0.5) * 4) }; });
+      runCal(recs, hidden);
+    };
+  }
+
   // ---------- 시작 ----------
   function init() {
-    buildForms();
+    buildForms(); initCal();
     $('play').onclick = function () { if (!result) return; if (player.idx >= result.frames.length - 1) player.idx = 0; player.playing = !player.playing; this.textContent = player.playing ? '⏸ 멈춤' : '▶ 재생'; };
     $('seek').oninput = function () { player.idx = +this.value; player.playing = false; $('play').textContent = '▶ 재생'; renderFrame(0, true); };
     $('speed').onchange = function () { player.speed = +this.value; };
