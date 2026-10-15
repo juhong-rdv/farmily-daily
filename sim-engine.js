@@ -91,7 +91,7 @@
         // 예상 일사는 '정시 앞뒤 30분 평균' 값이라 그대로 보간
         return { T: at(w.T, i, f), RH: at(w.RH, i, f), G: Math.max(0, at(w.G || [], i, f) || 0), GC: Math.max(0, at(w.GC || [], i, f) || 0),
           ws: s1 + (s2 - s1) * f, wd: (Math.atan2(vx, vy) / D2R + 360) % 360,
-          sky: w.SKY ? w.SKY[k] : 1, pty: w.PTY ? w.PTY[k] : 0, rain: w.R ? w.R[k] || 0 : 0 };
+          sky: w.SKY ? w.SKY[k] : 1, pty: w.PTY ? w.PTY[k] : 0, rain: w.R ? w.R[k] || 0 : 0, pop: w.P ? w.P[k] : null };
       }
     };
   }
@@ -112,6 +112,7 @@
         preH = n - st0; wd = { h0: '', T: [], RH: [], G: [], SKY: [], PTY: [], VEC: [], WSD: [], R: [] };
         var d0 = new Date(ph0 + 9 * 3600000); wd.h0 = d0.toISOString().slice(0, 16);
         ['T', 'RH', 'G', 'SKY', 'PTY', 'VEC', 'WSD', 'R'].forEach(function (k) { wd[k] = (P[k] || []).slice(st0).concat((w[k] || []).slice(0, nF)); });
+        if (w.P) { wd.P = []; for (var pi = st0; pi < n; pi++) wd.P.push(P.P ? P.P[pi] : null); wd.P = wd.P.concat(w.P.slice(0, nF)); }  // 강수확률(지난 시간은 없음)
       }
     }
     var S = sampler(wd, preH + nF), dt = 60;
@@ -158,9 +159,13 @@
       if (nRoof) { tRoof = Math.min(1, need / 0.5); tSide = Math.max(0, (need - 0.3) / 0.7); if (!day && c.nightDehum && need === 0.05) { tRoof = 0.1; tSide = 0; } }
       var maxSide = 1;
       if (To < c.coldOut) maxSide = Math.min(maxSide, c.coldOpen / 100);
-      if (o.pty > 0) { if (c.rainRoofClose) tRoof = 0; maxSide = Math.min(maxSide, 0.5); }
+      // 비·눈: 천창 닫기(설정), 측창은 최대 50% · 강한 비(시간당 3mm 이상·소나기)는 20%,
+      //        바람(3m/s 이상)과 함께 오면 빗물이 들이치는 바람받이 쪽 측창은 10%까지만
+      var wetNow = o.pty > 0 || o.rain > 0, heavy = o.pty === 4 || o.rain >= 3;
+      if (wetNow) { if (c.rainRoofClose) tRoof = 0; maxSide = Math.min(maxSide, heavy ? 0.2 : 0.5); }
       var cA = Math.cos((o.wd - nA) * D2R), cB = Math.cos((o.wd - nB) * D2R);  // 바람이 그쪽에서 불어오면 1
       var tA = Math.min(tSide, maxSide), tB = Math.min(tSide, maxSide);
+      if (wetNow && o.ws >= 3) { if (cA > 0.3) tA = Math.min(tA, 0.1); if (cB > 0.3) tB = Math.min(tB, 0.1); }
       if (o.ws >= c.windLimit) { if (cA > 0.3) tA = Math.min(tA, c.windOpen / 100); if (cB > 0.3) tB = Math.min(tB, c.windOpen / 100); tRoof = Math.min(tRoof, 0.3); }
       if (o.ws >= c.stormLimit) { tA = 0; tB = 0; tRoof = 0; }
       // 커튼: 밤에 외기 기준 이하면 닫고, 아침 일사 기준 넘으면 연다
@@ -180,9 +185,11 @@
       var lE = Math.max(0, 0.6 * fc * Rin + 10 * lai * VPDi);   // 증산 잠열 (W/m²)
       var Rsoil = (1 - fc) * 0.6 * Rin;
       var Qs = Rin - Rsoil - lE;
-      var clear = o.pty > 0 ? 0 : (o.sky === 1 ? 0.8 : o.sky === 3 ? 0.35 : 0.1);
+      var clear = wetNow ? 0 : (o.sky === 1 ? 0.8 : o.sky === 3 ? 0.35 : 0.1);
       var skyLoss = 28 * cov.sky * clear * (curtain ? cur.sky : 1);
-      var U = cal.kU * cov.U * (curtain ? cur.u : 1);
+      // 비에 젖은 피복은 열을 더 잘 빼앗김(물막·증발): 비 오는 동안 열관류율을 강수 세기에 따라 5~20% 올림
+      var wetU = wetNow ? 1.05 + 0.03 * Math.min(5, o.rain || 0.5) : 1;
+      var U = cal.kU * cov.U * (curtain ? cur.u : 1) * wetU;
       // 환기량
       var hv = house.ventH, AsA = hv * Lside * sideA, AsB = hv * Lside * sideB, Ar = house.roofW * roofLen * nRoof * roof * (curtain ? 0.3 : 1);
       var dT = Math.max(0, Ti - To), Tm = (Ti + To) / 2 + 273.15;
@@ -198,7 +205,9 @@
       var Qheat = heatOn ? heatCap : 0;
       var Tc = Ti - (curtain ? 0.45 : 0.75) * (Ti - To);
       var cond = Math.max(0, RHO * 0.003 * g.Ac * (Xi - xFrom(Tc, 100)));    // kg/s
-      var dTi = (g.A * (Qs + 7 * (Ts - Ti) - skyLoss) + Qheat + LAMBDA * cond - U * g.Ac * (Ti - To) - RHO * CP * (Gv + Ginf) * (Ti - To)) / Ca;
+      // 빗물이 피복을 식힘: 떨어지는 비(바깥 기온)를 피복 온도까지 데우는 열 (강수량 mm/h → kg/m²/s)
+      var Qrain = wetNow ? (o.rain || 0.5) / 3600 * 4186 * Math.max(0, Tc - To) * g.A : 0;
+      var dTi = (g.A * (Qs + 7 * (Ts - Ti) - skyLoss) + Qheat + LAMBDA * cond - U * g.Ac * (Ti - To) - Qrain - RHO * CP * (Gv + Ginf) * (Ti - To)) / Ca;
       var dTs = (Rsoil - 7 * (Ts - Ti) - 1.5 * (Ts - Tdeep)) / Cs;
       var E = lE / LAMBDA * g.A;                                             // kg/s
       var dX = (E - RHO * (Gv + Ginf) * (Xi - Xo) - cond) / (RHO * g.V);
@@ -218,7 +227,7 @@
         cur10.E += E * dt; cur10.heatS += heatOn ? dt : 0; cur10.irr += irr; cur10.cond += cond * dt;
         if (step % 10 === 0) {
           out.push({ t: t, To: To, Ti: Ti, Ts: Ts, RHo: o.RH, RHi: rhFrom(Ti, Xi), A: sideA, B: sideB, R: roof, cur: curtain, sh: shade,
-            heat: heatOn, hset: hset, vset: vset, G: o.G, Rin: Rin, el: sp.el, az: sp.az, wd: o.wd, ws: o.ws, sky: o.sky, pty: o.pty,
+            heat: heatOn, hset: hset, vset: vset, G: o.G, Rin: Rin, el: sp.el, az: sp.az, wd: o.wd, ws: o.ws, sky: o.sky, pty: o.pty, rain: o.rain || 0, pop: o.pop,
             day: day, E: cur10.E, heatS: cur10.heatS, irr: cur10.irr, cond: cur10.cond, Gv: Gv });
           cur10 = null;
         }
@@ -236,7 +245,7 @@
     fr.forEach(function (f) {
       var d = new Date(f.t + 9 * 3600000), key = d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1) + '-' + d.getUTCDate();
       if (!days[key]) { days[key] = { key: key, date: Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()), n: 0, tmax: -99, tmin: 99, omax: -99, omin: 99,
-        ok: 0, hot: 0, hot35: 0, cold: 0, cold5: 0, wet: 0, nightHot: 0, heatS: 0, irr: 0, E: 0, vent: 0, cond: 0, morningWet: 0 }; order.push(key); }
+        ok: 0, hot: 0, hot35: 0, cold: 0, cold5: 0, wet: 0, nightHot: 0, heatS: 0, irr: 0, E: 0, vent: 0, cond: 0, morningWet: 0, rainMm: 0, rainN: 0, snowN: 0, rainWet: 0 }; order.push(key); }
       var s = days[key], h = d.getUTCHours();
       s.n++; s.tmax = Math.max(s.tmax, f.Ti); s.tmin = Math.min(s.tmin, f.Ti); s.omax = Math.max(s.omax, f.To); s.omin = Math.min(s.omin, f.To);
       var ok = f.day ? (f.Ti >= 18 && f.Ti <= 28) : (f.Ti >= nightLow && f.Ti <= 20);
@@ -245,6 +254,7 @@
       if (!f.day && f.Ti < nightLow) s.cold++; if (f.Ti < 5) s.cold5++;
       if (!f.day && f.Ti > 20) s.nightHot++;
       if (f.RHi >= 90) s.wet++;
+      if (f.pty > 0 || f.rain > 0) { s.rainN++; s.rainMm += (f.rain || 0) / 6; if (f.pty === 2 || f.pty === 3) s.snowN++; if (f.RHi >= 90) s.rainWet++; }
       if (h >= 5 && h < 9 && f.RHi >= 75) s.morningWet++;
       if (f.A > 0.02 || f.B > 0.02 || f.R > 0.02) s.vent++;
       s.heatS += f.heatS; s.irr += f.irr; s.E += f.E; s.cond += f.cond;
@@ -255,11 +265,12 @@
       var oil = s.heatS / 3600 * (house.heater || 0) / (8700 * 0.85);
       return { key: k, date: s.date, hours: s.n * hr, full: s.n >= 143, tmax: s.tmax, tmin: s.tmin, omax: s.omax, omin: s.omin,
         okPct: s.n ? Math.round(s.ok / s.n * 100) : 0, hot: s.hot * hr, hot35: s.hot35 * hr, cold: s.cold * hr, cold5: s.cold5 * hr,
-        nightHot: s.nightHot * hr, wet: s.wet * hr, morningWet: s.morningWet * hr, vent: s.vent * hr, heatH: s.heatS / 3600, oilL: oil,
+        nightHot: s.nightHot * hr, wet: s.wet * hr, morningWet: s.morningWet * hr, rainMm: s.rainMm, rainH: s.rainN * hr, snowH: s.snowN * hr, rainWet: s.rainWet * hr, vent: s.vent * hr, heatH: s.heatS / 3600, oilL: oil,
         irr: s.irr, supplyL: supplyL, etL: etL, drain: supplyL > 0 && s.n >= 143 ? (supplyL - etL) / supplyL * 100 : null, condL: s.cond / g.A };
     });
   }
 
+  function f1r(x) { return (Math.round(x * 10) / 10).toFixed(1).replace(/\.0$/, ''); }
   function advice(sum, c, house, cropKey) {
     var tips = [];
     var full = sum.filter(function (d) { return d.full; }); if (!full.length) full = sum;
@@ -271,6 +282,13 @@
     if (hot >= 1) tips.push(['warn', '30℃ 넘는 시간이 하루 최대 ' + hot.toFixed(1) + '시간 예상됩니다. 환기 시작 온도를 ' + (c.ventDay - 2) + '℃로 낮추거나' + (house.shade ? ' 차광 기준 일사를 낮춰' : ' 차광막을 써서') + ' 꽃 떨어짐·호흡 소모를 줄여 보세요.']);
     if (cold >= 1) tips.push(['warn', '밤에 기준(' + (cropKey === 'cherry' ? 12 : 10) + '℃)보다 낮은 시간이 최대 ' + cold.toFixed(1) + '시간입니다. ' + (house.heater > 0 ? '난방 설정이나 난방기 용량을 확인하세요.' : '난방기가 없는 조건입니다. 보온커튼·난방을 검토하세요.')]);
     if (wet >= 3) tips.push(['warn', '습도 90% 이상이 하루 최대 ' + wet.toFixed(1) + '시간 이어집니다. 잿빛곰팡이병 위험이 있으니 ' + (c.nightDehum ? '아침 환기·순환팬을 함께' : '야간 제습 환기를 켜고 순환팬을') + ' 써 보세요.']);
+    sum.forEach(function (d) {
+      if (!d.rainH || d.rainH < 1) return;
+      var what = d.snowH >= d.rainH / 2 ? '눈·비' : '비';
+      tips.push([d.rainWet >= 2 ? 'warn' : 'info', fmtDay(d.date) + ' ' + what + ' ' + f1r(d.rainMm) + 'mm(' + f1r(d.rainH) + '시간) 예보 — 비 오는 동안 '
+        + (c.rainRoofClose && house.roofVent ? '천창이 닫히고 ' : '') + '측창도 절반 이하(강한 비는 20%, 바람받이 쪽은 10%)로 줄어'
+        + (d.rainWet >= 1 ? ' 그동안 습도 90% 이상이 ' + f1r(d.rainWet) + '시간 이어집니다. 비 그친 뒤 바로 환기하고 순환팬을 돌리세요.' : ' 환기가 줄어듭니다. 비 그친 뒤 습도를 확인하세요.')]);
+    });
     if (mw >= 2) tips.push(['info', '오전 5~9시 습도 75% 이상이 ' + mw.toFixed(1) + '시간입니다. 이 시간대 고습은 열과를 늘리니 해 뜬 뒤 짧게 환기하거나 송풍하세요.']);
     drains.forEach(function (d) {
       if (d.drain < 10) tips.push(['warn', fmtDay(d.date) + ' 급액이 증산보다 적거나 비슷합니다(추정 배액률 ' + Math.round(d.drain) + '%). 1회 급액량을 늘리거나 일사 기준을 낮추세요.']);
