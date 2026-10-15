@@ -249,6 +249,266 @@
   }
   function rgb(a, al) { return 'rgba(' + a[0] + ',' + a[1] + ',' + a[2] + ',' + al + ')'; }
 
+  // ---------- 단면(2D) 그림: 실제 하우스처럼 ----------
+  // 아치 파이프·도리·물받이·기초, 측창 감기 축·개폐기·방충망, 보온커튼·차광망, 두둑·멀칭·점적, 유인줄 토마토(겹잎·화방·열매),
+  // 온풍기·연통·비닐 덕트, 유동팬, 하늘색·햇살·산·이웃 하우스·배수로, 결로·비·눈·서리·안개·밤 어둠까지 그림.
+  function clamp2(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function hexS(n) { return '#' + ('00000' + (n >>> 0).toString(16)).slice(-6); }
+  function mixC(a, b, f) { var r = (a >> 16) & 255, g = (a >> 8) & 255, c = a & 255, r2 = (b >> 16) & 255, g2 = (b >> 8) & 255, c2 = b & 255; return (Math.round(r + (r2 - r) * f) << 16) | (Math.round(g + (g2 - g) * f) << 8) | Math.round(c + (c2 - c) * f); }
+  var SKY2 = [[-18, 0x040814, 0x0d1428, 0x000000], [-10, 0x081129, 0x1a2342, 0x000000], [-5, 0x1c2a58, 0x5a4a6e, 0xff7a4a],
+    [-1, 0x3a4f86, 0xe38a5a, 0xff8a4a], [3, 0x4f73b0, 0xf4b072, 0xffa860], [8, 0x4c86c8, 0xf0d2a6, 0xffd2a0],
+    [18, 0x3f8ad4, 0xcfe4f2, 0xfff1dc], [40, 0x2f7fd0, 0xbcdcf2, 0xffffff], [90, 0x2a76c8, 0xb4d6f0, 0xffffff]];
+  function sky2(el, over, pty) {
+    var k = SKY2, i = 0; while (i < k.length - 2 && el > k[i + 1][0]) i++;
+    var a = k[i], b = k[i + 1], f = clamp2((el - a[0]) / (b[0] - a[0]), 0, 1);
+    var top = mixC(a[1], b[1], f), hor = mixC(a[2], b[2], f), sun = mixC(a[3], b[3], f);
+    if (over) { var day = clamp2((el + 4) / 14, 0, 1), rn = pty > 0 && pty !== 3, sn = pty === 3;
+      top = mixC(top, mixC(0x141a26, rn ? 0x7d8792 : sn ? 0xc3c9d0 : 0x9aa4ae, day), 0.85); hor = mixC(hor, mixC(0x252c3a, rn ? 0xa3abb3 : sn ? 0xdde1e6 : 0xc6ccd2, day), 0.85); }
+    return { top: top, hor: hor, sun: sun };
+  }
+  function srand(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  var c2d = { key: '', bg: '', crop: '' };
+  function n1(v) { return (Math.round(v * 10) / 10).toString(); }
+  // 토마토 겹잎 (x,y 줄기 붙는 곳, dir ±1 방향, len px)
+  function leafSvg(x, y, dir, len, col, rot) {
+    var o = '', a = (rot || 0), ca = Math.cos(a), sa = Math.sin(a);
+    function P(px, py) { return n1(x + (px * ca - py * sa) * dir) + ' ' + n1(y + px * sa + py * ca); }
+    function D(t) { return len * (0.18 * t * t + 0.05 * t); }  // 끝으로 갈수록 처짐
+    o += '<path d="M' + P(0, 0) + 'Q' + P(len * 0.5, -len * 0.05) + ' ' + P(len, D(1)) + '" stroke="' + col + '" stroke-width="1.3" fill="none"/>';
+    [[0.3, 0.32, 0.15], [0.55, 0.36, 0.17], [0.78, 0.3, 0.14]].forEach(function (q) {
+      [-1, 1].forEach(function (sd) {
+        var bx = len * q[0], by = D(q[0]), ex = bx + len * q[1] * 0.55, ey = by + sd * len * q[1] * 0.75 + len * 0.06, w = len * q[2];
+        o += '<path d="M' + P(bx, by) + 'Q' + P((bx + ex) / 2 - sd * w * 0.3, (by + ey) / 2 - w) + ' ' + P(ex, ey) + 'Q' + P((bx + ex) / 2 + sd * w * 0.3, (by + ey) / 2 + w) + ' ' + P(bx, by) + 'Z" fill="' + col + '"/>';
+      });
+    });
+    var tx = len, ty = D(1), w2 = len * 0.17;
+    o += '<path d="M' + P(tx - len * 0.06, ty) + 'Q' + P(tx + len * 0.12, ty - w2) + ' ' + P(tx + len * 0.32, ty + len * 0.05) + 'Q' + P(tx + len * 0.12, ty + w2) + ' ' + P(tx - len * 0.06, ty) + 'Z" fill="' + col + '"/>';
+    return o;
+  }
+  function draw2D(f, h, g, o) {
+    var W = 900, ground = o.ground, sx = o.sx, sy = o.sy, x0 = o.x0, n = g.n, nW = n * g.W, FS = o.FS, narrowS = o.narrowS, multi = n > 1;
+    function fz(v) { return (v * FS).toFixed(1); }
+    function X(m) { return x0 + m * sx; }
+    function Y(m) { return ground - m * sy; }
+    function yAt(u) { return g.hs + (g.hr - g.hs) * 4 * u * (1 - u); }
+    var el = f.el, over = f.sky === 4 || f.pty > 0, isRain = f.pty === 1 || f.pty === 2 || f.pty === 4, isSnow = f.pty === 2 || f.pty === 3, snowCover = f.pty === 3 || (f.pty === 2 && f.To < 1);
+    var SC = sky2(el, over, f.pty), dayF = clamp2((el + 2) / 12, 0, 1), now = Date.now();
+    var frost = !over && f.To <= 2 && el < 12, fog = f.RHo >= 97 && f.ws < 2.5;
+    var axis = h.axis % 180, nB = (axis + 90) % 360;
+    var hsP = g.hs * sy, hrP = g.hr * sy, spanP = g.W * sx;
+    var s = '', lab = '';
+    // ── 정의 ──
+    var sunCol = hexS(SC.sun || 0xffffff);
+    s += '<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + hexS(SC.top) + '"/><stop offset=".62" stop-color="' + hexS(mixC(SC.top, SC.hor, 0.6)) + '"/><stop offset="1" stop-color="' + hexS(SC.hor) + '"/></linearGradient>'
+      + '<radialGradient id="sglow"><stop offset="0" stop-color="' + sunCol + '" stop-opacity=".85"/><stop offset=".25" stop-color="' + sunCol + '" stop-opacity=".35"/><stop offset="1" stop-color="' + sunCol + '" stop-opacity="0"/></radialGradient>'
+      + '<linearGradient id="soil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b5440"/><stop offset=".35" stop-color="#5a4433"/><stop offset="1" stop-color="#3f3024"/></linearGradient>'
+      + '<linearGradient id="mulch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3f45"/><stop offset=".35" stop-color="#16181b"/><stop offset="1" stop-color="#0d0e10"/></linearGradient>'
+      + '<linearGradient id="airg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + rgb(tempColor(f.Ti + 2), 1) + '" stop-opacity=".30"/><stop offset="1" stop-color="' + rgb(tempColor(f.Ti - 1), 1) + '" stop-opacity=".12"/></linearGradient>'
+      + '<linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6d8" stop-opacity=".55"/><stop offset="1" stop-color="#fff6d8" stop-opacity="0"/></linearGradient>'
+      + '<radialGradient id="hglow"><stop offset="0" stop-color="#ffb35c" stop-opacity=".75"/><stop offset=".5" stop-color="#ff8a3d" stop-opacity=".25"/><stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/></radialGradient>'
+      + '<radialGradient id="drop"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset="1" stop-color="#bcd3ea" stop-opacity=".35"/></radialGradient>'
+      + '<radialGradient id="puff"><stop offset="0" stop-color="#e6e9ec" stop-opacity=".7"/><stop offset="1" stop-color="#e6e9ec" stop-opacity="0"/></radialGradient>'
+      + '<linearGradient id="cloudg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cfd6de"/></linearGradient>'
+      + '<pattern id="net" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 0L4 4M4 0L0 4" stroke="#4b5563" stroke-width=".5"/></pattern>'
+      + '<pattern id="shd" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#111418" opacity=".7"/><path d="M0 2.5H5M2.5 0V5" stroke="#000" stroke-width="1.2"/></pattern>'
+      + '<pattern id="quilt" width="10" height="6" patternUnits="userSpaceOnUse"><rect width="10" height="6" fill="#ece6d6"/><path d="M0 3H10" stroke="#b9a988" stroke-width=".8" stroke-dasharray="2 2"/></pattern>';
+    // 하우스 단면 경로
+    var arch = '', archTop = '';
+    for (var i = 0; i < n; i++) { var a0 = x0 + i * spanP, a1 = a0 + spanP, am = (a0 + a1) / 2; var seg = 'Q' + n1(am) + ' ' + n1(ground - hsP - 2 * (hrP - hsP)) + ' ' + n1(a1) + ' ' + n1(ground - hsP); arch += (i === 0 ? 'M' + n1(a0) + ' ' + ground + 'L' + n1(a0) + ' ' + n1(ground - hsP) : '') + seg; archTop += (i === 0 ? 'M' + n1(a0) + ' ' + n1(ground - hsP) : '') + seg; }
+    var archFull = arch + 'L' + n1(x0 + nW * sx) + ' ' + ground + 'Z';
+    s += '<clipPath id="hin"><path d="' + archFull + '"/></clipPath></defs>';
+    // ── 하늘·해·구름·먼 산·나무·이웃 하우스 (정적인 것은 캐시) ──
+    s += '<rect width="' + W + '" height="' + ground + '" fill="url(#sk)"/>';
+    if (el < -6 && !over) { var sr = srand(3); for (var st = 0; st < 70; st++) { var stx = sr() * 900, sty = sr() * (ground - 120); s += '<circle cx="' + n1(stx) + '" cy="' + n1(sty) + '" r="' + n1(0.5 + sr() * 1.1) + '" fill="#fff" opacity="' + n1(clamp2((-el - 6) / 8, 0, 1) * (0.4 + sr() * 0.6)) + '"/>'; } }
+    if (el > -6) {
+      var dB = Math.cos((f.az - nB) * Math.PI / 180), ang = Math.atan2(Math.sin(Math.max(el, -6) * Math.PI / 180), Math.cos(el * Math.PI / 180) * dB);
+      var R = 330, cx = 450 + R * Math.cos(ang), cy = ground - 10 - R * 0.95 * Math.sin(ang);
+      s += '<circle cx="' + n1(cx) + '" cy="' + n1(cy) + '" r="' + (over ? 60 : 110) + '" fill="url(#sglow)" opacity="' + (over ? 0.35 : 1) + '"/>';
+      if (!over) s += '<circle cx="' + n1(cx) + '" cy="' + n1(cy) + '" r="15" fill="' + (el < 8 ? '#ffb15c' : '#fff6cf') + '"/>';
+    }
+    var nc = over ? 7 : f.sky === 3 ? 4 : 2, cdrift = (now / 1000 * (2 + f.ws * 1.5)) % 1000;
+    for (var k = 0; k < nc; k++) {
+      var ccx = ((k * 173 + 60 + cdrift * (Math.cos((f.wd + 180 - nB) * Math.PI / 180) >= 0 ? 1 : -1)) % 1000 + 1000) % 1000 - 50, ccy = (over ? 30 : 45) + (k * 37) % 60, sc2 = over ? 1.5 : 1;
+      var cfill = el > -2 ? (f.pty > 0 ? '#aab2bb' : over ? '#d5dae0' : 'url(#cloudg)') : '#3a4458';
+      s += '<g opacity="' + (over ? 0.95 : 0.85) + '" fill="' + cfill + '" transform="translate(' + n1(ccx) + ',' + ccy + ') scale(' + sc2 + ')"><ellipse cx="0" cy="0" rx="50" ry="15"/><ellipse cx="22" cy="-11" rx="28" ry="16"/><ellipse cx="-20" cy="-7" rx="22" ry="12"/><ellipse cx="44" cy="-2" rx="18" ry="10"/>'
+        + (el > 3 && !over ? '<ellipse cx="0" cy="8" rx="46" ry="5" fill="' + hexS(mixC(SC.hor, 0x8a96a6, 0.5)) + '" opacity=".35"/>' : '') + '</g>';
+    }
+    // 먼 산 두 겹 (지평선 쪽 색에 묻혀 흐릿하게)
+    var hz = ground - 2, mFar = mixC(mixC(0x1a2420, 0x58705c, dayF), SC.hor, 0.55), mNear = mixC(mixC(0x101812, 0x3f5a3c, dayF), SC.hor, 0.3);
+    var mr = srand(11), mp1 = 'M-10 ' + hz, mp2 = 'M-10 ' + hz;
+    for (var mx = -10; mx <= 910; mx += 20) { mp1 += 'L' + mx + ' ' + n1(hz - 34 - 22 * Math.sin(mx / 70) - 14 * Math.sin(mx / 23 + 1) - mr() * 6); }
+    for (mx = -10; mx <= 910; mx += 15) { mp2 += 'L' + mx + ' ' + n1(hz - 12 - 10 * Math.sin(mx / 45 + 2) - 6 * Math.sin(mx / 17) - mr() * 4); }
+    s += '<path d="' + mp1 + 'L910 ' + hz + 'Z" fill="' + hexS(mFar) + '"/><path d="' + mp2 + 'L910 ' + hz + 'Z" fill="' + hexS(mNear) + '"/>';
+    // 바람막이 나무 (뒤쪽)
+    var tcol = hexS(mixC(mixC(0x0c140d, 0x2f5a2c, dayF), SC.hor, 0.15)), tr = srand(23);
+    for (k = 0; k < 16; k++) { var tx = 20 + k * 56 + tr() * 20, th = 26 + tr() * 22; s += '<path d="M' + n1(tx) + ' ' + ground + 'V' + n1(ground - th * 0.4) + '" stroke="' + tcol + '" stroke-width="3"/><ellipse cx="' + n1(tx) + '" cy="' + n1(ground - th * 0.62) + '" rx="' + n1(th * 0.32) + '" ry="' + n1(th * 0.45) + '" fill="' + tcol + '"/>'; }
+    // 이웃 하우스 (양옆, 같은 크기 비율로 일부만 보임)
+    var nbW = Math.min(8, Math.max(6, g.W)) * sx, nbHs = 1.7 * sy, nbHr = 3.3 * sy, gap = 4 * sx;
+    [[x0 - gap - nbW, 1], [x0 - 2 * gap - 2 * nbW, 1], [x0 + nW * sx + gap, 1], [x0 + nW * sx + 2 * gap + nbW, 1]].forEach(function (q) {
+      var l = q[0], r = l + nbW, m = (l + r) / 2;
+      s += '<path d="M' + n1(l) + ' ' + ground + 'L' + n1(l) + ' ' + n1(ground - nbHs) + 'Q' + n1(m) + ' ' + n1(ground - nbHs - 2 * (nbHr - nbHs)) + ' ' + n1(r) + ' ' + n1(ground - nbHs) + 'L' + n1(r) + ' ' + ground + 'Z" fill="' + hexS(mixC(0xeef3f7, SC.hor, 0.5)) + '" fill-opacity="' + (dayF > 0.3 ? 0.55 : 0.25) + '" stroke="' + hexS(mixC(0xdfe6ec, SC.hor, 0.4)) + '" stroke-width="2"/>';
+      if (snowCover) s += '<path d="M' + n1(l + nbW * 0.15) + ' ' + n1(ground - nbHs - (nbHr - nbHs) * 0.5) + 'Q' + n1(m) + ' ' + n1(ground - nbHs - 2 * (nbHr - nbHs) - 4) + ' ' + n1(r - nbW * 0.15) + ' ' + n1(ground - nbHs - (nbHr - nbHs) * 0.5) + '" stroke="#f5f7f9" stroke-width="5" fill="none"/>';
+    });
+    // ── 땅: 풀(서리·눈) · 흙 단면 · 배수로 ──
+    var grassC = snowCover ? '#f2f5f8' : frost ? '#dfe7ec' : isRain ? '#4f6a33' : '#6b8e3d';
+    s += '<rect y="' + ground + '" width="' + W + '" height="200" fill="url(#soil)"/>';
+    var gr = srand(31); for (k = 0; k < 60; k++) s += '<circle cx="' + n1(gr() * 900) + '" cy="' + n1(ground + 10 + gr() * 50) + '" r="' + n1(0.8 + gr() * 2) + '" fill="' + (gr() > 0.5 ? '#7a614a' : '#3a2c20') + '" opacity=".7"/>';
+    s += '<rect y="' + (ground - 1) + '" width="' + W + '" height="6" fill="' + grassC + '"/>';
+    for (k = 0; k < 120; k++) { var gx = (k * 7.7) % 900; if (gx > X(-0.2) && gx < X(nW + 0.2)) continue; s += '<path d="M' + n1(gx) + ' ' + ground + 'l' + n1((gr() - 0.5) * 3) + ' ' + n1(-3 - gr() * 4) + '" stroke="' + grassC + '" stroke-width="1.2"/>'; }
+    if (frost) for (k = 0; k < 40; k++) s += '<circle cx="' + n1(gr() * 900) + '" cy="' + n1(ground + gr() * 3) + '" r=".9" fill="#fff"/>';
+    [-1.6, nW + 1.6].forEach(function (dm) { var dx = X(dm), dw = Math.max(8, 0.4 * sx), dh = Math.max(6, 0.22 * sy); s += '<path d="M' + n1(dx - dw / 2) + ' ' + ground + 'v' + n1(dh) + 'h' + n1(dw) + 'v' + n1(-dh) + '" fill="' + (isRain ? '#5d7686' : '#4a4b3c') + '" stroke="#b9b6ae" stroke-width="2.5"/>' + (isRain ? '<rect x="' + n1(dx - dw / 2 + 2) + '" y="' + n1(ground + dh * 0.4) + '" width="' + n1(dw - 4) + '" height="' + n1(dh * 0.55) + '" fill="#7d9bb0"/>' : ''); });
+    if (isRain) for (k = 0; k < 6; k++) { var pdx = (k * 151 + 40) % 900; if (pdx > X(-0.3) && pdx < X(nW + 0.3)) continue; s += '<ellipse cx="' + pdx + '" cy="' + (ground + 2) + '" rx="' + (14 + k % 3 * 6) + '" ry="2.5" fill="' + hexS(SC.hor) + '" opacity=".7"/>'; }
+    // ── 하우스 안 ──
+    s += '<path d="' + archFull + '" fill="url(#airg)"/>';
+    s += '<rect x="' + n1(X(0)) + '" y="' + ground + '" width="' + n1(nW * sx) + '" height="5" fill="#5a4433"/>';
+    // 햇살(빛줄기): 해 쪽에서 피복을 지나 비스듬히
+    if (el > 3 && f.G > 80 && !over) {
+      var dBs = Math.cos((f.az - nB) * Math.PI / 180), dxm = Math.cos(el * Math.PI / 180) * dBs / Math.max(0.15, Math.sin(el * Math.PI / 180));
+      var op = clamp2(f.G / 900, 0.15, 0.55) * (f.sh ? 0.4 : 1) * (f.RHi > 80 ? 1.25 : 1);
+      s += '<g clip-path="url(#hin)" opacity="' + n1(op) + '">';
+      for (k = 0; k < 7; k++) { var bxm = (k + 0.5) / 7 * nW, ty2 = yAt(((bxm % g.W) / g.W)), bw = nW * sx / 7 * 0.45, sh = -dxm * ty2 * sx; s += '<path d="M' + n1(X(bxm) - bw / 2) + ' ' + n1(Y(ty2)) + 'h' + n1(bw) + 'l' + n1(sh) + ' ' + n1(ty2 * sy) + 'h' + n1(-bw * 1.6) + 'Z" fill="url(#beam)"/>'; }
+      s += '</g>';
+    }
+    // 기초 (콘크리트)
+    [0, nW].forEach(function (m) { s += '<rect x="' + n1(X(m) - 5) + '" y="' + n1(ground - 3) + '" width="10" height="13" fill="#b9b6ae"/>'; });
+    // 두둑·작물: 정적 부분 캐시
+    var rowsPer = Math.max(2, Math.round(g.W / 1.6)), bedW = g.W / rowsPer, beds = [];
+    for (i = 0; i < n; i++) for (k = 0; k < rowsPer; k++) beds.push(i * g.W + (k + 0.5) * bedW);
+    var bedTop = Math.min(0.75, bedW * 0.42), bedBot = Math.min(1.05, bedW * 0.62), bedH = 0.22;
+    var plH = Math.min(g.hs * 0.95, 0.5 + o.lai * 0.55);
+    var ck = JSON.stringify([g.n, g.W, g.hs, g.hr, x0, sx, sy, ground, o.stage, o.crop, o.lai]);
+    if (ck !== c2d.key) {
+      c2d.key = ck; var cs = '', cb = '', pr = srand(77);
+      beds.forEach(function (bx) {
+        cb += '<path d="M' + n1(X(bx - bedBot / 2)) + ' ' + ground + 'L' + n1(X(bx - bedTop / 2)) + ' ' + n1(Y(bedH)) + 'Q' + n1(X(bx)) + ' ' + n1(Y(bedH + 0.04)) + ' ' + n1(X(bx + bedTop / 2)) + ' ' + n1(Y(bedH)) + 'L' + n1(X(bx + bedBot / 2)) + ' ' + ground + 'Z" fill="url(#mulch)"/>'
+          + '<path d="M' + n1(X(bx - bedTop / 2) + 2) + ' ' + n1(Y(bedH) + 1) + 'Q' + n1(X(bx)) + ' ' + n1(Y(bedH + 0.035)) + ' ' + n1(X(bx + bedTop / 2) - 2) + ' ' + n1(Y(bedH) + 1) + '" stroke="#6b7480" stroke-width="1" fill="none" opacity=".6"/>';
+      });
+      var LC = ['#3f7f2b', '#4a8c31', '#579a39', '#36742a', '#5f9f3e'], ripe = ['#d2231b', '#dc3a1c', '#e8641f', '#ee8a2a', '#c9b23c', '#7fae3e', '#6aa339'];
+      beds.forEach(function (bx, bi) {
+        [-1, 1].forEach(function (sd) {
+          var lx = bx + sd * bedTop * 0.28, span = Math.floor(lx / g.W), uu = clamp2((lx - span * g.W) / g.W, 0.02, 0.98);
+          var wireY = Math.min(3.0, yAt(uu) - 0.4), ph = Math.max(0.35, Math.min(plH, wireY - bedH - 0.1)), yb = bedH + 0.02, px = X(lx);
+          cs += '<path d="M' + n1(px) + ' ' + n1(Y(yb)) + 'V' + n1(Y(wireY)) + '" stroke="#f2efe6" stroke-width=".8" opacity=".6"/><circle cx="' + n1(px) + '" cy="' + n1(Y(wireY)) + '" r="1.6" fill="#8d969e"/>';
+          // 줄기: 살짝 지그재그
+          var stem = 'M' + n1(px) + ' ' + n1(Y(yb)), nseg = Math.max(3, Math.round(ph / 0.18));
+          for (var q = 1; q <= nseg; q++) stem += 'L' + n1(px + (q % 2 ? 1.4 : -1.4)) + ' ' + n1(Y(yb + ph * q / nseg));
+          cs += '<path d="' + stem + '" stroke="#5d8a3a" stroke-width="' + n1(Math.max(1.6, sx * 0.022)) + '" fill="none" stroke-linejoin="round"/>';
+          var bare = o.stage === 'harvest' ? ph * 0.32 : 0.05, nl = Math.max(3, Math.round((ph - bare) / 0.2)), lenPx = (o.stage === 'early' ? 0.24 : 0.42) * sx;
+          for (var lv = 0; lv < nl; lv++) {
+            var t = (lv + 0.5) / nl, ly = Y(yb + bare + (ph - bare) * t), dir = (lv + bi + (sd > 0 ? 1 : 0)) % 2 ? 1 : -1, ln = lenPx * (t > 0.8 ? 1.15 - (t - 0.8) * 2.2 : 0.85 + t * 0.35);
+            cs += leafSvg(px, ly, dir, ln, LC[(lv + bi) % LC.length], -0.25 + pr() * 0.2);
+          }
+          if (o.stage !== 'early') {
+            var nT = Math.min(o.stage === 'harvest' ? 6 : 4, Math.max(1, Math.floor((ph - 0.4) / 0.32))), cherry = o.crop === 'cherry';
+            for (var tt = 0; tt < nT; tt++) {
+              var tyM = yb + 0.38 + tt * Math.max(0.28, (ph - 0.55) / nT); if (tyM > yb + ph - 0.08) break;
+              var tdir = tt % 2 ? 1 : -1, fromTop = nT - 1 - tt, ty3 = Y(tyM);
+              if (fromTop < (o.stage === 'harvest' ? 1 : 2)) { for (var fl = 0; fl < 4; fl++) cs += '<path d="M' + n1(px + tdir * (5 + fl * 3.2)) + ' ' + n1(ty3 + 2 + (fl % 2) * 2.5) + 'l2 3.2h-4z" fill="#f6d21c"/>'; continue; }
+              var colI = o.stage === 'harvest' ? Math.min(ripe.length - 1, Math.floor(Math.max(0, tt - Math.floor(nT * 0.15)) * ripe.length / Math.max(1, nT - 1))) : ripe.length - 1;
+              var nf = cherry ? 7 : 4, fr = (cherry ? 0.014 : 0.034) * sx;
+              cs += '<path d="M' + n1(px) + ' ' + n1(ty3) + 'q' + n1(tdir * 6) + ' 1 ' + n1(tdir * (8 + nf * fr * 0.9)) + ' ' + n1(4 + fr) + '" stroke="#5d8a3a" stroke-width="1" fill="none"/>';
+              for (var fi = 0; fi < nf; fi++) { var fxp = px + tdir * (5 + fi * fr * 1.5), fyp = ty3 + 4 + fr + (fi % 2) * fr * 0.9; cs += '<circle cx="' + n1(fxp) + '" cy="' + n1(fyp) + '" r="' + n1(Math.max(1.4, fr * (1 - fi * 0.04))) + '" fill="' + ripe[colI] + '"/><circle cx="' + n1(fxp - fr * 0.3) + '" cy="' + n1(fyp - fr * 0.35) + '" r="' + n1(Math.max(0.5, fr * 0.3)) + '" fill="#fff" opacity=".35"/>'; }
+            }
+          }
+        });
+      });
+      c2d.beds = cb; c2d.crop = cs;
+    }
+    s += c2d.beds;
+    // 점적 호스 (관수 때 파랗게)
+    beds.forEach(function (bx) { [-1, 1].forEach(function (sd) { s += '<circle cx="' + n1(X(bx + sd * bedTop * 0.22)) + '" cy="' + n1(Y(bedH + 0.03)) + '" r="2" fill="' + (f.irr > 0 ? '#38bdf8' : '#2b3138') + '"/>'; }); });
+    // 비닐 덕트 (각 동 가운데 통로 바닥, 난방 때 부풀어 오름)
+    if (h.heater > 0) for (i = 0; i < n; i++) { var dxm2 = i * g.W + bedW * Math.max(1, Math.floor(rowsPer / 2)), dr = 0.2 * sx, dry = (f.heat ? 0.2 : 0.06) * sy; s += '<ellipse cx="' + n1(X(dxm2)) + '" cy="' + n1(ground - dry) + '" rx="' + n1(dr) + '" ry="' + n1(dry) + '" fill="#f2f6f8" fill-opacity=".85" stroke="#cfd8de"/>'; }
+    // 온풍기 + 연통 (마지막 통로) + 연기
+    var hxm = (n - 1) * g.W + bedW * (rowsPer - 1), hW = Math.min(0.85, bedW * 0.5) * sx, hH = Math.min(1.35, g.hs * 0.75) * sy, hx = X(hxm) - hW / 2, hy = ground - hH;
+    if (h.heater > 0) {
+      var chY = Math.min(g.hs - 0.15, Math.min(1.35, g.hs * 0.75) + 1.0), chx = X(hxm) + hW * 0.2;
+      s += '<path d="M' + n1(chx) + ' ' + n1(hy) + 'V' + n1(Y(chY)) + 'H' + n1(X(nW) + 0.5 * sx) + 'v' + n1(-1.0 * sy) + '" stroke="#8b9298" stroke-width="' + n1(Math.max(3, 0.12 * sx)) + '" fill="none" stroke-linejoin="round"/>'
+        + '<path d="M' + n1(X(nW) + 0.5 * sx - 9) + ' ' + n1(Y(chY + 1.0) - 2) + 'l9 -7l9 7z" fill="#8b9298"/>';
+      if (f.heat) { var drift = Math.cos(((f.wd + 180) % 360 - nB) * Math.PI / 180) * Math.min(1, f.ws / 3); for (k = 0; k < 5; k++) { var tp = ((now / 3500) + k / 5) % 1; s += '<circle cx="' + n1(X(nW) + 0.5 * sx + drift * tp * 40) + '" cy="' + n1(Y(chY + 1.0) - 8 - tp * 50) + '" r="' + n1(5 + tp * 14) + '" fill="url(#puff)" opacity="' + n1((1 - tp) * Math.min(1, tp * 5)) + '"/>'; } }
+      s += '<rect x="' + n1(hx) + '" y="' + n1(hy) + '" width="' + n1(hW) + '" height="' + n1(hH) + '" rx="2" fill="#5b6b5e"/>';
+      for (k = 1; k < 5; k++) s += '<line x1="' + n1(hx + 3) + '" x2="' + n1(hx + hW - 3) + '" y1="' + n1(hy + hH * 0.12 + k * 3) + '" y2="' + n1(hy + hH * 0.12 + k * 3) + '" stroke="#3a453c" stroke-width="1"/>';
+      var bwx = hx + hW / 2, bwy = hy + hH * 0.65;
+      if (f.heat) { var fl2 = 0.6 + 0.4 * Math.sin(now / 120); s += '<circle cx="' + n1(bwx) + '" cy="' + n1(bwy) + '" r="' + n1(Math.max(18, 0.5 * sx) * (0.9 + 0.1 * fl2)) + '" fill="url(#hglow)"/>'; }
+      s += '<circle cx="' + n1(bwx) + '" cy="' + n1(bwy) + '" r="4" fill="' + (f.heat ? '#ffb347' : '#2a1a10') + '" stroke="#2d3530"/>';
+    } else s += '<rect x="' + n1(hx) + '" y="' + n1(ground - 18) + '" width="' + n1(hW) + '" height="18" rx="2" fill="#475569" opacity=".6"/><text x="' + n1(hx + hW / 2) + '" y="' + n1(ground - 6) + '" font-size="' + fz(9) + '" fill="#e2e8f0" text-anchor="middle">없음</text>';
+    s += c2d.crop;
+    // 유동팬 (지붕 아래) · 센서함
+    var fanR = 0.28 * sx, fanA = (now / (f.Gv > 0.3 || f.heat || f.cur ? 60 : 160)) % 360;
+    for (i = 0; i < n; i++) { var fxm = i * g.W + g.W / 2, fym = multi ? g.hs - 0.45 : yAt(0.5) - 0.55; s += '<line x1="' + n1(X(fxm)) + '" x2="' + n1(X(fxm)) + '" y1="' + n1(Y(yAt(0.5))) + '" y2="' + n1(Y(fym) - fanR) + '" stroke="#9ea7ad" stroke-width="1"/><circle cx="' + n1(X(fxm)) + '" cy="' + n1(Y(fym)) + '" r="' + n1(fanR) + '" fill="#e5e9ec" fill-opacity=".25" stroke="#9ea7ad" stroke-width="2"/><g transform="translate(' + n1(X(fxm)) + ',' + n1(Y(fym)) + ') rotate(' + n1(fanA) + ')">' + [0, 90, 180, 270].map(function (aa) { return '<ellipse rx="' + n1(fanR * 0.15) + '" ry="' + n1(fanR * 0.45) + '" cy="' + n1(-fanR * 0.45) + '" fill="#5f6870" transform="rotate(' + aa + ')"/>'; }).join('') + '</g>'; }
+    var sbxm = g.W / 2 + (rowsPer % 2 ? bedW * 0.5 : 0); s += '<line x1="' + n1(X(sbxm)) + '" x2="' + n1(X(sbxm)) + '" y1="' + n1(Y(yAt(0.5))) + '" y2="' + n1(Y(1.55)) + '" stroke="#8e979f" stroke-width=".8"/><rect x="' + n1(X(sbxm) - 6) + '" y="' + n1(Y(1.55)) + '" width="12" height="16" rx="2" fill="#f5f5f0" stroke="#c9cdd1"/>';
+    // 결로·습한 공기
+    if (f.RHi >= 90) { s += '<path d="' + archFull + '" fill="#e8eef4" opacity="' + n1(clamp2((f.RHi - 90) / 10, 0, 1) * 0.22) + '"/>'; }
+    if (f.RHi >= 93) { var dr2 = srand(5), ndp = Math.round(clamp2((f.RHi - 93) / 7, 0.3, 1) * 70); for (k = 0; k < ndp; k++) { var um = dr2() * nW, uu2 = (um % g.W) / g.W, dpy = Y(yAt(uu2)) + 4 + dr2() * 4; s += '<circle cx="' + n1(X(um)) + '" cy="' + n1(dpy) + '" r="' + n1(1.2 + dr2() * 1.8) + '" fill="url(#drop)"/>'; } }
+    // ── 구조: 아치 파이프 + 피복 + 도리 + 물받이·기둥 ──
+    s += '<path d="' + archFull + '" fill="none" stroke="#c9d0d6" stroke-width="3.2" stroke-linejoin="round"/>';
+    s += '<path d="' + archTop + '" fill="none" stroke="#ffffff" stroke-opacity="' + (isRain ? 0.95 : 0.7) + '" stroke-width="' + (h.cover === 'po2' ? 2.4 : 1.4) + '" transform="translate(0,-2)"/>';
+    if (h.cover === 'po2') s += '<path d="' + archTop + '" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="1" transform="translate(0,-5)"/>';
+    [0, nW].forEach(function (m) { s += '<line x1="' + n1(X(m) + (m ? 2 : -2)) + '" y1="' + n1(ground - 3) + '" x2="' + n1(X(m) + (m ? 2 : -2)) + '" y2="' + n1(Y(0.3)) + '" stroke="#fff" stroke-opacity=".75" stroke-width="2.5"/>'; });
+    var purl = [0.5, 0.22, 0.78]; if (g.W > 6) purl.push(0.36, 0.64);
+    for (i = 0; i < n; i++) purl.forEach(function (pu) { s += '<circle cx="' + n1(X(i * g.W + pu * g.W)) + '" cy="' + n1(Y(yAt(pu)) + 3) + '" r="2.6" fill="#aeb7bf" stroke="#7f8a94" stroke-width=".6"/>'; });
+    [0, nW].forEach(function (m) { s += '<circle cx="' + n1(X(m)) + '" cy="' + n1(Y(g.hs)) + '" r="3" fill="#aeb7bf"/><circle cx="' + n1(X(m)) + '" cy="' + n1(Y(0.3)) + '" r="2.6" fill="#aeb7bf"/>'; });
+    if (multi) {
+      for (i = 1; i < n; i++) { var gxp = X(i * g.W); s += '<line x1="' + n1(gxp) + '" y1="' + ground + '" x2="' + n1(gxp) + '" y2="' + n1(Y(g.hs)) + '" stroke="#b6bfc6" stroke-width="3.5"/><path d="M' + n1(gxp - 9) + ' ' + n1(Y(g.hs) - 6) + 'v8h18v-8" fill="#b8c1c8" stroke="#8e979f" stroke-width="1"/>'; }
+      s += '<line x1="' + n1(X(0)) + '" x2="' + n1(X(nW)) + '" y1="' + n1(Y(g.hs - 0.12)) + '" y2="' + n1(Y(g.hs - 0.12)) + '" stroke="#8e979f" stroke-width="1.6"/>';
+    }
+    // 눈 쌓인 지붕
+    if (snowCover && !(f.Ti > 8 && !f.cur)) for (i = 0; i < n; i++) { var sxl = X(i * g.W + 0.16 * g.W), sxr = X(i * g.W + 0.84 * g.W); s += '<path d="M' + n1(sxl) + ' ' + n1(Y(yAt(0.16)) - 2) + 'Q' + n1((sxl + sxr) / 2) + ' ' + n1(Y(2 * g.hr - yAt(0.16)) - 10) + ' ' + n1(sxr) + ' ' + n1(Y(yAt(0.84)) - 2) + '" stroke="#f7f9fb" stroke-width="7" fill="none" stroke-linecap="round"/>'; }
+    // 차광막 (바깥, 지붕 위)
+    if (h.shade) {
+      if (f.sh) s += '<path d="' + archTop + '" transform="translate(0,' + n1(-0.32 * sy) + ')" fill="none" stroke="url(#shd)" stroke-width="7"/>';
+      else for (i = 0; i < n; i++) s += '<circle cx="' + n1(X(i * g.W + 0.12)) + '" cy="' + n1(Y(g.hs + 0.36)) + '" r="6" fill="#1f2328"/>';
+    }
+    // 보온커튼
+    if (h.curtain !== 'none') {
+      var cfill = h.curtain === 'multi' ? 'url(#quilt)' : '#efece4', cw = h.curtain === 'multi' ? 7 : 4;
+      if (f.cur) {
+        if (!multi) { var cp = 'M' + n1(X(0.2)) + ' ' + n1(Y(0.15)); for (k = 1; k <= 20; k++) { var cu = 0.03 + 0.94 * k / 20; cp += 'L' + n1(X(cu * g.W)) + ' ' + n1(Y(yAt(cu) - 0.28)); } cp += 'L' + n1(X(nW - 0.2)) + ' ' + n1(Y(0.15)); s += '<path d="' + cp.replace('M' + n1(X(0.2)) + ' ' + n1(Y(0.15)), 'M' + n1(X(0.2)) + ' ' + n1(Y(0.15)) + 'L' + n1(X(0.2)) + ' ' + n1(Y(yAt(0.03) - 0.28))) + '" fill="none" stroke="' + (h.curtain === 'multi' ? '#d9cfb6' : '#e8e3d6') + '" stroke-width="' + (cw + 1) + '" stroke-linejoin="round"/>'; }
+        else s += '<rect x="' + n1(X(0.05)) + '" y="' + n1(Y(g.hs - 0.18) - cw / 2) + '" width="' + n1((nW - 0.1) * sx) + '" height="' + cw + '" fill="' + cfill + '" stroke="#bfa77a" stroke-width=".6"/>';
+        lab += '<text x="' + n1(X(0.4)) + '" y="' + n1(Y(multi ? g.hs - 0.18 : yAt(0.12) - 0.28) + 16 * FS) + '" font-size="' + fz(11) + '" fill="#f8f5ec" font-weight="700" stroke="#3b3424" stroke-width="2.5" paint-order="stroke">보온커튼 닫힘</text>';
+      } else {
+        if (!multi) [0.3, nW - 0.3].forEach(function (m) { s += '<circle cx="' + n1(X(m)) + '" cy="' + n1(Y(g.hs - 0.05)) + '" r="' + (h.curtain === 'multi' ? 7 : 5) + '" fill="#e8dcc0" stroke="#bfa77a"/>'; });
+        else for (i = 0; i < n; i++) s += '<rect x="' + n1(X(i * g.W + 0.15)) + '" y="' + n1(Y(g.hs - 0.14)) + '" width="' + n1(0.3 * sx) + '" height="' + n1(0.22 * sy) + '" rx="3" fill="#e8dcc0" stroke="#bfa77a"/>';
+      }
+    }
+    // 측창: 아래 0.3m 고정 + 그 위로 감아 올림 (감기 축·개폐기·방충망)
+    var ventPx = Math.min(h.ventH, g.hs - 0.3) * sy, ventY0 = Y(0.3);
+    function sideVent(x, open, label, isA) {
+      var hh = ventPx * open, top = ventY0 - hh, out = isA ? -1 : 1, rr = 3.5 + open * 4.5, ov = '';
+      if (hh > 0.5) ov += '<rect x="' + n1(x - 2.5) + '" y="' + n1(top) + '" width="5" height="' + n1(hh) + '" fill="' + (h.net ? 'url(#net)' : 'none') + '" opacity=".95"/>';
+      ov += '<line x1="' + n1(x) + '" y1="' + n1(top) + '" x2="' + n1(x) + '" y2="' + n1(Y(g.hs)) + '" stroke="#fff" stroke-opacity=".8" stroke-width="2.5"/>';
+      ov += '<circle cx="' + n1(x + out * 4) + '" cy="' + n1(top) + '" r="' + n1(rr) + '" fill="#e6edf2" stroke="#94a3b8" stroke-width="1.2"/><circle cx="' + n1(x + out * 4) + '" cy="' + n1(top) + '" r="1.8" fill="#64748b"/>';
+      ov += '<rect x="' + n1(x + out * (6 + rr) - (isA ? 9 : 0)) + '" y="' + n1(top - 6) + '" width="9" height="12" rx="1.5" fill="#2f3b46"/>';
+      var lx = isA ? x - 8 : x + 8, an = isA ? 'end' : 'start';
+      lab += '<text x="' + n1(lx) + '" y="' + n1(ground + 22 * FS) + '" font-size="' + fz(13) + '" font-weight="700" fill="#fff" text-anchor="' + an + '" stroke="#2b2118" stroke-width="3" paint-order="stroke">' + label + ' 측창</text>'
+        + '<text x="' + n1(lx) + '" y="' + n1(ground + 42 * FS) + '" font-size="' + fz(15) + '" font-weight="800" fill="#fff" text-anchor="' + an + '" stroke="#2b2118" stroke-width="3" paint-order="stroke">' + Math.round(open * 100) + '%</text>';
+      return ov;
+    }
+    s += sideVent(X(0), f.A, dir8((axis + 270) % 360), true) + sideVent(X(nW), f.B, dir8(nB), false);
+    // 천창: 각 동 꼭대기 덮개가 들림 (밀대·방충망)
+    if (h.roofVent) for (i = 0; i < n; i++) {
+      var ax = X(i * g.W + g.W / 2), ay = Y(g.hr), len = Math.max(14, h.roofW * sx), rot = -f.R * 40;
+      if (h.net && f.R > 0.02) s += '<path d="M' + n1(ax) + ' ' + n1(ay) + 'L' + n1(ax + len) + ' ' + n1(ay + len * 0.25) + '" stroke="url(#net)" stroke-width="6" opacity=".8"/>';
+      s += '<g transform="translate(' + n1(ax) + ',' + n1(ay) + ') rotate(' + n1(rot) + ')"><line x1="0" y1="0" x2="' + n1(len) + '" y2="' + n1(len * 0.25) + '" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/><line x1="0" y1="0" x2="' + n1(len) + '" y2="' + n1(len * 0.25) + '" stroke="#94a3b8" stroke-width="1"/></g>';
+      if (f.R > 0.02) { var tipA = rot * Math.PI / 180, tipx = ax + len * 0.75 * Math.cos(tipA) - len * 0.19 * Math.sin(tipA), tipy = ay + len * 0.75 * Math.sin(tipA) + len * 0.19 * Math.cos(tipA); s += '<line x1="' + n1(tipx) + '" y1="' + n1(tipy) + '" x2="' + n1(ax + len * 0.75) + '" y2="' + n1(ay + len * 0.19 + 8) + '" stroke="#6b7680" stroke-width="2"/>'; }
+      if (i === 0) lab += '<text x="' + n1(ax) + '" y="' + n1(ay - 18) + '" font-size="' + fz(12) + '" font-weight="700" fill="#fff" text-anchor="middle" stroke="#0f172a" stroke-width="3" paint-order="stroke">천창 ' + Math.round(f.R * 100) + '%</text>';
+    }
+    // 관수 표시
+    if (f.irr > 0) beds.forEach(function (bx) { lab += '<text x="' + n1(X(bx)) + '" y="' + n1(Y(bedH) - 4) + '" font-size="' + fz(12) + '" text-anchor="middle">💧</text>'; });
+    // ── 비·눈 ──
+    var wdx = Math.cos(((f.wd + 180) % 360 - nB) * Math.PI / 180) * f.ws;
+    if (isRain) { var heavy = f.pty === 4 || (f.rain || 0) >= 3, nr = heavy ? 120 : 70; for (k = 0; k < nr; k++) { var rx = ((k * 61 + now / 4) % 960) - 30, ry = (k * 97 + now / 2) % (ground - 10); s += '<line x1="' + n1(rx) + '" y1="' + n1(ry) + '" x2="' + n1(rx + wdx * 1.6) + '" y2="' + n1(ry + 11) + '" stroke="#b9d3ee" stroke-width="1.1" opacity=".75"/>'; } }
+    if (isSnow) for (k = 0; k < 90; k++) { var sxx = ((k * 83 + now / 40 * (1 + (k % 3) * 0.3) * (wdx >= 0 ? 1 : -1) * Math.min(3, Math.abs(wdx) + 0.5)) % 920 + 920) % 920 - 10, syy = (k * 53 + now / 30) % ground; s += '<circle cx="' + n1(sxx + Math.sin(now / 700 + k) * 4) + '" cy="' + n1(syy) + '" r="' + n1(1.2 + (k % 3) * 0.6) + '" fill="#fff" opacity=".9"/>'; }
+    // ── 안개 · 밤 어둠 (조명은 그 위에 다시 밝게) ──
+    if (fog) s += '<rect width="900" height="' + (ground + 6) + '" fill="' + hexS(SC.hor) + '" opacity=".4"/>';
+    var dark = clamp2((4 - el) / 12, 0, 1) * 0.5;
+    if (dark > 0.02) {
+      s += '<rect width="900" height="440" fill="#050a1a" opacity="' + n1(dark) + '"/>';
+      if (h.heater > 0 && f.heat) { var fl3 = 0.6 + 0.4 * Math.sin(now / 120); s += '<circle cx="' + n1(hx + hW / 2) + '" cy="' + n1(hy + hH * 0.65) + '" r="' + n1(Math.max(36, 1.2 * sx) * (0.9 + 0.1 * fl3)) + '" fill="url(#hglow)" opacity=".7"/>'; }
+    }
+    return s + lab;
+  }
+
   function renderFrame(dt, still) {
     if (!result) return;
     var f = frameAt(player.idx), h = S.house, g = result.geom;
@@ -266,85 +526,8 @@
     var d3 = !!(window.FSIM3D && window.FSIM3D.active());
     if (d3) window.FSIM3D.draw(f, { house: h, geom: g, lai: result.lai, stage: S.stage, crop: S.crop, dt: still ? 0.016 : (dt || 0.016) });
     else {
-    var svg = '';
-    // 하늘
-    var el = f.el, sky1, sky2;
-    if (el > 8) { sky1 = '#7cc4f4'; sky2 = '#d9efff'; } else if (el > -2) { sky1 = '#f4a259'; sky2 = '#ffe2b8'; } else if (el > -8) { sky1 = '#3b4a7a'; sky2 = '#9a7aa0'; } else { sky1 = '#0b1530'; sky2 = '#26345c'; }
-    if (f.sky === 4 || f.pty > 0) { sky1 = el > -2 ? '#9aa6b2' : '#1c2333'; sky2 = el > -2 ? '#cfd6dc' : '#3a4256'; }
-    svg += '<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + sky1 + '"/><stop offset="1" stop-color="' + sky2 + '"/></linearGradient>'
-      + '<pattern id="net" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 0L4 4M4 0L0 4" stroke="#4b5563" stroke-width=".5"/></pattern>'
-      + '<pattern id="shd" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#1f2937" opacity=".55"/><path d="M0 3H6M3 0V6" stroke="#111827" stroke-width="1"/></pattern></defs>';
-    svg += '<rect width="' + W + '" height="' + ground + '" fill="url(#sk)"/>';
-    if (el < -8 && f.sky === 1) for (var s = 0; s < 30; s++) svg += '<circle cx="' + ((s * 137) % 900) + '" cy="' + ((s * 71) % 200 + 10) + '" r="1" fill="#fff" opacity=".7"/>';
-    // 태양 (단면에 투영: 오른쪽 = 측창 B 쪽)
-    if (el > -6) {
-      var dB = Math.cos((f.az - nB) * Math.PI / 180), ang = Math.atan2(Math.sin(Math.max(el, -6) * Math.PI / 180), Math.cos(el * Math.PI / 180) * dB);
-      var R = 330, cx = 450 + R * Math.cos(ang), cy = ground - 10 - R * 0.95 * Math.sin(ang);
-      svg += '<circle cx="' + cx.toFixed(0) + '" cy="' + cy.toFixed(0) + '" r="26" fill="#ffd54a" opacity=".35"/><circle cx="' + cx.toFixed(0) + '" cy="' + cy.toFixed(0) + '" r="17" fill="#ffc107" stroke="#f59e0b" stroke-width="2"/>';
-      if (el > 3 && f.G > 80) { for (var rr = 0; rr < 3; rr++) { var tx = 450 + (rr - 1) * nW * sx * 0.3, ty = ground - hrP; svg += '<line x1="' + cx.toFixed(0) + '" y1="' + cy.toFixed(0) + '" x2="' + tx.toFixed(0) + '" y2="' + ty.toFixed(0) + '" stroke="#ffd54a" stroke-width="2" opacity="' + Math.min(0.5, f.G / 1200) + '" stroke-dasharray="6 6"/>'; } }
-    }
-    // 구름·비
-    var nc = f.pty > 0 ? 6 : f.sky === 4 ? 6 : f.sky === 3 ? 3 : 1;
-    for (var k = 0; k < nc; k++) { var ccx = (k * 173 + 60) % 860 + 20, ccy = 40 + (k * 37) % 60; svg += '<g opacity="' + (f.sky === 1 && !f.pty ? .5 : .9) + '" fill="' + (el > -2 ? (f.sky === 4 || f.pty ? '#e5e7eb' : '#fff') : '#475569') + '"><ellipse cx="' + ccx + '" cy="' + ccy + '" rx="46" ry="16"/><ellipse cx="' + (ccx + 26) + '" cy="' + (ccy - 10) + '" rx="28" ry="15"/><ellipse cx="' + (ccx - 22) + '" cy="' + (ccy - 6) + '" rx="22" ry="12"/></g>'; }
-    if (f.pty > 0) for (k = 0; k < 60; k++) { var rx = (k * 61 + (Date.now() / 6 | 0)) % 900, ry = (k * 97 + (Date.now() / 3 | 0)) % 320 + 60; svg += '<line x1="' + rx + '" y1="' + ry + '" x2="' + (rx - 3) + '" y2="' + (ry + 10) + '" stroke="#93c5fd" stroke-width="1.2"/>'; }
-    // 땅
-    svg += '<rect y="' + ground + '" width="' + W + '" height="200" fill="#8b6b4a"/><rect y="' + ground + '" width="' + W + '" height="6" fill="#6b8e3d"/>';
-    // 하우스 안 공기색 + 구조
-    var arch = '';
-    for (var i = 0; i < g.n; i++) { var a0 = x0 + i * spanP, a1 = a0 + spanP, am = (a0 + a1) / 2; arch += (i === 0 ? 'M' + a0 + ' ' + ground + 'L' + a0 + ' ' + (ground - hsP) : '') + 'Q' + am + ' ' + (ground - hsP - 2 * (hrP - hsP)) + ' ' + a1 + ' ' + (ground - hsP); }
-    var archFull = arch + 'L' + (x0 + nW * sx) + ' ' + ground + 'Z';
-    svg += '<path d="' + archFull + '" fill="' + rgb(tempColor(f.Ti), 0.32) + '"/>';
-    // 차광막 (바깥, 지붕 위)
-    if (h.shade) {
-      if (f.sh) svg += '<path d="' + arch.replace(/^M[^L]+L/, 'M') + '" transform="translate(0,-6)" fill="none" stroke="url(#shd)" stroke-width="9"/>';
-      else svg += '<rect x="' + (x0 - 6) + '" y="' + (ground - hsP - 14) + '" width="10" height="14" fill="#374151"/>';
-    }
-    // 측창: 아래에서 위로 열림 (0.3m 높이부터)
-    var ventY0 = ground - 0.3 * sy, ventPx = Math.min(h.ventH, g.hs - 0.3) * sy;
-    function sideVent(x, open, label, nrm, isA) {
-      var hh = ventPx * open, top = ventY0 - hh;
-      var o = '<line x1="' + x + '" y1="' + ground + '" x2="' + x + '" y2="' + ventY0 + '" stroke="#e2e8f0" stroke-width="4"/>';
-      if (hh > 0.5) o += '<rect x="' + (x - 3) + '" y="' + top + '" width="6" height="' + hh + '" fill="' + (h.net ? 'url(#net)' : 'none') + '" opacity=".9"/>';
-      o += '<line x1="' + x + '" y1="' + top + '" x2="' + x + '" y2="' + (ground - hsP) + '" stroke="#e2e8f0" stroke-width="4"/>';
-      o += '<circle cx="' + x + '" cy="' + top + '" r="5" fill="#94a3b8" stroke="#475569"/>';
-      var lx = isA ? x - 8 : x + 8, an = isA ? 'end' : 'start';
-      o += '<text x="' + lx + '" y="' + (ground + 20 * FS) + '" font-size="' + fz(13) + '" font-weight="700" fill="#fff" text-anchor="' + an + '">' + label + ' 측창</text>'
-        + '<text x="' + lx + '" y="' + (ground + 40 * FS) + '" font-size="' + fz(15) + '" font-weight="800" fill="#fff" text-anchor="' + an + '">' + Math.round(open * 100) + '%</text>';
-      return o;
-    }
-    svg += '<path d="' + archFull + '" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linejoin="round"/>';
-    // 연동 기둥(칸막이 없음, 기둥만)
-    for (i = 1; i < g.n; i++) svg += '<line x1="' + (x0 + i * spanP) + '" y1="' + ground + '" x2="' + (x0 + i * spanP) + '" y2="' + (ground - hsP) + '" stroke="#cbd5e1" stroke-width="2"/>';
-    svg += sideVent(x0, f.A, dir8(nA), nA, true) + sideVent(x0 + nW * sx, f.B, dir8(nB), nB, false);
-    // 천창: 각 동 꼭대기 오른쪽 덮개가 들림
-    if (h.roofVent) for (i = 0; i < g.n; i++) {
-      var ax = x0 + i * spanP + spanP / 2, ay = ground - hrP, len = Math.max(14, h.roofW * sx), rot = -f.R * 40;
-      svg += '<g transform="translate(' + ax + ',' + ay + ') rotate(' + rot.toFixed(1) + ')"><line x1="0" y1="0" x2="' + len + '" y2="' + (len * 0.25) + '" stroke="#f8fafc" stroke-width="5" stroke-linecap="round"/></g>';
-      if (i === 0) svg += '<text x="' + ax + '" y="' + (ay - 18) + '" font-size="' + fz(12) + '" font-weight="700" fill="#fff" text-anchor="middle" stroke="#0f172a" stroke-width="3" paint-order="stroke">천창 ' + Math.round(f.R * 100) + '%</text>';
-    }
-    // 보온커튼
-    if (h.curtain !== 'none') {
-      var cyy = ground - hsP + 4;
-      if (f.cur) svg += '<rect x="' + (x0 + 4) + '" y="' + cyy + '" width="' + (nW * sx - 8) + '" height="7" fill="#e8dcc0" stroke="#bfa77a"/><text x="' + (x0 + 12) + '" y="' + (cyy + 22) + '" font-size="' + fz(12) + '" fill="#5b4a2a" font-weight="700">보온커튼 닫힘</text>';
-      else svg += '<rect x="' + (x0 + nW * sx - 22) + '" y="' + cyy + '" width="14" height="12" fill="#e8dcc0" stroke="#bfa77a"/>';
-    }
-    // 작물 (토마토 줄)
-    var lai = result.lai, ph = Math.min(g.hs * 0.95, 0.5 + lai * 0.55) * sy, rows = Math.max(2, Math.round(g.W / 1.6)) * g.n;
-    for (i = 0; i < rows; i++) {
-      var px = x0 + (i + 0.5) * nW * sx / rows;
-      svg += '<line x1="' + px + '" y1="' + ground + '" x2="' + px + '" y2="' + (ground - ph) + '" stroke="#3f7d2a" stroke-width="3"/>';
-      for (var lv = 0; lv < 5; lv++) { var ly = ground - ph * (0.2 + lv * 0.18); svg += '<ellipse cx="' + (px + (lv % 2 ? 7 : -7)) + '" cy="' + ly + '" rx="9" ry="4" fill="#4d9a33"/>'; }
-      if (S.stage === 'flower') svg += '<circle cx="' + (px + 4) + '" cy="' + (ground - ph * 0.55) + '" r="3" fill="#facc15"/>';
-      if (S.stage === 'harvest') for (lv = 0; lv < 3; lv++) svg += '<circle cx="' + (px + (lv % 2 ? -6 : 6)) + '" cy="' + (ground - ph * (0.3 + lv * 0.17)) + '" r="' + (S.crop === 'cherry' ? 3 : 5) + '" fill="' + (lv === 0 ? '#dc2626' : lv === 1 ? '#f97316' : '#84cc16') + '"/>';
-      if (f.irr > 0) svg += '<text x="' + px + '" y="' + (ground - 4) + '" font-size="' + fz(13) + '" text-anchor="middle">💧</text>';
-    }
-    // 난방기
-    var hx = x0 + nW * sx - 46, hy = ground - 26;
-    svg += '<rect x="' + hx + '" y="' + hy + '" width="34" height="24" rx="3" fill="#475569"/>';
-    if (f.heat) { var fl = 0.6 + 0.4 * Math.sin(Date.now() / 120); svg += '<circle cx="' + (hx + 17) + '" cy="' + (hy + 12) + '" r="' + (12 + 4 * fl) + '" fill="#f97316" opacity=".45"/><text x="' + (hx + 17) + '" y="' + (hy + 17) + '" font-size="' + fz(13) + '" text-anchor="middle">🔥</text>'; }
-    if (h.heater <= 0) svg += '<text x="' + (hx + 17) + '" y="' + (hy + 16) + '" font-size="' + fz(9) + '" fill="#e2e8f0" text-anchor="middle">없음</text>';
-    // 결로
-    if (f.RHi >= 95) for (k = 0; k < 14; k++) { var dx = x0 + 20 + k * (nW * sx - 40) / 13; svg += '<circle cx="' + dx + '" cy="' + (ground - hsP - 3 - Math.abs(Math.sin(k)) * 8) + '" r="2.4" fill="#bfdbfe"/>'; }
+    var svg = draw2D(f, h, g, { ground: ground, sx: sx, sy: sy, x0: x0, FS: FS, narrowS: narrowS, lai: result.lai, stage: S.stage, crop: S.crop });
+    var el = f.el, ventY0 = ground - 0.3 * sy, ventPx = Math.min(h.ventH, g.hs - 0.3) * sy, i;
     // 바람 (단면 방향 성분) — 입자
     var to = (f.wd + 180) % 360, vx = Math.cos((to - nB) * Math.PI / 180), along = Math.abs(Math.sin((to - nB) * Math.PI / 180));
     var spd = f.ws * vx * 26; // px/s
