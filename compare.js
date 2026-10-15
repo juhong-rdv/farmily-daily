@@ -10,8 +10,10 @@
   function defs() { return F.defaults(crop()); }
 
   // ── 계산 가로채기: 바꾼 값이 있으면 권장값으로도 계산해 둠 ──
-  var last = null, orig = F.run;
+  var last = null, ctrlRef = null, orig = F.run;
   F.run = function (w, lat, lon, house, cropKey, stageKey, c, opt) {
+    if (c && typeof c === 'object') ctrlRef = c;   // sim.js 의 S.ctrl (화면 설정) 그 자체
+    if (ctrlRef) setTimeout(syncRain, 0);
     var r = orig.apply(this, arguments);
     try {
       var d = F.defaults(cropKey), ch = Object.keys(d).some(function (k) { return d[k] !== c[k]; });
@@ -46,8 +48,38 @@
     var d = defs();
     inputs().forEach(function (inp) { var fi = fieldInfo(inp); if (fi.lab && d[fi.key] !== undefined) fi.lab.classList.toggle('chg', d[fi.key] !== curVal(inp)); });
   }
+  // ── 비·비바람 때 창 위치 (실제 제어기의 '감우 시 위치') 입력칸: '비 오면 천창 닫기' 아래에 끼워 넣음 ──
+  var RAIN_FIELDS = [
+    { k: 'rainRoofMax', label: '비 올 때 천창 최대', help: '0 = 완전히 닫음 · 위 칸을 켰을 때', min: 0, max: 100, step: 5, unit: '%' },
+    { k: 'rainSideMax', label: '비 올 때 측창 최대', help: '시간당 3mm 이상 강한 비는 이 값과 20% 중 작은 값', min: 0, max: 100, step: 5, unit: '%' },
+    { k: 'rainWindLimit', label: '비바람 기준 풍속', help: '비 + 이 풍속 이상이면 아래 값 적용', min: 1, max: 15, step: 0.5, unit: 'm/s' },
+    { k: 'rainWindOpen', label: '비바람 때 바람받이 측창 최대', help: '반대쪽(바람 빠지는 쪽)은 \'비 올 때 측창 최대\'까지', min: 0, max: 100, step: 5, unit: '%' }
+  ];
+  // 계산할 때마다 화면 칸을 실제 설정값과 맞춤(처음 열 때·권장값 되돌리기·설정 코드 불러오기 뒤)
+  function syncRain() {
+    if (!ctrlRef) return; var changed = false;
+    RAIN_FIELDS.forEach(function (f) { var el = $('k_' + f.k); if (el && document.activeElement !== el && ctrlRef[f.k] != null && +el.value !== ctrlRef[f.k]) { el.value = ctrlRef[f.k]; changed = true; } });
+    if (changed) mark();
+  }
+  function injectRain() {
+    var anchor = $('k_rainRoofClose'); if (!anchor || $('k_rainSideMax')) return;
+    var lab = anchor.closest('label.fld'), d = defs(), cur = ctrlRef || {};
+    RAIN_FIELDS.slice().reverse().forEach(function (f) {
+      var v = cur[f.k] != null ? cur[f.k] : d[f.k];
+      var el = document.createElement('label'); el.className = 'fld'; el.id = 'w_k_' + f.k;
+      el.innerHTML = '<span class="fl">' + f.label + '<i>' + f.help + '</i></span><span class="numw"><input type="number" id="k_' + f.k + '" min="' + f.min + '" max="' + f.max + '" step="' + f.step + '" value="' + v + '"><em>' + f.unit + '</em></span>';
+      lab.parentNode.insertBefore(el, lab.nextSibling);
+      el.querySelector('input').addEventListener('change', function () {
+        var x = +this.value; if (isNaN(x)) x = d[f.k]; x = Math.max(f.min, Math.min(f.max, x)); this.value = x;
+        if (ctrlRef) ctrlRef[f.k] = x;
+        // sim.js 가 저장·다시 계산하도록 기존 칸의 change 를 한 번 보냄(값은 그대로)
+        anchor.dispatchEvent(new Event('change'));
+      });
+    });
+  }
   function decorate() {
     var box = $('f-ctrl'); if (!box || !box.firstChild || box.querySelector('.rechint')) return;
+    injectRain();
     var d = defs(), cn = $('c_crop'), name = cn && cn.selectedOptions[0] ? cn.selectedOptions[0].textContent : '토마토';
     var p = document.createElement('p'); p.className = 'rechint';
     p.innerHTML = '작은 글씨 <b>권장</b> = ' + name + ' 일반 권장값 · 바꾼 값은 <span class="chgk">노란 칸</span>으로 표시되고, 아래 \'예상 결과\'에서 권장값일 때와 비교됩니다.';
