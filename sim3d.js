@@ -268,16 +268,44 @@
     for (i = 0; i < NS; i++) sst.push({ x: (Math.random() - 0.5) * 90, y: Math.random() * 32, z: (Math.random() - 0.5) * 90, ph: Math.random() * 6.28 });
     var sg = new T.BufferGeometry(); sg.setAttribute('position', new T.BufferAttribute(sp0, 3));
     var snow = new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 0.22, transparent: true, opacity: 0.95 })); snow.frustumCulled = false; scene.add(snow);
-    // 풍향·풍속계 (프로펠러형) + 바람자루(공항식)
-    var metal = new T.MeshLambertMaterial({ color: 0x9ca3af }), dark = new T.MeshLambertMaterial({ color: 0x374151 });
+    // 외부 기상대: 기둥 + 가로대 위 3컵 풍속계(바람 세기만큼 회전)·화살 풍향계(바람이 불어오는 쪽을 가리킴), 일사 차폐통·태양광판·기록 상자 + 바람자루(공항식)
+    var metal = new T.MeshLambertMaterial({ color: 0x9ca3af }), dark = new T.MeshLambertMaterial({ color: 0x374151 }), white = new T.MeshLambertMaterial({ color: 0xf3f4f6 });
     var sens = new T.Group(); scene.add(sens);
-    var mast = new T.Mesh(new T.CylinderGeometry(0.05, 0.07, 1, 8), metal); mast.position.y = 0.5; sens.add(mast); mast.castShadow = true;
-    var head = new T.Group(); head.scale.setScalar(2.2); sens.add(head);
-    var body = new T.Mesh(new T.CylinderGeometry(0.09, 0.09, 0.6, 10), dark); body.rotation.z = Math.PI / 2; head.add(body);
-    var nose = new T.Mesh(new T.ConeGeometry(0.09, 0.25, 10), dark); nose.rotation.z = -Math.PI / 2; nose.position.x = 0.42; head.add(nose);
-    var tail = new T.Mesh(new T.BoxGeometry(0.7, 0.4, 0.02), new T.MeshLambertMaterial({ color: 0xf8fafc })); tail.position.x = -0.6; tail.position.y = 0.05; head.add(tail);
-    var prop = new T.Group(); prop.position.x = 0.55; head.add(prop);
-    for (i = 0; i < 4; i++) { var bl = new T.Mesh(new T.BoxGeometry(0.02, 0.42, 0.07), new T.MeshLambertMaterial({ color: 0xf97316 })); bl.position.y = 0.21; var bg2 = new T.Group(); bg2.rotation.x = i * Math.PI / 2; bg2.add(bl); prop.add(bg2); }
+    var mast = new T.Mesh(new T.CylinderGeometry(0.04, 0.05, 1, 10), metal); mast.position.y = 0.5; sens.add(mast); mast.castShadow = true;
+    var head = new T.Group(); head.scale.setScalar(2.0); sens.add(head);
+    var arm = new T.Mesh(new T.CylinderGeometry(0.018, 0.018, 1.0, 8), metal); arm.rotation.z = Math.PI / 2; head.add(arm);
+    var clamp0 = new T.Mesh(new T.BoxGeometry(0.07, 0.09, 0.07), dark); head.add(clamp0);
+    // 3컵 풍속계 (가로대 한쪽 끝)
+    var cupPost = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 0.16, 8), metal); cupPost.position.set(0.5, 0.08, 0); head.add(cupPost);
+    var cupBody = new T.Mesh(new T.CylinderGeometry(0.03, 0.035, 0.09, 12), white); cupBody.position.set(0.5, 0.2, 0); head.add(cupBody);
+    var cups = new T.Group(); cups.position.set(0.5, 0.27, 0); head.add(cups);
+    var cupGeo = new T.SphereGeometry(0.045, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2); cupGeo.rotateZ(Math.PI / 2);
+    for (i = 0; i < 3; i++) {
+      var cw = new T.Group(); cw.rotation.y = i * Math.PI * 2 / 3; cups.add(cw);
+      var spoke = new T.Mesh(new T.CylinderGeometry(0.005, 0.005, 0.12, 6), metal); spoke.rotation.z = Math.PI / 2; spoke.position.x = 0.06; cw.add(spoke);
+      var cup = new T.Mesh(cupGeo, new T.MeshLambertMaterial({ color: 0x1f2937, side: T.DoubleSide })); cup.position.set(0.12, 0, 0); cup.rotation.y = Math.PI / 2; cw.add(cup);
+    }
+    var hubC = new T.Mesh(new T.SphereGeometry(0.018, 10, 8), white); cups.add(hubC);
+    // 화살 풍향계 (다른 쪽 끝) — 화살촉이 바람이 불어오는 쪽을 향함
+    var vPost = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 0.16, 8), metal); vPost.position.set(-0.5, 0.08, 0); head.add(vPost);
+    var vBody = new T.Mesh(new T.CylinderGeometry(0.028, 0.03, 0.08, 12), white); vBody.position.set(-0.5, 0.2, 0); head.add(vBody);
+    var vane = new T.Group(); vane.position.set(-0.5, 0.26, 0); head.add(vane);
+    var rod = new T.Mesh(new T.CylinderGeometry(0.007, 0.007, 0.42, 6), metal); rod.rotation.z = Math.PI / 2; rod.position.x = -0.03; vane.add(rod);
+    var tip = new T.Mesh(new T.ConeGeometry(0.022, 0.07, 10), dark); tip.rotation.z = -Math.PI / 2; tip.position.x = 0.21; vane.add(tip);
+    var finShape = new T.Shape(); finShape.moveTo(0, -0.01); finShape.lineTo(-0.13, -0.04); finShape.lineTo(-0.13, 0.08); finShape.lineTo(-0.03, 0.03); finShape.lineTo(0, 0.01);
+    var fin = new T.Mesh(new T.ShapeGeometry(finShape), new T.MeshLambertMaterial({ color: 0xf8fafc, side: T.DoubleSide })); fin.position.x = -0.12; vane.add(fin);
+    var cwt = new T.Mesh(new T.SphereGeometry(0.016, 8, 6), dark); cwt.position.x = 0.15; vane.add(cwt);
+    var pivot = new T.Mesh(new T.SphereGeometry(0.014, 8, 6), white); vane.add(pivot);
+    // 기둥 중간: 온습도 일사 차폐통(흰 접시 여러 겹) · 태양광판 · 기록 상자
+    var shield = new T.Group(); shield.scale.setScalar(1.6); sens.add(shield);
+    for (i = 0; i < 7; i++) { var pl0 = new T.Mesh(new T.CylinderGeometry(0.11 - i * 0.004, 0.12 - i * 0.004, 0.018, 16), white); pl0.position.y = i * 0.035; pl0.castShadow = true; shield.add(pl0); }
+    var shArm = new T.Mesh(new T.BoxGeometry(0.16, 0.02, 0.02), metal); shArm.position.set(0.08, 0.1, 0); shield.add(shArm); shield.children.forEach(function (c) { if (c !== shArm) c.position.x = 0.18; });
+    var panel = new T.Group(); panel.scale.setScalar(1.6); sens.add(panel);
+    var pv0 = new T.Mesh(new T.BoxGeometry(0.42, 0.02, 0.3), new T.MeshPhongMaterial({ color: 0x1e3a5f, shininess: 90, specular: 0x8899aa })); pv0.rotation.x = 0.6; pv0.position.set(0, 0, 0.12); pv0.castShadow = true; panel.add(pv0);
+    var pvF = new T.Mesh(new T.BoxGeometry(0.44, 0.015, 0.32), metal); pvF.rotation.x = 0.6; pvF.position.set(0, -0.012, 0.12); panel.add(pvF);
+    var logger = new T.Mesh(new T.BoxGeometry(0.33, 0.42, 0.18), white); logger.castShadow = true; sens.add(logger);
+    var conduit = new T.Mesh(new T.CylinderGeometry(0.006, 0.006, 1, 6), dark); sens.add(conduit);
+    var prop = cups;
     var sockPole = new T.Mesh(new T.CylinderGeometry(0.05, 0.06, 1, 8), metal); sockPole.castShadow = true; scene.add(sockPole);
     var sockYaw = new T.Group(), sockPitch = new T.Group(); sockYaw.scale.setScalar(2.2); sockYaw.add(sockPitch); scene.add(sockYaw);
     var ring = new T.Mesh(new T.TorusGeometry(0.28, 0.025, 6, 16), metal); ring.rotation.y = Math.PI / 2; sockPitch.add(ring);
@@ -293,7 +321,7 @@
     lbs.N.textContent = '북'; lbs.E.textContent = '동'; lbs.S.textContent = '남'; lbs.W.textContent = '서';
     G = { X: X, moon: moon, moonSpr: moonSpr, stars: stars, moonKey: '', bright: ls('farmily.sim.bright') === '1', wrap: wrap, r: r, cv: cv, ov: ov, scene: scene, cam: cam, hemi: hemi, sun: sun, sunBall: sunBall, sunHalo: sunHalo, clouds: clouds, cmat: cmat,
       skyDome: skyDome, skyMat: skyMat, mtMat: mtMat, mountains: mt, groundMat: groundMat,
-      rain: rain, rp: rp, rst: rst, snow: snow, sp0: sp0, sst: sst, sens: sens, head: head, prop: prop, mast: mast, sockPole: sockPole, sockYaw: sockYaw, sockPitch: sockPitch, ground: ground, wind: wind, wp: wp, wst: wst, lbs: lbs, hud: ov.querySelector('#o3hud'), house: null, key: '', w: 0,
+      rain: rain, rp: rp, rst: rst, snow: snow, sp0: sp0, sst: sst, sens: sens, head: head, prop: prop, cups: cups, vane: vane, shield: shield, panel: panel, logger: logger, conduit: conduit, mast: mast, sockPole: sockPole, sockYaw: sockYaw, sockPitch: sockPitch, ground: ground, wind: wind, wp: wp, wst: wst, lbs: lbs, hud: ov.querySelector('#o3hud'), house: null, key: '', w: 0,
       orbit: { az: 0, el: 22, dist: 20, preset: 0, tl: new T.Vector3() } };
     controls();
     resize();
@@ -709,6 +737,7 @@
     // 풍향계·바람자루 자리: 가까이 보기 쪽 끝 바깥 모서리
     var mh = hr + 1.6, sp1 = grp.localToWorld(new T.Vector3(x0 + NW + 2.5, 0, es * (L / 2 - 1.5))), sp2b = grp.localToWorld(new T.Vector3(x0 - 2.5, 0, es * (L / 2 - 1.5)));
     G.sens.position.copy(sp1); G.mast.scale.y = mh; G.mast.position.y = mh / 2; G.head.position.y = mh + 0.2;
+    G.shield.position.set(0, mh * 0.5, 0); G.panel.position.set(0, mh * 0.68, 0); G.logger.position.set(0, mh * 0.32, 0.1); G.conduit.scale.y = mh * 0.55; G.conduit.position.set(0.05, mh * 0.6, 0.03);
     var sh2 = Math.max(4, hs + 1.5); G.sockPole.scale.y = sh2; G.sockPole.position.set(sp2b.x, sh2 / 2, sp2b.z); G.sockYaw.position.set(sp2b.x, sh2 - 0.1, sp2b.z);
     G.sensTop = new T.Vector3(sp1.x, mh + 2.0, sp1.z);
     preset(G.orbit.preset);
@@ -803,9 +832,9 @@
       });
       G.snow.position.set(tw.x, 0, tw.z); G.snow.geometry.attributes.position.needsUpdate = true;
     }
-    // 풍향계: 머리가 바람이 불어오는 쪽을 향함, 프로펠러는 풍속만큼 회전 · 바람자루는 바람 가는 쪽으로 펴짐
-    G.head.rotation.y = (90 - f.wd) * D2R;
-    G.prop.rotation.x += Math.min(25, f.ws * 4) * dt;
+    // 풍향계: 화살촉이 바람이 불어오는 쪽을 향함, 컵은 풍속만큼 회전 · 바람자루는 바람 가는 쪽으로 펴짐
+    G.vane.rotation.y = (90 - f.wd) * D2R + Math.sin(now / 700) * 0.06 * Math.min(1, f.ws / 2);
+    G.cups.rotation.y -= Math.min(30, f.ws * 3.5) * dt;
     G.sockYaw.rotation.y = (90 - (f.wd + 180)) * D2R;
     var droop = (1 - Math.min(1, f.ws / 7)) * 70 * D2R; G.sockPitch.rotation.z = -droop + Math.sin(now / 300) * 0.04 * Math.min(1, f.ws / 3);
     // ── 측창·천창·커튼·차광 ──
