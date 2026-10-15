@@ -1,4 +1,4 @@
-/* farmily-daily : 자동제어 '권장값 비교' — sim.js 보다 먼저 불러옵니다.
+/* farmily-daily : 자동제어 '권장값 비교' + 강수 그래프·예상 결과 '비·눈' 줄 — sim.js 보다 먼저 불러옵니다.
    1) 자동제어 입력칸마다 권장값을 작게 보여 주고, 바꾼 값은 노란 칸 + '↺ 권장값으로' 단추
    2) 값을 바꾸면 같은 날씨·같은 하우스로 권장값일 때를 한 번 더 계산해
       예상 결과 위에 '권장값과 비교' 표를, 기온·습도 그래프에 '권장값일 때' 초록 점선을 보여 줌 */
@@ -108,14 +108,53 @@
       + '<p style="margin:8px 0 0">' + verdict + ' <button type="button" class="btn sm ghost" id="cmpreset">모두 권장값으로</button></p></div>';
   }
   function decorateSummary() {
-    var s = $('summary'); if (!s || !s.firstChild || s.querySelector('.cmpbox') || !last) return;
-    var div = document.createElement('div'); div.innerHTML = compareHTML(); if (div.firstChild) s.insertBefore(div.firstChild, s.firstChild);
+    var s = $('summary'); if (!s || !s.firstChild || !last) return;
+    // 예상 결과 표에 '비·눈' 줄 추가
+    var tbl = s.querySelector('table.sumt');
+    if (tbl && !tbl.querySelector('.rainrow')) {
+      var rows = tbl.querySelectorAll('tr'), after = null;
+      for (var i = 0; i < rows.length; i++) { var th = rows[i].querySelector('th'); if (th && th.textContent.indexOf('습도 90%') === 0) after = rows[i]; }
+      var tr = document.createElement('tr'); tr.className = 'rainrow';
+      tr.innerHTML = '<th>비·눈 (강수량 · 시간)</th>' + last.r.summary.map(function (d) {
+        if (!d.rainH) return '<td>없음</td>';
+        return '<td' + (d.rainWet >= 2 ? ' class="mid"' : '') + '>' + (d.snowH >= d.rainH / 2 ? '🌨 ' : '🌧 ') + f1(d.rainMm) + 'mm · ' + f1(d.rainH) + '시간' + (d.rainWet >= 0.5 ? '<br><small>그동안 습도 90%↑ ' + f1(d.rainWet) + '시간</small>' : '') + '</td>';
+      }).join('');
+      if (after && after.nextSibling) after.parentNode.insertBefore(tr, after.nextSibling); else (rows[0] && rows[0].parentNode || tbl).appendChild(tr);
+    }
+    if (!s.querySelector('.cmpbox')) { var div = document.createElement('div'); div.innerHTML = compareHTML(); if (div.firstChild) s.insertBefore(div.firstChild, s.firstChild); }
     if (window.postHeight) setTimeout(window.postHeight, 50);
   }
   document.addEventListener('click', function (e) { if (e.target && e.target.id === 'cmpreset') { var r = $('reset'); if (r) r.click(); } });
 
+  // ── 강수 그래프 (습도 그래프 아래): 시간당 강수량 막대 + 강수확률 ──
+  function rainPanel() {
+    var ch = $('charts'); if (!ch || !last || ch.querySelector('.rainch')) return;
+    var svgs = ch.querySelectorAll('svg.ch'); if (svgs.length < 2) return;
+    var fr = last.r.frames, t0 = fr[0].t, t1 = fr[fr.length - 1].t, CL = 44, CR = 12, CW = +svgs[1].getAttribute('viewBox').split(' ')[2], H = 84, top = 22, bot = H - 8;
+    function X(t) { return CL + (t - t0) / (t1 - t0) * (CW - CL - CR); }
+    var mx = 2, anyRain = false, anyPop = false;
+    fr.forEach(function (f) { if (f.rain > mx) mx = f.rain; if (f.pty > 0 || f.rain > 0) anyRain = true; if (f.pop != null) anyPop = true; });
+    mx = Math.ceil(mx);
+    function Y(v) { return bot - v / mx * (bot - top); }
+    var o = '<svg viewBox="0 0 ' + CW + ' ' + H + '" class="ch rainch"><text x="' + CL + '" y="14" font-size="12" font-weight="700" fill="#444">🌧 비·눈 (시간당 mm)' + (anyPop ? ' · 강수확률' : '') + '</text>';
+    var ns = null; fr.forEach(function (f, i) { if (!f.day && ns == null) ns = f.t; if ((f.day || i === fr.length - 1) && ns != null) { o += '<rect x="' + X(ns).toFixed(1) + '" y="' + top + '" width="' + (X(f.t) - X(ns)).toFixed(1) + '" height="' + (bot - top) + '" fill="#eef0f4"/>'; ns = null; } });
+    [0, mx / 2, mx].forEach(function (v) { o += '<line x1="' + CL + '" x2="' + (CW - CR) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" stroke="#e5e7eb"/><text x="' + (CL - 5) + '" y="' + (Y(v) + 4).toFixed(1) + '" font-size="10" fill="#888" text-anchor="end">' + f1(v) + '</text>'; });
+    fr.forEach(function (f, i) {
+      if (!(f.pty > 0 || f.rain > 0)) return;
+      var x = X(f.t), x2 = i < fr.length - 1 ? X(fr[i + 1].t) : x + 1, v = Math.max(f.rain || 0.3, 0.3);
+      o += '<rect x="' + x.toFixed(1) + '" y="' + Y(v).toFixed(1) + '" width="' + Math.max(0.8, x2 - x + 0.2).toFixed(1) + '" height="' + (bot - Y(v)).toFixed(1) + '" fill="' + (f.pty === 3 ? '#a5b4fc' : f.pty === 2 ? '#818cf8' : f.pty === 4 ? '#1d4ed8' : '#3b82f6') + '"/>';
+    });
+    if (anyPop) { var d = ''; fr.forEach(function (f, i) { if (f.pop == null) return; d += (d ? 'L' : 'M') + X(f.t).toFixed(1) + ' ' + (bot - f.pop / 100 * (bot - top)).toFixed(1); }); o += '<path d="' + d + '" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 3"/>'; }
+    if (!anyRain) o += '<text x="' + ((CL + CW - CR) / 2) + '" y="' + ((top + bot) / 2 + 4) + '" font-size="12" fill="#64748b" text-anchor="middle">이 기간에는 비·눈 예보가 없습니다</text>';
+    fr.forEach(function (f) { var dd = new Date(f.t + 9 * 3600000); if (dd.getUTCMinutes() === 0 && dd.getUTCHours() === 0) o += '<line x1="' + X(f.t).toFixed(1) + '" x2="' + X(f.t).toFixed(1) + '" y1="' + top + '" y2="' + bot + '" stroke="#9ca3af"/>'; });
+    o += '<line class="playhead" x1="0" x2="0" y1="' + top + '" y2="' + H + '" stroke="#12341f" stroke-width="2"/></svg>';
+    var w = document.createElement('div'); w.className = 'chw';
+    w.innerHTML = '<div class="leg"><span><i style="border-top:4px solid #3b82f6"></i>비</span><span><i style="border-top:4px solid #818cf8"></i>비/눈·눈</span>' + (anyPop ? '<span><i style="border-top:2px dashed #94a3b8"></i>강수확률 (위 끝 100%)</span>' : '') + '<span style="color:#888">비 오면 천창 닫힘·측창 줄임</span></div>' + o;
+    var hum = svgs[1].parentNode; hum.parentNode.insertBefore(w, hum.nextSibling);
+  }
   // ── 기온·습도 그래프에 '권장값일 때' 초록 점선 (sim.js 그래프와 같은 눈금 계산) ──
   function decorateCharts() {
+    rainPanel();
     if (!last || !last.b) return;
     var svgs = document.querySelectorAll('#charts svg.ch'); if (svgs.length < 2 || svgs[0].querySelector('.basel')) return;
     var fr = last.r.frames, bf = last.b.frames, t0 = fr[0].t, t1 = fr[fr.length - 1].t, CL = 44, CR = 12;
