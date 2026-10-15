@@ -39,6 +39,8 @@
       ventDay: 26, ventNight: 20, band: 4,            // 환기 시작 온도, 완전 개방까지 온도폭
       windLimit: 6, windOpen: 20, stormLimit: 10,      // 강풍 시 바람받이 측창 최대 %, 폭풍 시 모두 닫음
       rainRoofClose: true, coldOut: 10, coldOpen: 30,  // 외기 10℃ 미만이면 측창 최대 30%
+      rainRoofMax: 0, rainSideMax: 50,                 // 비 올 때(감우 시) 천창 최대 %(0 = 닫음, 위 칸을 켰을 때) · 측창 최대 %
+      rainWindLimit: 3, rainWindOpen: 10,              // 비 + 이 풍속 이상이면 바람받이 쪽 측창 최대 %
       nightDehum: true,                                // 야간 습도 90% 이상이면 측창 5% (외기 8℃ 이상일 때)
       heatDay: 15, heatEve: 13 + a, heatMid: 11 + a, heatDawn: 13 + a, // 주간 / 일몰~+5시간 / 심야 / 일출 2시간 전~일출
       curtainOut: 15, curtainOpenRad: 30,              // 일몰 후 외기 15℃ 미만이면 커튼 닫음, 일사 30W/m² 넘으면 연다
@@ -159,13 +161,15 @@
       if (nRoof) { tRoof = Math.min(1, need / 0.5); tSide = Math.max(0, (need - 0.3) / 0.7); if (!day && c.nightDehum && need === 0.05) { tRoof = 0.1; tSide = 0; } }
       var maxSide = 1;
       if (To < c.coldOut) maxSide = Math.min(maxSide, c.coldOpen / 100);
-      // 비·눈: 천창 닫기(설정), 측창은 최대 50% · 강한 비(시간당 3mm 이상·소나기)는 20%,
-      //        바람(3m/s 이상)과 함께 오면 빗물이 들이치는 바람받이 쪽 측창은 10%까지만
+      // 비·눈(실제 제어기의 '감우 시 위치'): 천창은 설정 위치까지(기본 0 = 닫음), 측창은 설정 최대(기본 50%) ·
+      //        강한 비(시간당 3mm 이상·소나기)는 그 값과 20% 중 작은 값, 바람(기본 3m/s 이상)과 함께 오면 바람받이 쪽 측창은 설정 최대(기본 10%)
       var wetNow = o.pty > 0 || o.rain > 0, heavy = o.pty === 4 || o.rain >= 3;
-      if (wetNow) { if (c.rainRoofClose) tRoof = 0; maxSide = Math.min(maxSide, heavy ? 0.2 : 0.5); }
+      var rRoof = (c.rainRoofMax != null ? c.rainRoofMax : 0) / 100, rSide = (c.rainSideMax != null ? c.rainSideMax : 50) / 100;
+      var rwLim = c.rainWindLimit != null ? c.rainWindLimit : 3, rwOpen = (c.rainWindOpen != null ? c.rainWindOpen : 10) / 100;
+      if (wetNow) { if (c.rainRoofClose) tRoof = Math.min(tRoof, rRoof); maxSide = Math.min(maxSide, heavy ? Math.min(rSide, 0.2) : rSide); }
       var cA = Math.cos((o.wd - nA) * D2R), cB = Math.cos((o.wd - nB) * D2R);  // 바람이 그쪽에서 불어오면 1
       var tA = Math.min(tSide, maxSide), tB = Math.min(tSide, maxSide);
-      if (wetNow && o.ws >= 3) { if (cA > 0.3) tA = Math.min(tA, 0.1); if (cB > 0.3) tB = Math.min(tB, 0.1); }
+      if (wetNow && o.ws >= rwLim) { if (cA > 0.3) tA = Math.min(tA, rwOpen); if (cB > 0.3) tB = Math.min(tB, rwOpen); }
       if (o.ws >= c.windLimit) { if (cA > 0.3) tA = Math.min(tA, c.windOpen / 100); if (cB > 0.3) tB = Math.min(tB, c.windOpen / 100); tRoof = Math.min(tRoof, 0.3); }
       if (o.ws >= c.stormLimit) { tA = 0; tB = 0; tRoof = 0; }
       // 커튼: 밤에 외기 기준 이하면 닫고, 아침 일사 기준 넘으면 연다
@@ -286,7 +290,8 @@
       if (!d.rainH || d.rainH < 1) return;
       var what = d.snowH >= d.rainH / 2 ? '눈·비' : '비';
       tips.push([d.rainWet >= 2 ? 'warn' : 'info', fmtDay(d.date) + ' ' + what + ' ' + f1r(d.rainMm) + 'mm(' + f1r(d.rainH) + '시간) 예보 — 비 오는 동안 '
-        + (c.rainRoofClose && house.roofVent ? '천창이 닫히고 ' : '') + '측창도 절반 이하(강한 비는 20%, 바람받이 쪽은 10%)로 줄어'
+        + (c.rainRoofClose && house.roofVent ? (c.rainRoofMax > 0 ? '천창이 ' + c.rainRoofMax + '% 이하로 줄고 ' : '천창이 닫히고 ') : '')
+        + '측창도 ' + (c.rainSideMax != null ? c.rainSideMax : 50) + '% 이하(바람 ' + (c.rainWindLimit != null ? c.rainWindLimit : 3) + 'm/s 이상이면 바람받이 쪽 ' + (c.rainWindOpen != null ? c.rainWindOpen : 10) + '%)로 줄어'
         + (d.rainWet >= 1 ? ' 그동안 습도 90% 이상이 ' + f1r(d.rainWet) + '시간 이어집니다. 비 그친 뒤 바로 환기하고 순환팬을 돌리세요.' : ' 환기가 줄어듭니다. 비 그친 뒤 습도를 확인하세요.')]);
     });
     if (mw >= 2) tips.push(['info', '오전 5~9시 습도 75% 이상이 ' + mw.toFixed(1) + '시간입니다. 이 시간대 고습은 열과를 늘리니 해 뜬 뒤 짧게 환기하거나 송풍하세요.']);
