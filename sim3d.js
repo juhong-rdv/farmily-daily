@@ -1,6 +1,6 @@
 /* farmily-daily : 우리 하우스 시뮬레이션 3D 화면 (three.js r128)
    sim.js 가 프레임마다 FSIM3D.draw(f, ctx) 를 부릅니다. WebGL 이 안 되면 기존 단면 그림을 씁니다.
-   실제 하우스처럼: 아치 파이프·도리·물받이·기초, 측창 감기 축과 개폐기, 방충망, 출입문, 온풍기·비닐 덕트·연통, 유동팬,
+   실제 하우스처럼: 아치 파이프·도리·물받이·기초, 측창 감기 축과 개폐기, 방충망, 출입문과 FARMILY 간판(밤에 불 켜짐), 온풍기·비닐 덕트·연통, 유동팬,
    두둑·멀칭·점적, 유인줄로 키우는 토마토(잎·화방·열매), 주변 농로·배수로·이웃 하우스·관리사·전봇대·먼 산,
    시간대별 하늘색·햇빛 색·안개·서리·눈·비 젖음까지 그립니다. */
 (function (root) {
@@ -189,6 +189,26 @@
   var G = null;
 
   // ---------- 화면 준비 ----------
+  // 간판 그림: 흰 판 위에 FARMILY 로고 (로고 파일을 불러오면 다시 그림)
+  var LOGO = null, signTexs = [];
+  function paintSign(cv) {
+    var x = cv.getContext('2d'), w = cv.width, h = cv.height;
+    var g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#eef1f4');
+    x.fillStyle = g; x.fillRect(0, 0, w, h);
+    if (LOGO && LOGO.complete && LOGO.naturalWidth) { var lw = w * 0.86, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; x.drawImage(LOGO, (w - lw) / 2, (h - lh) / 2, lw, lh); }
+    else { x.fillStyle = '#292929'; x.font = 'bold ' + Math.round(h * 0.55) + 'px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('FARMILY', w / 2, h / 2); }
+  }
+  function signTexture() {
+    var cv = document.createElement('canvas'); cv.width = 1280; cv.height = 256; paintSign(cv);
+    var tx = new T.CanvasTexture(cv); tx.anisotropy = 4; signTexs.push(tx);
+    if (!LOGO) {
+      LOGO = new Image();
+      LOGO.onload = function () { signTexs.forEach(function (t) { paintSign(t.image); t.needsUpdate = true; }); };
+      LOGO.src = '/farmily-daily/farmily-logo.svg';
+    }
+    if (signTexs.length > 4) signTexs.shift();
+    return tx;
+  }
   function setup() {
     var wrap = document.getElementById('stagewrap');
     var css = document.createElement('style');
@@ -560,6 +580,18 @@
     var lfF = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(dw, dhh - 0.08, 0.02)), new T.LineBasicMaterial({ color: 0x6b7680 })); lfF.position.y = dhh / 2; leaf.add(lfF);
     var handle = new T.Mesh(new T.BoxGeometry(0.03, 0.18, 0.04), doorFrame); handle.position.set(-dw / 2 + 0.1, 1.0, 0.03 * es); leaf.add(handle);
     var apron = add(new T.Mesh(uvM(new T.PlaneGeometry(dw * 2.2, 2.4), dw * 2.2, 2.4), conc)); apron.rotation.x = -Math.PI / 2; apron.position.set(dxc + dw * 0.4, 0.03, zN + es * 1.2); apron.receiveShadow = true;
+    // ── FARMILY 간판: 출입문 위 박공 바깥쪽 (밤에는 불이 들어오는 라이트박스) ──
+    var sgW = Math.min(W * 0.55, 4.0), sgH, sgY;
+    for (var sgi = 0; sgi < 12; sgi++) { sgH = sgW / 5; sgY = dhh + 0.14 + sgH / 2; if (sgY + sgH / 2 <= yAt(0.5 - sgW / W / 2) - 0.1 || sgW < 1.3) break; sgW *= 0.9; }
+    var sgTex = signTexture(), sgOut = es * 0.16;
+    var signMat = new T.MeshLambertMaterial({ color: 0xffffff, map: sgTex, emissive: 0x000000, emissiveMap: sgTex });
+    var sgFrameMat = new T.MeshPhongMaterial({ color: 0x2b2f34, shininess: 40, specular: 0x444444 });
+    var sgBox = add(new T.Mesh(new T.BoxGeometry(sgW + 0.1, sgH + 0.1, 0.12), sgFrameMat)); sgBox.position.set(dxc, sgY, zN + sgOut - es * 0.07); sgBox.castShadow = true;
+    var sgFace = add(new T.Mesh(new T.PlaneGeometry(sgW, sgH), signMat)); sgFace.position.set(dxc, sgY, zN + sgOut); sgFace.rotation.y = es > 0 ? 0 : Math.PI;
+    [-1, 1].forEach(function (sd) { var br = add(new T.Mesh(new T.BoxGeometry(0.05, 0.05, 0.22), sgFrameMat)); br.position.set(dxc + sd * sgW * 0.38, sgY - sgH / 2 - 0.02, zN + es * 0.05); });
+    var sgGlowMat = new T.MeshBasicMaterial({ map: G.X.puff, color: 0xfff6e6, transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false });
+    var sgGlow = add(new T.Mesh(new T.PlaneGeometry(sgW * 1.7, sgH * 3.2), sgGlowMat)); sgGlow.position.set(dxc, sgY, zN + es * 0.02); sgGlow.rotation.y = sgFace.rotation.y; sgGlow.renderOrder = 3;
+    var signLight = new T.PointLight(0xfff4e0, 0, 9, 1.8); signLight.position.set(dxc, sgY - 0.1, zN + es * 1.4); grp.add(signLight);
 
     // ── 보온커튼: 단동은 아치를 따라 안쪽에(양옆 감기), 연동은 물받이 높이에 수평 ──
     var curC = [], curO = [];
@@ -723,7 +755,7 @@
     G.house = grp;
     G.dims = { n: n, W: W, L: L, hs: hs, hr: hr, NW: NW, x0: x0, vh: vh, du: du, axis: axis, baseOp: baseOp };
     G.parts = { film: film, flapMat: flapMat, sides: sides, flaps: flaps, curC: curC, curO: curO, shOn: shOn, shOff: shOff, air: air, airMat: airMat, dripMat: dripMat, heat: heat, arA: arA, arB: arB, arR: arR,
-      fans: fans, snowRoof: snowRoof, puddles: puddles, ditches: [env.userData['ditch-1'], env.userData.ditch1], lamp: lamp, bulbMat: bulbMat, winMat: winMat, irrLed: irrLed, road: road, filmMap: 'film' };
+      fans: fans, snowRoof: snowRoof, puddles: puddles, ditches: [env.userData['ditch-1'], env.userData.ditch1], lamp: lamp, bulbMat: bulbMat, winMat: winMat, signMat: signMat, signLight: signLight, signGlow: sgGlowMat, irrLed: irrLed, road: road, filmMap: 'film' };
     // 바람 입자 범위
     var half = Math.max(L, NW) / 2 + 18;
     G.wb = { half: half, ymax: hr + 5 };
@@ -798,6 +830,9 @@
     P.snowRoof.forEach(function (m) { m.visible = (f.pty === 3 || (f.pty === 2 && f.To < 1)) && !(f.Ti > 8 && !f.cur); });
     // 밤 조명: 마당 가로등·관리사 창
     var night = el < -3;
+    // 간판: 해 지고 어두워지면(해 높이 0° 아래) 불이 들어오고, 해 질 녘엔 서서히 밝아짐
+    var sgOn = clamp((1 - el) / 4, 0, 1);
+    if (P.signMat) { P.signMat.emissive.setRGB(0.95 * sgOn, 0.95 * sgOn, 0.95 * sgOn); P.signLight.intensity = 0.9 * sgOn; P.signGlow.opacity = 0.55 * sgOn; }
     P.lamp.intensity = night ? 1.1 : 0; P.bulbMat.color.setHex(night ? 0xfff1c8 : 0x777777); P.winMat.color.setHex(night ? 0xffcf7a : mixHex(0x2b3946, horC, 0.35));
     // 구름: 맑음 2 · 구름많음 6 · 흐림/비/눈 12 (흐리면 낮고 회색)
     var nc = over ? 12 : part ? 6 : 2;
