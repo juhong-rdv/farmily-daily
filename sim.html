@@ -68,6 +68,12 @@
   #calout p { font-size: 14px; margin: 8px 0; }
   #f-date { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; }
   #f-date input[type=date], #f-date select { font: inherit; font-size: 15px; padding: 5px 8px; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+  #wmode { font-weight: 700; border-color: #12341f !important; }
+  .vpre { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .vpre .btn.sm { font-size: 13px; padding: 4px 10px; }
+  .vgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0 20px; }
+  .vgrid input[type=date] { font: inherit; font-size: 14px; padding: 3px 6px; border: 1px solid #ccc; border-radius: 6px; }
+  #vcard { border-color: #c4b5fd; background: #faf8ff; }
   /* farmily.ai 페이지 안(iframe)에 들어갈 때: 옆 칸을 따로 스크롤하지 않고 전체 높이로 펼침 */
   html.embed .side { position: static; max-height: none; overflow: visible; }
   @media (max-width: 900px) {
@@ -81,7 +87,7 @@
 <div class="wrap">
   <header>
     <h1>🏠 온실 제어 시뮬레이션 <small style="font-size:14px;color:#666;font-weight:600">토마토 · 방울토마토</small></h1>
-    <p>하우스 크기·방향과 자동제어기 설정을 넣으면, 기상청 예보로 앞으로 2~3일 하우스 안 온도·습도와 창·커튼·차광·난방·관수가 어떻게 움직일지 시간대별로 보여 드립니다.</p>
+    <p>하우스 크기·방향과 자동제어기 설정을 넣으면, 기상청 예보로 앞으로 2~3일 하우스 안 온도·습도와 창·커튼·차광·난방·관수가 어떻게 움직일지 시간대별로 보여 드립니다. 위 날씨 칸에서 <b>🧪 가상 날씨</b>를 고르면 폭염·한파·비바람 같은 날씨를 직접 만들어 미리 시험해 볼 수도 있습니다.</p>
   </header>
   <div class="top"><span id="f-region"></span><span id="f-date"></span><span id="status">불러오는 중…</span></div>
   <div class="grid">
@@ -92,6 +98,7 @@
         <button class="btn ghost" id="reset" type="button">토마토 권장값으로 되돌리기</button></details></div>
     </div>
     <div class="main">
+      <div class="card" id="vcard" style="display:none"></div>
       <div class="card">
         <h2>▶ 시간대별 하우스 모습 <small style="font-size:12px;color:#888;font-weight:400">3D · 끌어서 돌려 보기</small></h2>
         <div id="stagewrap"><svg id="stage" viewBox="0 0 900 440" role="img" aria-label="하우스 단면: 창 열림, 보온커튼, 차광막, 난방, 관수, 해 위치, 바람, 안팎 온도·습도"></svg></div>
@@ -131,8 +138,9 @@
           <li>하우스는 공기·작물 1개와 흙 1개로 단순화해 1분 간격으로 열(햇빛 유입, 피복 열손실, 밤 복사냉각, 환기, 난방, 흙 저장열)과 수분(증산, 환기, 결로)을 계산합니다.</li>
           <li>환기량은 창 면적, 바람 세기·방향(하우스 방향 기준), 안팎 온도차로 계산합니다. 강풍 때 바람받이 측창 제한, 외기 저온 제한, 비·눈 올 때 천창·측창 줄이기(자동제어 설정의 '비 올 때'·'비바람' 칸 값대로 — 기본은 천창 닫음, 측창 50%, 시간당 3mm 이상 강한 비는 20%, 비와 함께 3m/s 이상 바람이면 바람받이 쪽 10%), 비에 젖은 피복의 열손실 증가, 모터 속도(측창 4분·천창 3분에 끝까지)도 반영합니다.</li>
           <li>토마토 적온·관리 기준은 농촌진흥청·제주특별자치도농업기술원 토마토 재배 자료(낮 25~27℃, 밤 일몰 후 12~13℃·이후 10℃ 이상, 30℃ 넘으면 환기, 적습 70~80%)와 경기도농업기술원 일사비례 급액 시험(70J/cm²마다 급액, 배액률 30%, 일출 1시간 후~일몰 2시간 전)을 참고한 일반값입니다. 품종·작형에 맞게 바꿔 쓰세요.</li>
-          <li>3D·단면 그림은 입력한 하우스 크기·방향 그대로 그립니다. 아치 파이프·도리·물받이, 측창 감기 축과 개폐기, 방충망, 보온커튼·차광막, 온풍기·비닐 덕트·연통, 유동팬, 두둑·멀칭·점적, 유인줄로 키우는 토마토(생육 단계에 따라 키·잎·꽃·열매 색이 바뀜)를 실제 모습에 가깝게 보여 줍니다. 해 위치·그림자·하늘색·바람 방향은 실제 시각과 예보 기준이고, 습도가 높으면 필름에 물방울(결로), 비가 오면 젖은 땅과 물웅덩이, 눈이 오면 흰 땅, 맑은 새벽 2℃ 이하면 서리가 보입니다. 주변의 농로·배수로·이웃 하우스·관리사·먼 산은 분위기를 위한 그림이며 계산에는 들어가지 않습니다. 3D가 안 되는 기기에서는 단면 그림으로 바뀝니다.</li>
+          <li>3D·단면 그림은 입력한 하우스 크기·방향 그대로 그립니다. 아치 파이프·도리·물받이, 측창 감기 축과 개폐기, 방충망, 보온커튼·차광막, 온풍기·비닐 덕트·연통, 유동팬, 두둑·멀칭·점적, 유인줄로 키우는 토마토(생육 단계에 따라 키·잎·꽃·열매 색이 바뀜)를 실제 모습에 가깝게 보여 줍니다. 해 위치·그림자·하늘색·바람 방향은 실제 시각과 예보 기준이고, 습도가 높으면 필름에 물방울(결로), 비가 오면 젖은 땅과 물웅덩이, 눈이 오면 흰 땅, 맑은 새벽 2℃ 이하면 서리가 보입니다. 출입문 위에는 FARMILY 간판이 달려 있어 해가 지면 불이 들어옵니다. 주변의 농로·배수로·이웃 하우스·관리사·먼 산은 분위기를 위한 그림이며 계산에는 들어가지 않습니다. 3D가 안 되는 기기에서는 단면 그림으로 바뀝니다.</li>
           <li>📅 날짜를 고르면 그날부터 1~3일을 계산합니다. 지난 시간은 가까운 기상청 관측소의 시간별 관측값(기온·습도·바람·일사·비)을, 앞으로의 시간은 단기예보를 씁니다. 관측 자료는 최근 35일부터 쌓이고 있습니다. 하우스 안 온도·습도는 어느 경우든 모델 계산값입니다.</li>
+          <li>🧪 가상 날씨를 고르면 예보 대신 직접 정한 최저·최고기온, 습도, 하늘, 바람, 비·눈으로 시간별 바깥 날씨를 만들어 계산합니다(새벽 6시 최저·오후 3시 최고, 습도는 기온과 반대로, 비 오는 동안은 흐림·습도 95% 이상·햇빛 크게 줄어듦, 햇빛 세기는 날짜·지역의 해 높이로 계산). 실제 예보가 아니므로 설정을 비교해 보는 용도로 쓰세요.</li>
           <li>계산은 '직전 30시간 바깥 자료(관측소 시간자료·지난 예보)'부터 시작해 지금 하우스 안 상태를 먼저 맞춘 뒤 예보 기간으로 이어 갑니다.</li>
           <li>실제 하우스와는 차이가 날 수 있습니다(틈새·피복 노후·주변 지형·작물 상태). 위 '실제 기록으로 모델 맞추기'로 우리 하우스에 맞춰 쓰시길 권합니다.</li>
         </ul>
@@ -142,10 +150,10 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>window.THREE || document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>')</script>
-<script src="/farmily-daily/sim-engine.js?v=20261015x"></script>
-<script src="/farmily-daily/sim3d.js?v=20261015x"></script>
-<script src="/farmily-daily/share.js?v=20261015x"></script>
-<script src="/farmily-daily/compare.js?v=20261015x"></script>
+<script src="/farmily-daily/sim-engine.js?v=20261016a"></script>
+<script src="/farmily-daily/sim3d.js?v=20261016a"></script>
+<script src="/farmily-daily/share.js?v=20261016a"></script>
+<script src="/farmily-daily/compare.js?v=20261016a"></script>
 <script>
   // 좁은 화면에서는 하우스 정보·제어 설정을 접어 두고 그림부터 보이게
   if (window.innerWidth < 900) { var ds = document.querySelectorAll('.side details'); for (var i = 1; i < ds.length; i++) ds[i].open = false; }
@@ -160,7 +168,7 @@
     });
   } catch (e) {}
 </script>
-<script src="/farmily-daily/sim.js?v=20261015x"></script>
+<script src="/farmily-daily/sim.js?v=20261016a"></script>
 <script>
   // farmily.ai 페이지 안(iframe)에 들어 있을 때 내용 높이를 바깥 페이지에 알려 iframe 높이를 맞춤
   // (오늘의 농업 소식과 같은 { farmilyHeight: 높이 } 신호)
