@@ -172,12 +172,178 @@
   function loadWeather() {
     $('status').textContent = '예보 불러오는 중…';
     fetch(BASE + 'data/weather/' + S.region + '.json', { cache: 'no-store' }).then(function (x) { if (!x.ok) throw 0; return x.json(); })
-      .then(function (w) { weather = w; prevSummary = null; simulate(); })
+      .then(function (w) { weather = w; prevSummary = null; if (!$('v_fc')) buildVirt(); simulate(); })
       .catch(function () { $('status').textContent = '이 지역 예보를 아직 불러올 수 없습니다.'; });
   }
 
+  // ---------- 가상 날씨 ----------
+  // 예보 대신 직접 만든 날씨(기온·습도·하늘·비·바람)로 계산해 '이런 날이면 우리 하우스는?'을 미리 봄
+  var VFIELDS = [
+    { k: 'tmin', label: '아침 최저기온', unit: '℃', min: -25, max: 35, step: 1 },
+    { k: 'tmax', label: '낮 최고기온', unit: '℃', min: -15, max: 45, step: 1 },
+    { k: 'trend', label: '날마다 기온 변화', help: '다음 날로 갈수록 + 오름 · − 내림(찬 공기)', unit: '℃/일', min: -10, max: 10, step: 1 },
+    { k: 'rhDay', label: '한낮 습도', unit: '%', min: 10, max: 100, step: 5 },
+    { k: 'rhNight', label: '밤·새벽 습도', unit: '%', min: 30, max: 100, step: 5 },
+    { k: 'sky', label: '하늘', type: 'select', opts: [['1', '맑음'], ['3', '구름 많음'], ['4', '흐림']] },
+    { k: 'ws', label: '바람 세기', help: '평균 풍속 (한낮엔 조금 더 셈)', unit: 'm/s', min: 0, max: 25, step: 0.5 },
+    { k: 'wd', label: '바람 방향', type: 'select', opts: [['0', '북풍'], ['45', '북동풍'], ['90', '동풍'], ['135', '남동풍'], ['180', '남풍'], ['225', '남서풍'], ['270', '서풍'], ['315', '북서풍']] },
+    { k: 'rain', label: '비·눈', type: 'select', opts: [['0', '없음'], ['1', '약한 비 (시간당 1mm)'], ['4', '비 (시간당 4mm)'], ['12', '강한 비 (시간당 12mm)'], ['snow', '눈']] },
+    { k: 'rainDay', label: '비·눈 오는 날', type: 'select', opts: [['1', '첫째 날'], ['2', '둘째 날'], ['3', '셋째 날']], rain: 1 },
+    { k: 'rainHour', label: '비·눈 시작 시각', unit: '시', min: 0, max: 23, step: 1, rain: 1 },
+    { k: 'rainHours', label: '비·눈 오는 시간', unit: '시간', min: 1, max: 48, step: 1, rain: 1 }
+  ];
+  var VPRESETS = [
+    ['☀️ 맑은 가을날', { tmin: 10, tmax: 24, trend: 0, rhDay: 45, rhNight: 90, sky: '1', ws: 2, wd: '315', rain: '0' }],
+    ['📉 찬 공기 내려옴', { tmin: 12, tmax: 22, trend: -6, rhDay: 40, rhNight: 80, sky: '1', ws: 6, wd: '315', rain: '0' }],
+    ['🌥 흐리고 습한 날', { tmin: 15, tmax: 21, trend: 0, rhDay: 75, rhNight: 98, sky: '4', ws: 1, wd: '90', rain: '0' }],
+    ['🌧 하루 종일 비', { tmin: 14, tmax: 18, trend: 0, rhDay: 85, rhNight: 98, sky: '4', ws: 3, wd: '180', rain: '4', rainDay: '1', rainHour: 6, rainHours: 14 }],
+    ['🌀 비바람·태풍', { tmin: 20, tmax: 25, trend: 0, rhDay: 90, rhNight: 99, sky: '4', ws: 14, wd: '135', rain: '12', rainDay: '1', rainHour: 3, rainHours: 18 }],
+    ['🔥 폭염', { tmin: 27, tmax: 36, trend: 0, rhDay: 50, rhNight: 85, sky: '1', ws: 1.5, wd: '225', rain: '0' }],
+    ['❄️ 한파', { tmin: -12, tmax: -2, trend: -1, rhDay: 40, rhNight: 70, sky: '1', ws: 5, wd: '315', rain: '0' }],
+    ['🌨 눈 오는 날', { tmin: -4, tmax: 1, trend: 0, rhDay: 80, rhNight: 95, sky: '4', ws: 3, wd: '0', rain: 'snow', rainDay: '1', rainHour: 18, rainHours: 10 }]
+  ];
+  var VBASE = { on: false, date: '', days: 2, tmin: 10, tmax: 24, trend: 0, rhDay: 45, rhNight: 90, sky: '1', ws: 2, wd: '315', rain: '0', rainDay: '1', rainHour: 6, rainHours: 6 };
+  S.virt = (function () { try { return Object.assign({}, VBASE, JSON.parse(ls('farmily.sim.virt') || '{}') || {}); } catch (e) { return Object.assign({}, VBASE); } })();
+  function saveVirt() { ls('farmily.sim.virt', JSON.stringify(S.virt)); }
+  function vStart() { var d = S.virt.date || ymd(Date.now()); return Date.parse(d + 'T00:00:00+09:00'); }
+
+  // 시간별 바깥 날씨 만들기: 계산 시작 하루 전(하우스 안 상태 맞추기용)부터 기간 끝까지
+  function virtWeather() {
+    var V = S.virt, H = 3600000, c = COORD[S.region] || [36.5, 127.5];
+    var t0 = vStart(), a = t0 - 24 * H, n = (V.days + 1) * 24 + 1;
+    var tmin = +V.tmin, tmax = Math.max(+V.tmax, tmin + 1), tr = +V.trend || 0;
+    function lo(d) { return tmin + tr * Math.max(0, d); }
+    function hi(d) { return tmax + tr * Math.max(0, d); }
+    var rainOn = V.rain !== '0', rs = t0 + ((+V.rainDay || 1) - 1) * 86400000 + (+V.rainHour || 0) * H, re = rs + (+V.rainHours || 1) * H;
+    var snow = V.rain === 'snow', rmm = snow ? 1 : +V.rain || 0, sky0 = +V.sky || 1, ws0 = +V.ws || 0, wd0 = +V.wd || 0;
+    var w = { h0: kst(a).toISOString().slice(0, 16), h0t: a, src: [], T: [], RH: [], G: [], GC: [], SKY: [], PTY: [], VEC: [], WSD: [], R: [], P: [] };
+    for (var i = 0; i < n; i++) {
+      var t = a + i * H, h = kst(t).getUTCHours(), d = Math.floor(i / 24) - 1, T;
+      // 새벽 6시 최저 → 오후 3시 최고 → 다음 날 새벽 최저로 이어지는 하루 곡선
+      if (h < 6) T = lo(d) + (hi(d - 1) - lo(d)) * (1 + Math.cos(Math.PI * (h + 9) / 15)) / 2;
+      else if (h <= 15) T = lo(d) + (hi(d) - lo(d)) * (1 - Math.cos(Math.PI * (h - 6) / 9)) / 2;
+      else T = lo(d + 1) + (hi(d) - lo(d + 1)) * (1 + Math.cos(Math.PI * (h - 15) / 15)) / 2;
+      var wet = rainOn && t >= rs && t < re, near = rainOn && t >= rs - 3 * H && t < re + 2 * H;
+      if (wet) T -= 0.35 * Math.max(0, T - lo(d));
+      var fr = Math.max(0, Math.min(1, (T - lo(d)) / Math.max(1, hi(d) - lo(d))));
+      var RH = +V.rhNight - (+V.rhNight - +V.rhDay) * fr;
+      if (wet) RH = Math.max(RH, 95); else if (near) RH = Math.max(RH, 85);
+      var sky = wet || near ? 4 : sky0;
+      var sp = F.sunPos(c[0], c[1], new Date(t)), cz = Math.sin(Math.max(0, sp.el) * Math.PI / 180);
+      var clear = sp.el > 0 ? 1098 * cz * Math.exp(-0.057 / Math.max(cz, 0.01)) : 0;
+      var G = clear * (wet ? (rmm >= 10 ? 0.12 : 0.2) : sky === 1 ? 1 : sky === 3 ? 0.7 : 0.35);
+      var gust = h >= 9 && h <= 21 ? 0.75 + 0.5 * Math.sin(Math.PI * (h - 9) / 12) : 0.7;
+      var ws = Math.max(0, ws0 * gust * (wet ? 1.15 : 1));
+      w.src.push('virt'); w.T.push(Math.round(T * 10) / 10); w.RH.push(Math.round(Math.max(5, Math.min(100, RH))));
+      w.G.push(Math.round(G)); w.GC.push(Math.round(clear)); w.SKY.push(sky); w.PTY.push(wet ? (snow ? 3 : 1) : 0);
+      w.VEC.push(Math.round((wd0 + 12 * Math.sin(i / 5) + 360) % 360)); w.WSD.push(Math.round(ws * 10) / 10); w.R.push(wet ? rmm : 0);
+      w.P.push(wet ? 90 : near ? 60 : sky === 4 ? 30 : sky === 3 ? 20 : 0);
+    }
+    return { w: w, t0: t0 };
+  }
+  function virtLabel() {
+    var V = S.virt, sky = { 1: '맑음', 3: '구름 많음', 4: '흐림' }[V.sky] || '';
+    var rain = V.rain === '0' ? '' : ' · ' + (V.rain === 'snow' ? '눈' : '비 시간당 ' + V.rain + 'mm') + ' (' + V.rainDay + '일째 ' + V.rainHour + '시부터 ' + V.rainHours + '시간)';
+    return sky + ' · 최저 ' + V.tmin + '℃ / 최고 ' + V.tmax + '℃' + (+V.trend ? ' (날마다 ' + (V.trend > 0 ? '+' : '') + V.trend + '℃)' : '') + ' · 바람 ' + V.ws + 'm/s' + rain;
+  }
+  function vFieldHTML(f) {
+    var v = S.virt[f.k], id = 'v_' + f.k, h = '<label class="fld" id="w_' + id + '"' + (f.rain && S.virt.rain === '0' ? ' style="display:none"' : '') + '><span class="fl">' + f.label + (f.help ? '<i>' + f.help + '</i>' : '') + '</span>';
+    if (f.type === 'select') h += '<select id="' + id + '">' + f.opts.map(function (o) { return '<option value="' + o[0] + '"' + (String(v) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>';
+    else h += '<span class="numw"><input type="number" id="' + id + '" min="' + f.min + '" max="' + f.max + '" step="' + f.step + '" value="' + v + '"><em>' + f.unit + '</em></span>';
+    return h + '</label>';
+  }
+  function buildVirt() {
+    var top = document.querySelector('.top'); if (!$('vcard')) return;
+    if (!$('wmode')) {
+      var m = document.createElement('select'); m.id = 'wmode'; m.setAttribute('aria-label', '날씨 자료');
+      m.innerHTML = '<option value="fc">📡 기상청 예보</option><option value="virt">🧪 가상 날씨</option>';
+      top.insertBefore(m, top.firstChild);
+      m.onchange = function () { S.virt.on = this.value === 'virt'; saveVirt(); prevSummary = null; showVirt(); simulate(); };
+    }
+    $('wmode').value = S.virt.on ? 'virt' : 'fc';
+    var V = S.virt, card = $('vcard');
+    card.innerHTML = '<h2>🧪 가상 날씨 만들기 <small style="font-size:12px;color:#888;font-weight:400">예보가 아닌, 직접 정한 날씨로 계산합니다</small></h2>'
+      + '<div class="vpre">' + VPRESETS.map(function (p, i) { return '<button class="btn ghost sm" type="button" data-vp="' + i + '">' + p[0] + '</button>'; }).join('')
+      + (weather ? '<button class="btn ghost sm" type="button" id="v_fc">📡 지금 예보 값으로 채우기</button>' : '') + '</div>'
+      + '<div class="vgrid">'
+      + '<label class="fld"><span class="fl">시작 날짜<i>계절에 따라 해 높이·낮 길이가 바뀝니다</i></span><input type="date" id="v_date" value="' + (V.date || ymd(Date.now())) + '"></label>'
+      + '<label class="fld"><span class="fl">기간</span><select id="v_days">' + [1, 2, 3].map(function (d) { return '<option value="' + d + '"' + (+V.days === d ? ' selected' : '') + '>' + d + '일</option>'; }).join('') + '</select></label>'
+      + VFIELDS.map(vFieldHTML).join('') + '</div>'
+      + '<p class="note">기온은 새벽 6시쯤 가장 낮고 오후 3시쯤 가장 높게, 습도는 그 반대로 움직이도록 만듭니다. 비·눈이 오는 동안은 하늘이 흐려지고 습도가 95% 이상으로 오르며 햇빛이 크게 줄어듭니다. 지역(위 시·군)은 해 위치 계산에만 씁니다. 설정을 바꾸면 아래 예상 결과 표에 바로 전 설정과의 차이가 작은 글씨로 나옵니다.</p>';
+    Array.prototype.forEach.call(card.querySelectorAll('[data-vp]'), function (b) {
+      b.onclick = function () { var p = VPRESETS[+this.dataset.vp][1]; Object.assign(S.virt, { trend: 0, rain: '0' }, p); saveVirt(); buildVirt(); simulate(); };
+    });
+    if ($('v_fc')) $('v_fc').onclick = function () {
+      var ds = (weather.days || []).filter(function (d) { return d.min != null && d.max != null; });
+      if (!ds.length) return;
+      var T = weather.T.filter(function (x) { return x != null; }), RH = (weather.RH || []).filter(function (x) { return x != null; }), Wv = (weather.WSD || []).filter(function (x) { return x != null; });
+      var avg = function (a) { return a.length ? a.reduce(function (s, x) { return s + x; }, 0) / a.length : 0; };
+      Object.assign(S.virt, { date: ds[0].d, tmin: Math.round(ds[0].min), tmax: Math.round(ds[0].max),
+        trend: ds[1] ? Math.round(((ds[1].min + ds[1].max) - (ds[0].min + ds[0].max)) / 2) : 0,
+        rhDay: Math.round(Math.min.apply(null, RH.length ? RH : [50]) / 5) * 5, rhNight: Math.round(Math.max.apply(null, RH.length ? RH : [90]) / 5) * 5,
+        ws: Math.round(avg(Wv) * 2) / 2, rain: '0' });
+      // 하늘: 첫날 낮 동안 가장 많은 하늘 상태 · 비·눈: 예보 안의 첫 강수 구간
+      var h0 = Date.parse(weather.h0 + ':00+09:00'), cnt = { 1: 0, 3: 0, 4: 0 }, d0 = Date.parse(ds[0].d + 'T00:00:00+09:00');
+      for (var i = 0; i < weather.T.length; i++) { var t = h0 + i * 3600000, hh = kst(t).getUTCHours(); if (t >= d0 && t < d0 + 86400000 && hh >= 8 && hh <= 17 && weather.SKY && cnt[weather.SKY[i]] != null) cnt[weather.SKY[i]]++; }
+      S.virt.sky = ['1', '3', '4'].sort(function (x, y) { return cnt[y] - cnt[x]; })[0];
+      var PT = weather.PTY || [], RR = weather.R || [];
+      for (i = 0; i < PT.length; i++) {
+        t = h0 + i * 3600000; if (t < d0) continue; if (t >= d0 + 3 * 86400000) break;
+        if (PT[i] > 0) {
+          var j = i, sum = 0, snowN = 0; while (j < PT.length && PT[j] > 0) { sum += RR[j] || 0; if (PT[j] === 3 || PT[j] === 2) snowN++; j++; }
+          var mm = sum / (j - i);
+          Object.assign(S.virt, { rain: snowN > (j - i) / 2 ? 'snow' : mm >= 8 ? '12' : mm >= 2.5 ? '4' : '1', rainDay: String(Math.floor((t - d0) / 86400000) + 1), rainHour: kst(t).getUTCHours(), rainHours: Math.min(48, j - i) });
+          if (+S.virt.days < +S.virt.rainDay) S.virt.days = +S.virt.rainDay;
+          break;
+        }
+      }
+      saveVirt(); buildVirt(); simulate();
+    };
+    $('v_date').onchange = function () { S.virt.date = this.value; prevSummary = null; saveVirt(); simulate(); };
+    $('v_days').onchange = function () { S.virt.days = +this.value; prevSummary = null; saveVirt(); simulate(); };
+    VFIELDS.forEach(function (f) {
+      $('v_' + f.k).onchange = function () {
+        var v = this.value;
+        if (f.type !== 'select') { v = +v; if (isNaN(v)) v = VBASE[f.k]; v = Math.max(f.min, Math.min(f.max, v)); this.value = v; }
+        S.virt[f.k] = v;
+        if (f.k === 'tmin' && S.virt.tmax <= v) { S.virt.tmax = v + 1; $('v_tmax').value = v + 1; }
+        if (f.k === 'tmax' && S.virt.tmin >= v) { S.virt.tmin = v - 1; $('v_tmin').value = v - 1; }
+        if (f.k === 'rain') VFIELDS.forEach(function (g) { if (g.rain) $('w_v_' + g.k).style.display = v === '0' ? 'none' : ''; });
+        saveVirt(); clearTimeout(tmr); tmr = setTimeout(simulate, 200);
+      };
+    });
+    showVirt();
+  }
+  function showVirt() {
+    var on = S.virt.on; if (!$('vcard')) return;
+    $('vcard').style.display = on ? '' : 'none';
+    var fd = $('f-date'); if (fd) fd.style.display = on ? 'none' : '';
+    if (on && !$('v_date')) buildVirt();
+    if (window.postHeight) setTimeout(window.postHeight, 50);
+  }
+
   // ---------- 계산 ----------
+  function simVirtual() {
+    var c = COORD[S.region] || [36.5, 127.5];
+    var keepIdx = player.idx, keepT = result && result.frames[Math.floor(keepIdx)] ? result.frames[Math.floor(keepIdx)].t : null;
+    var old = result ? result.summary : null, vw = virtWeather();
+    var win = 'v|' + vw.t0 + '|' + S.virt.days; if (win !== lastWin) { keepT = null; old = null; lastWin = win; }
+    result = F.run(vw.w, c[0], c[1], S.house, S.crop, S.stage, S.ctrl, { cal: activeCal(), noPast: true, recordFrom: vw.t0 });
+    result.drv = null; result.virt = true;
+    if (old) prevSummary = old;
+    var r = find(S.region), g = result.geom;
+    $('status').innerHTML = esc(r ? r.sido + ' ' + r.name : '') + ' · 바닥 ' + Math.round(g.A).toLocaleString() + 'm² · ' + result.plants.toLocaleString() + '주'
+      + ' · <b style="color:#7c3aed">🧪 가상 날씨</b> ' + esc(dlabel(vw.t0 + 9 * 3600000)) + '부터 ' + S.virt.days + '일: ' + esc(virtLabel())
+      + (activeCal() ? ' · <b style="color:#15803d">실측 보정 적용 중</b>' : '');
+    var fr = result.frames;
+    player.idx = 0;
+    if (keepT != null) for (var i = 0; i < fr.length; i++) if (fr[i].t >= keepT) { player.idx = i; break; }
+    if (keepT == null) { for (i = 0; i < fr.length; i++) { var d = kst(fr[i].t); if (d.getUTCHours() === 7 && d.getUTCMinutes() === 0) { player.idx = i; break; } } }
+    $('seek').max = fr.length - 1; $('seek').value = player.idx;
+    drawCharts(); drawSummary(); renderFrame();
+  }
   function simulate() {
+    if (S.virt && S.virt.on) return simVirtual();
     if (!weather) return;
     var c = COORD[S.region] || [36.5, 127.5];
     var keepIdx = player.idx, keepT = result && result.frames[Math.floor(keepIdx)] ? result.frames[Math.floor(keepIdx)].t : null;
@@ -689,7 +855,7 @@
       + row('예상 증산량 · 배액률', function (d) { return Math.round(d.etL * 1000) + 'mL/주' + (d.drain != null ? ' · <b>' + Math.round(d.drain) + '%</b>' : ''); }, function (d) { return d.drain == null ? '' : d.drain < 10 ? 'bad' : d.drain > 45 ? 'mid' : 'ok'; })
       + '</table>';
     var tips = F.advice(sum, c, h, S.crop);
-    $('summary').innerHTML = t + '<ul class="tips">' + tips.map(function (x) { return '<li class="' + x[0] + '">' + (x[0] === 'warn' ? '⚠️ ' : x[0] === 'ok' ? '✅ ' : '💡 ') + x[1] + '</li>'; }).join('') + '</ul>'
+    $('summary').innerHTML = t + '<ul class="tips">' + tips.map(function (x) { return '<li class="' + x[0] + '">' + (x[0] === 'warn' ? '⚠️ ' : x[0] === 'ok' ? '✅ ' : '💡 ') + (result.virt ? String(x[1]).replace(/ 예보 —/g, ' (가상 날씨) —') : x[1]) + '</li>'; }).join('') + '</ul>'
       + (prevSummary ? '<p class="note">작은 글씨 숫자는 바로 전 설정과 비교한 변화입니다(초록 = 좋아짐).</p>' : '');
   }
 
@@ -853,7 +1019,7 @@
       if (v === 'now') { player.idx = 0; break; } var parts2 = v.split('-'); if (+parts2[0] === dd && +parts2[1] === hh && d.getUTCMinutes() === 0) { player.idx = i; break; } }
       $('seek').value = player.idx; renderFrame(0, true); this.value = ''; };
     fetch(BASE + 'data/regions.json').then(function (r) { return r.json(); }).then(function (d) {
-      regions = d.regions; sido = d.sido; if (!find(S.region)) S.region = '3406'; buildRegion(); loadWeather();
+      regions = d.regions; sido = d.sido; if (!find(S.region)) S.region = '3406'; buildRegion(); buildVirt(); if (S.virt.on) simulate(); loadWeather();
     });
     requestAnimationFrame(tick);
     setInterval(function () { if (!result) return; var fr = result.frames, sel = $('jump'), h = '<option value="">시각 바로 가기</option><option value="now">처음(지금)</option>';
