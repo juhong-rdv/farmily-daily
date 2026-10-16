@@ -225,9 +225,10 @@
     sido.forEach(function (s) { h += '<option value="' + s.short + '"' + (r0 && r0.sido === s.short ? ' selected' : '') + '>' + esc(s.full) + '</option>'; });
     h += '</select><select id="lc-sigun" aria-label="시군"><option value="">시·군 선택</option></select><span id="lc-mine"></span></div><div id="lc-body"></div>';
     app.innerHTML = h;
-    fillSigun(r0 ? r0.sido : '');
+    // 선택 이벤트를 먼저 연결한 뒤 시·군 목록을 채움 (서울·세종처럼 시·군이 하나뿐인 곳은 채우면서 바로 고르기 때문)
     document.getElementById('lc-sido').onchange = function () { fillSigun(this.value); };
     document.getElementById('lc-sigun').onchange = function () { if (this.value) { cur = this.value; ls('farmily.region', cur); load(cur); } };
+    fillSigun(r0 ? r0.sido : '');
     if (!r0) document.getElementById('lc-body').innerHTML = '<div class="lc-s">시·도와 시·군을 고르시면 우리 지역의 서리 예상일, 최근 7일 일조량, 오늘 밤 난방이 필요한 시간, 바람·예상 일사량, 48시간 그래프, 병 발생 위험 신호를 보여 드리고 아래 소식 중 우리 지역 내용을 노랗게 표시합니다. 선택은 이 기기에 기억됩니다.</div>';
     ph();
   }
@@ -236,7 +237,7 @@
     var el = document.getElementById('lc-sigun'), h = '<option value="">시·군 선택</option>';
     regions.forEach(function (r) { if (r.sido === s) h += '<option value="' + r.code + '"' + (r.code === cur ? ' selected' : '') + '>' + esc(r.name) + '</option>'; });
     el.innerHTML = h; el.disabled = !s;
-    if (s) { var only = regions.filter(function (r) { return r.sido === s; }); if (only.length === 1) { el.value = only[0].code; el.onchange.call(el); } }
+    if (s) { var only = regions.filter(function (r) { return r.sido === s; }); if (only.length === 1 && only[0].code !== cur) { el.value = only[0].code; if (el.onchange) el.onchange.call(el); } }
   }
 
   function load(code) {
