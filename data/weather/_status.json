@@ -1,5 +1,5 @@
 {
- "started": "2026-10-18T16:16+09:00",
+ "started": "2026-10-18T21:39+09:00",
  "errors": [
   "1101 서울특별시: 접속 실패(http): ConnectTimeout(MaxRetryError(\"HTTPConnectionPool(host='apis.data.go.kr', port=80): Max retries exceeded with url: /13600",
   "2101 부산광역시: 접속 실패(http): ConnectTimeout(MaxRetryError(\"HTTPConnectionPool(host='apis.data.go.kr', port=80): Max retries exceeded with url: /13600",
@@ -23,7 +23,7 @@
     "pageNo": 1,
     "numOfRows": 10,
     "base_date": "20261018",
-    "base_time": "1400",
+    "base_time": "2000",
     "nx": 60,
     "ny": 127
    },
@@ -47,7 +47,7 @@
     "pageNo": 1,
     "numOfRows": 10,
     "base_date": "20261018",
-    "base_time": "1500",
+    "base_time": "2000",
     "nx": 60,
     "ny": 127
    },
@@ -59,7 +59,7 @@
     "pageNo": 1,
     "numOfRows": 10,
     "ftype": "SHRT",
-    "basedatetime": "202610181400"
+    "basedatetime": "202610182000"
    },
    "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getFcstVersion?pageNo=1&numOfRows=10&ftype=SHRT&b"
   },
@@ -69,7 +69,7 @@
     "pageNo": 1,
     "numOfRows": 10,
     "regId": "11B10101",
-    "tmFc": "202610180600"
+    "tmFc": "202610181800"
    },
    "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/MidFcstInfoService/getMidTa?pageNo=1&numOfRows=10&regId=11B10101&tmFc=20261"
   },
@@ -101,5 +101,5 @@
   "fails": 0,
   "error": null
  },
- "finished": "2026-10-18T16:22+09:00"
+ "finished": "2026-10-18T21:45+09:00"
 }
