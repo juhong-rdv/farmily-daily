@@ -1,57 +1,96 @@
 {
- "started": "2026-10-18T21:39+09:00",
- "errors": [
-  "1101 서울특별시: 접속 실패(http): ConnectTimeout(MaxRetryError(\"HTTPConnectionPool(host='apis.data.go.kr', port=80): Max retries exceeded with url: /13600",
-  "2101 부산광역시: 접속 실패(http): ConnectTimeout(MaxRetryError(\"HTTPConnectionPool(host='apis.data.go.kr', port=80): Max retries exceeded with url: /13600",
-  "2102 기장군: 접속 실패(http): ConnectTimeout(MaxRetryError(\"HTTPConnectionPool(host='apis.data.go.kr', port=80): Max retries exceeded with url: /13600",
-  "2201 대구광역시: 접속 실패(http): ConnectTimeout(MaxRetryError(\"HTTPConnectionPool(host='apis.data.go.kr', port=80): Max retries exceeded with url: /13600",
-  "2202 달성군: 접속 실패(http): ConnectTimeout(MaxRetryError(\"HTTPConnectionPool(host='apis.data.go.kr', port=80): Max retries exceeded with url: /13600",
-  "연속 실패로 중단 — 접속 실패면 해외(GitHub 서버) 접속 차단, 키 오류면 승인·반영 대기(1~2시간)를 확인하세요."
- ],
+ "started": "2026-10-19T07:28+09:00",
+ "errors": [],
  "mid_invalid": [],
  "counts": {
-  "ok": 0,
-  "fail": 5,
+  "ok": 167,
+  "fail": 0,
   "regions": 167
  },
- "base": "접속 안 됨",
- "samples": [],
+ "base": "https://apis.data.go.kr/1360000",
+ "samples": [
+  {
+   "path": "/AsosDalyInfoService/getWthrDataList",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 400,
+    "dataCd": "ASOS",
+    "dateCd": "DAY",
+    "startDt": "20261014",
+    "endDt": "20261018",
+    "stnIds": 108
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"108\",\"stnNm\":\"서울\",\"tm\":\"2026-10-14\",\"avgTa\":\"15.2\",\"minTa\":\"9.3\",\"minTaHrmt\":\"0714\",\"maxTa\":\"19.6\",\"maxTaHrmt\":\"1533\",\"mi10MaxRn\":\"\",\"mi10MaxRnHrmt\":\"\",\"hr1MaxRn\":\"\",\"hr1MaxRnHrmt\":\"\",\"sumRnDur\":\"\",\"sumRn\":\"\",\"maxInsWs\":\"8.9\",\"maxInsWsWd\":\"320\",\"maxInsWsHrmt\":\"1308\",\"maxWs\":\"5.0\",\"maxWsWd\":\"290\",\"maxWsHrmt\":\"1315\",\"avgWs\":\"2.6\",\"hr24SumRws\":\"2250\",\"maxWd\":\"270\",\"avgTd\":\"2.6\",\"minRhm\":\"22\",\"minRhmHrmt\":\"1232\",\"avgRhm\":\"45.1\",\"avgPv\":\"7.7\",\"avgPa\":\"1009.3\",\"maxPs\":\"1021.9\","
+  },
+  {
+   "path": "/AsosDalyInfoService/getWthrDataList",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 400,
+    "dataCd": "ASOS",
+    "dateCd": "DAY",
+    "startDt": "20261013",
+    "endDt": "20261018",
+    "stnIds": 159
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"159\",\"stnNm\":\"부산\",\"tm\":\"2026-10-13\",\"avgTa\":\"22.3\",\"minTa\":\"18.7\",\"minTaHrmt\":\"2359\",\"maxTa\":\"24.8\",\"maxTaHrmt\":\"1444\",\"mi10MaxRn\":\"13.3\",\"mi10MaxRnHrmt\":\"1235\",\"hr1MaxRn\":\"24.6\",\"hr1MaxRnHrmt\":\"1152\",\"sumRnDur\":\"4.73\",\"sumRn\":\"28.2\",\"maxInsWs\":\"15.6\",\"maxInsWsWd\":\"290\",\"maxInsWsHrmt\":\"1230\",\"maxWs\":\"7.6\",\"maxWsWd\":\"270\",\"maxWsHrmt\":\"1234\",\"avgWs\":\"2.5\",\"hr24SumRws\":\"2180\",\"maxWd\":\"110\",\"avgTd\":\"17.5\",\"minRhm\":\"50\",\"minRhmHrmt\":\"2009\",\"avgRhm\":\"75.5\",\"avgPv\":\"20.7\",\"avgPa"
+  },
+  {
+   "path": "/AsosDalyInfoService/getWthrDataList",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 400,
+    "dataCd": "ASOS",
+    "dateCd": "DAY",
+    "startDt": "20261013",
+    "endDt": "20261018",
+    "stnIds": 257
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"257\",\"stnNm\":\"양산시\",\"tm\":\"2026-10-13\",\"avgTa\":\"21.5\",\"minTa\":\"16.1\",\"minTaHrmt\":\"2322\",\"maxTa\":\"25.7\",\"maxTaHrmt\":\"1415\",\"mi10MaxRn\":\"2.0\",\"mi10MaxRnHrmt\":\"1434\",\"hr1MaxRn\":\"3.7\",\"hr1MaxRnHrmt\":\"1042\",\"sumRnDur\":\"\",\"sumRn\":\"8.5\",\"maxInsWs\":\"8.3\",\"maxInsWsWd\":\"200\",\"maxInsWsHrmt\":\"1158\",\"maxWs\":\"4.5\",\"maxWsWd\":\"200\",\"maxWsHrmt\":\"1225\",\"avgWs\":\"1.7\",\"hr24SumRws\":\"1430\",\"maxWd\":\"180\",\"avgTd\":\"18.7\",\"minRhm\":\"63\",\"minRhmHrmt\":\"1747\",\"avgRhm\":\"84.0\",\"avgPv\":\"21.9\",\"avgPa\":\"1012"
+  }
+ ],
  "probe": [
   {
    "test": "단기예보 최신",
    "params": {
     "pageNo": 1,
     "numOfRows": 10,
-    "base_date": "20261018",
-    "base_time": "2000",
+    "base_date": "20261019",
+    "base_time": "0500",
     "nx": 60,
     "ny": 127
    },
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilageFcst?pageNo=1&numOfRows=10&base_date=202"
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261019\",\"baseTime\":\"0500\",\"category\":\"TMP\",\"fcstDate\":\"20261019\",\"fcstTime\":\"0600\",\"fcstValue\":\"12\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261019\",\"baseTime\":\"0500\",\"category\":\""
   },
   {
    "test": "단기예보 어제23시",
    "params": {
     "pageNo": 1,
     "numOfRows": 10,
-    "base_date": "20261017",
+    "base_date": "20261018",
     "base_time": "2300",
     "nx": 60,
     "ny": 127
    },
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getVilageFcst?pageNo=1&numOfRows=10&base_date=202"
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261018\",\"baseTime\":\"2300\",\"category\":\"TMP\",\"fcstDate\":\"20261019\",\"fcstTime\":\"0000\",\"fcstValue\":\"16\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261018\",\"baseTime\":\"2300\",\"category\":\""
   },
   {
    "test": "초단기실황",
    "params": {
     "pageNo": 1,
     "numOfRows": 10,
-    "base_date": "20261018",
-    "base_time": "2000",
+    "base_date": "20261019",
+    "base_time": "0600",
     "nx": 60,
     "ny": 127
    },
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?pageNo=1&numOfRows=10&base_date=2"
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261019\",\"baseTime\":\"0600\",\"category\":\"PTY\",\"nx\":60,\"ny\":127,\"obsrValue\":\"0\"},{\"baseDate\":\"20261019\",\"baseTime\":\"0600\",\"category\":\"REH\",\"nx\":60,\"ny\":127,\"obsrValue\":\"86\"},{"
   },
   {
    "test": "예보버전",
@@ -59,9 +98,10 @@
     "pageNo": 1,
     "numOfRows": 10,
     "ftype": "SHRT",
-    "basedatetime": "202610182000"
+    "basedatetime": "202610190500"
    },
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/VilageFcstInfoService_2.0/getFcstVersion?pageNo=1&numOfRows=10&ftype=SHRT&b"
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"filetype\":\"SHRT\",\"version\":\"19700101090000\"}]},\"pageNo\":1,\"numOfRows\":10,\"totalCount\":1}}}"
   },
   {
    "test": "중기기온 서울",
@@ -69,9 +109,10 @@
     "pageNo": 1,
     "numOfRows": 10,
     "regId": "11B10101",
-    "tmFc": "202610181800"
+    "tmFc": "202610190600"
    },
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/MidFcstInfoService/getMidTa?pageNo=1&numOfRows=10&regId=11B10101&tmFc=20261"
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"regId\":\"11B10101\",\"taMin4\":4,\"taMin4Low\":1,\"taMin4High\":1,\"taMax4\":19,\"taMax4Low\":1,\"taMax4High\":0,\"taMin5\":9,\"taMin5Low\":1,\"taMin5High\":1,\"taMax5\":22,\"taMax5Low\":0,\"taMax5High\":1,\"taM"
   },
   {
    "test": "ASOS 서울 어제",
@@ -80,16 +121,17 @@
     "numOfRows": 10,
     "dataCd": "ASOS",
     "dateCd": "DAY",
-    "startDt": "20261017",
-    "endDt": "20261017",
+    "startDt": "20261018",
+    "endDt": "20261018",
     "stnIds": 108
    },
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1360000/AsosDalyInfoService/getWthrDataList?pageNo=1&numOfRows=10&dataCd=ASOS&dateC"
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"108\",\"stnNm\":\"서울\",\"tm\":\"2026-10-18\",\"avgTa\":\"\",\"minTa\":\"\",\"minTaHrmt\":\"\",\"maxTa\":\"\",\"maxTaHrmt\":\"\",\"mi10MaxRn\":\"\",\"mi10MaxRnHrmt\":\"\",\"hr1MaxRn\":\"\",\"hr1MaxRnHrmt\":\"\",\"sumRnDur\":"
   }
  ],
  "calib": {
   "first_download": 0,
-  "daily_add": 0,
+  "daily_add": 61,
   "have_gsr": 61,
   "no_gsr": 32,
   "pending": 0,
@@ -97,9 +139,9 @@
  },
  "obs": {
   "stations": 87,
-  "rows_added": 0,
+  "rows_added": 4176,
   "fails": 0,
   "error": null
  },
- "finished": "2026-10-18T21:45+09:00"
+ "finished": "2026-10-19T07:36+09:00"
 }
