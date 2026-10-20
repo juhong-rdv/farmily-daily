@@ -74,6 +74,23 @@
   .vgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0 20px; }
   .vgrid input[type=date] { font: inherit; font-size: 14px; padding: 3px 6px; border: 1px solid #ccc; border-radius: 6px; }
   #vcard { border-color: #c4b5fd; background: #faf8ff; }
+  /* 지금 장면의 날짜·시각·날씨 큰 표시 */
+  #nowbox { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; background: #f4f8f4; border: 1px solid #dbe7db; border-radius: 12px; padding: 12px 18px; margin: 0 0 12px; }
+  #nowbox .nb-when { flex: 1 1 260px; min-width: 0; }
+  #nowbox .nb-date { font-size: 17px; font-weight: 700; color: #12341f; line-height: 1.3; }
+  #nowbox .nb-time { font-size: 40px; font-weight: 800; color: #12341f; line-height: 1.15; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+  #nowbox .nb-time small { font-size: 20px; font-weight: 700; margin-right: 6px; }
+  #nowbox .nb-tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 10px; margin-left: 8px; vertical-align: 3px; background: #e5e7eb; color: #374151; }
+  #nowbox .nb-tag.now { background: #12341f; color: #fff; }
+  #nowbox .nb-tag.fc { background: #dbeafe; color: #1e40af; }
+  #nowbox .nb-tag.virt { background: #ede9fe; color: #6d28d9; }
+  #nowbox .nb-wx { display: flex; align-items: center; gap: 12px; flex: 1 1 300px; }
+  #nowbox .nb-ico { font-size: 52px; line-height: 1; }
+  #nowbox .nb-temp { font-size: 40px; font-weight: 800; color: #222; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  #nowbox .nb-sky { font-size: 18px; font-weight: 700; color: #333; }
+  #nowbox .nb-sub { font-size: 14px; color: #555; line-height: 1.5; }
+  #nowbox .nb-in { font-size: 14px; color: #c2410c; font-weight: 700; }
+  @media (max-width: 600px) { #nowbox { padding: 10px 14px; } #nowbox .nb-time, #nowbox .nb-temp { font-size: 32px; } #nowbox .nb-ico { font-size: 42px; } }
   /* farmily.ai 페이지 안(iframe)에 들어갈 때: 옆 칸을 따로 스크롤하지 않고 전체 높이로 펼침 */
   html.embed .side { position: static; max-height: none; overflow: visible; }
   @media (max-width: 900px) {
@@ -101,6 +118,7 @@
       <div class="card" id="vcard" style="display:none"></div>
       <div class="card">
         <h2>▶ 시간대별 하우스 모습 <small style="font-size:12px;color:#888;font-weight:400">3D · 끌어서 돌려 보기</small></h2>
+        <div id="nowbox" aria-live="polite"><div class="nb-when"><div class="nb-date">불러오는 중…</div></div></div>
         <div id="stagewrap"><svg id="stage" viewBox="0 0 900 440" role="img" aria-label="하우스 단면: 창 열림, 보온커튼, 차광막, 난방, 관수, 해 위치, 바람, 안팎 온도·습도"></svg></div>
         <div class="ctl">
           <button class="btn" id="play" type="button">▶ 재생</button>
@@ -167,6 +185,69 @@
       if (e.target && (e.target.id === 'r_sido' || e.target.id === 'r_sigun')) setTimeout(function () { var s = document.getElementById('r_sigun'); if (s && s.value) localStorage.setItem('farmily.region', s.value); }, 0);
     });
   } catch (e) {}
+</script>
+<script>
+  // 시간대별 하우스 모습 위에 '지금 보고 있는 장면'의 날짜·시각·바깥 날씨를 크게 보여 줌
+  // 3D 그림이 장면마다 받는 값(FSIM3D.draw)을 함께 받아 쓰고, 단면(2D) 그림일 때는 아래 상태 칩 글자에서 읽어 옴
+  (function () {
+    var DOW = ['일', '월', '화', '수', '목', '금', '토'];
+    var D16 = ['북', '북북동', '북동', '동북동', '동', '동남동', '남동', '남남동', '남', '남남서', '남서', '서남서', '서', '서북서', '북서', '북북서'];
+    function f1(x) { return x == null || isNaN(x) ? '-' : (Math.round(x * 10) / 10).toFixed(1).replace(/\.0$/, ''); }
+    var last = '', lastF = 0;
+    function srcNow() {
+      var wm = document.getElementById('wmode'); if (wm && wm.value === 'virt') return 'virt';
+      var c = (document.getElementById('chips') || {}).textContent || '';
+      return c.indexOf('관측값') >= 0 ? 'obs' : c.indexOf('지난 자료') >= 0 ? 'past' : 'fc';
+    }
+    function show(o) {
+      var box = document.getElementById('nowbox'); if (!box) return;
+      var d = new Date(o.t + 9 * 3600000), hh = d.getUTCHours(), mm = ('0' + d.getUTCMinutes()).slice(-2), src = srcNow();
+      var ico = '', wx = '';
+      if (o.sky != null) {
+        var night = !(o.el > 0), pty = +o.pty || 0, sky = +o.sky || 1;
+        if (pty === 3) { ico = '🌨'; wx = '눈'; }
+        else if (pty === 2) { ico = '🌨'; wx = '비 또는 눈'; }
+        else if (pty === 1 || pty === 4) { ico = '🌧'; wx = o.rain >= 3 ? '강한 비' : '비'; }
+        else if (sky === 4) { ico = '☁️'; wx = '흐림'; }
+        else if (sky === 3) { ico = night ? '☁️' : '⛅'; wx = '구름 많음'; }
+        else { ico = night ? '🌙' : '☀️'; wx = '맑음'; }
+      } else ico = o.el > 0 ? '🌤' : '🌙';
+      var diff = o.t - Date.now(), tag, cls;
+      if (src === 'virt') { tag = '가상 날씨'; cls = 'virt'; }
+      else if (Math.abs(diff) <= 10 * 60000) { tag = '지금'; cls = 'now'; }
+      else if (diff > 0) { tag = '예보'; cls = 'fc'; }
+      else { tag = src === 'obs' ? '지난 시간 · 관측' : '지난 시간'; cls = ''; }
+      var sub = '습도 ' + Math.round(o.RHo) + '% · ' + (o.ws < 0.5 ? '바람 거의 없음' : D16[Math.round(o.wd / 22.5) % 16] + '풍 ' + f1(o.ws) + 'm/s');
+      if (o.rain > 0 && o.pty) sub += ' · 시간당 ' + f1(o.rain) + 'mm';
+      else if (o.pop != null && o.pop >= 30 && diff > 0 && src !== 'virt') sub += ' · 강수확률 ' + Math.round(o.pop) + '%';
+      var html = '<div class="nb-when"><div class="nb-date">' + d.getUTCFullYear() + '년 ' + (d.getUTCMonth() + 1) + '월 ' + d.getUTCDate() + '일 (' + DOW[d.getUTCDay()] + ')'
+        + '<span class="nb-tag ' + cls + '">' + tag + '</span></div>'
+        + '<div class="nb-time"><small>' + (hh < 12 ? '오전' : '오후') + '</small>' + (hh % 12 === 0 ? 12 : hh % 12) + ':' + mm + '</div></div>'
+        + '<div class="nb-wx"><div class="nb-ico" aria-hidden="true">' + ico + '</div><div>'
+        + '<div class="nb-sky">바깥' + (wx ? ' ' + wx : ' 기온') + '</div><div class="nb-temp">' + f1(o.To) + '℃</div>'
+        + '<div class="nb-sub">' + sub + '</div>' + (o.Ti != null ? '<div class="nb-in">하우스 안 ' + f1(o.Ti) + '℃ · ' + Math.round(o.RHi) + '%</div>' : '') + '</div></div>';
+      if (html !== last) { box.innerHTML = html; last = html; }
+    }
+    // 3D: 장면 값을 그대로 받음
+    if (window.FSIM3D && typeof window.FSIM3D.draw === 'function') {
+      var draw0 = window.FSIM3D.draw;
+      window.FSIM3D.draw = function (f) { try { if (f && f.t) { lastF = Date.now(); show(f); } } catch (e) {} return draw0.apply(this, arguments); };
+    }
+    // 단면(2D) 그림일 때: 상태 칩 글자에서 시각·기온·습도·바람·해를 읽음
+    var Dmap = {}; D16.forEach(function (n, k) { Dmap[n] = k * 22.5; });
+    function fromChips() {
+      if (Date.now() - lastF < 1500) return;
+      var c = document.getElementById('chips'); if (!c) return;
+      var tx = c.textContent, m = tx.match(/🕒\s*(\d+)\/(\d+)\([^)]*\)\s*(\d+):(\d+)/); if (!m) return;
+      var now = new Date(Date.now() + 9 * 3600000), y = now.getUTCFullYear();
+      if (+m[1] < now.getUTCMonth() + 1 - 6) y++; else if (+m[1] > now.getUTCMonth() + 1 + 6) y--;
+      var t = Date.parse(y + '-' + ('0' + m[1]).slice(-2) + '-' + ('0' + m[2]).slice(-2) + 'T' + ('0' + m[3]).slice(-2) + ':' + m[4] + ':00+09:00');
+      var tm = tx.match(/바깥 (-?[\d.]+)℃ · (\d+)%/), wm = tx.match(/([가-힣]+)풍 ([\d.]+)m\/s/), sun = tx.indexOf('해 높이') >= 0;
+      show({ t: t, To: tm ? +tm[1] : null, RHo: tm ? +tm[2] : null, wd: wm && Dmap[wm[1]] != null ? Dmap[wm[1]] : 0, ws: wm ? +wm[2] : 0, el: sun ? 10 : -10 });
+    }
+    function hook() { var c = document.getElementById('chips'); if (!c) return setTimeout(hook, 300); new MutationObserver(fromChips).observe(c, { childList: true, characterData: true, subtree: true }); }
+    hook();
+  })();
 </script>
 <script src="/farmily-daily/sim.js?v=20261016a"></script>
 <script>
