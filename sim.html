@@ -170,6 +170,23 @@
 </script>
 <script src="/farmily-daily/sim.js?v=20261016a"></script>
 <script>
+  // 처음 열면 하우스 장면을 오늘 '지금' 시각에 맞춤 (sim.js는 처음에 오전 7시 장면을 보여 줌)
+  // 장면은 고른 날짜 0시부터 10분 간격이므로, 오늘 날짜일 때 (지금 - 오늘 0시) / 10분 번째 장면으로 한 번만 이동
+  (function () {
+    var tries = 0;
+    (function wait() {
+      var seek = document.getElementById('seek'), dd = document.getElementById('d_date'), wm = document.getElementById('wmode');
+      if (!seek || !dd || !(+seek.max > 0)) { if (++tries < 150) setTimeout(wait, 200); return; }
+      var now = Date.now(), today = new Date(now + 9 * 3600000).toISOString().slice(0, 10);
+      if ((wm && wm.value === 'virt') || dd.value !== today) return;
+      var i = Math.round((now - Date.parse(today + 'T00:00:00+09:00')) / 600000);
+      if (i < 0 || i > +seek.max) return;
+      seek.value = i;
+      seek.dispatchEvent(new Event('input', { bubbles: true }));
+    })();
+  })();
+</script>
+<script>
   // farmily.ai 페이지 안(iframe)에 들어 있을 때 내용 높이를 바깥 페이지에 알려 iframe 높이를 맞춤
   // (오늘의 농업 소식과 같은 { farmilyHeight: 높이 } 신호)
   (function () {
