@@ -340,6 +340,7 @@
     if (keepT != null) for (var i = 0; i < fr.length; i++) if (fr[i].t >= keepT) { player.idx = i; break; }
     if (keepT == null) { for (i = 0; i < fr.length; i++) { var d = kst(fr[i].t); if (d.getUTCHours() === 7 && d.getUTCMinutes() === 0) { player.idx = i; break; } } }
     $('seek').max = fr.length - 1; $('seek').value = player.idx;
+    var nb = $('nowbox'); if (nb) nb.dataset.place = (r ? r.sido + ' ' + r.name : '') + ' · 가상 날씨';
     drawCharts(); drawSummary(); renderFrame();
   }
   function simulate() {
@@ -379,12 +380,26 @@
     player.idx = 0;
     if (keepT != null) for (var i = 0; i < fr.length; i++) if (fr[i].t >= keepT) { player.idx = i; break; }
     if (keepT == null) { var noon = 0; for (i = 0; i < fr.length; i++) { var d = kst(fr[i].t); if (d.getUTCHours() === 7 && d.getUTCMinutes() === 0) { noon = i; break; } } player.idx = noon; }
+    if (player.live && !player.playing) { var ni = nowIdx(); if (ni >= 0) player.idx = ni; }
     $('seek').max = fr.length - 1; $('seek').value = player.idx;
+    var nb = $('nowbox'); if (nb) nb.dataset.place = (r ? r.sido + ' ' + r.name : '') + (weather.obs_stn ? ' · 관측 ' + weather.obs_stn.name + ' 관측소' + (weather.obs_stn.km ? ' (' + weather.obs_stn.km + 'km)' : '') : '');
     drawCharts(); drawSummary(); renderFrame();
   }
 
   // ---------- 플레이어 ----------
-  var player = { idx: 0, playing: false, speed: 6, last: 0 };  // speed: 초당 프레임(10분) 수 → 6 = 1시간/초
+  var player = { idx: 0, playing: false, speed: 6, last: 0, live: true };  // speed: 초당 프레임(10분) 수 → 6 = 1시간/초 · live: '지금' 따라가기(기본)
+  // 지금 시각에 가장 가까운 장면 번호 (범위 밖이면 -1)
+  function nowIdx() {
+    if (!result || !result.frames.length) return -1;
+    var fr = result.frames, now = Date.now();
+    if (now < fr[0].t || now > fr[fr.length - 1].t) return -1;
+    var best = 0; for (var i = 0; i < fr.length; i++) if (Math.abs(fr[i].t - now) < Math.abs(fr[best].t - now)) best = i;
+    return best;
+  }
+  function setLive(on) {
+    player.live = on; var b = $('now'); if (b) { b.classList.toggle('on', on); b.title = on ? '지금 시각을 따라가는 중 (날씨 자료가 갱신되면 자동 반영)' : '지금 시각으로 이동'; }
+  }
+  function goNow() { var i = nowIdx(); if (i < 0) return false; player.idx = i; $('seek').value = i; renderFrame(0, true); return true; }
   function frameAt(x) {
     var fr = result.frames, i = Math.max(0, Math.min(fr.length - 1, Math.floor(x))), j = Math.min(fr.length - 1, i + 1), f = x - i;
     var a = fr[i], b = fr[j]; if (f <= 0 || i === j) return a;
@@ -401,7 +416,11 @@
       if (player.idx >= result.frames.length - 1) { player.idx = result.frames.length - 1; player.playing = false; $('play').textContent = '▶ 재생'; }
       $('seek').value = Math.floor(player.idx);
       renderFrame(dt);
-    } else { player.last = 0; renderFrame(0.016, true); }
+    } else {
+      player.last = 0;
+      if (player.live && result && !(S.virt && S.virt.on)) { var ni = nowIdx(); if (ni >= 0 && ni !== Math.floor(player.idx)) { player.idx = ni; $('seek').value = ni; } }
+      renderFrame(0.016, true);
+    }
     requestAnimationFrame(tick);
   }
 
@@ -833,7 +852,7 @@
         tip.style.display = 'block'; var x = ev.clientX - rc.left; tip.style.left = Math.max(0, Math.min(rc.width - 230, x + (x > rc.width / 2 ? -240 : 14))) + 'px'; tip.style.top = (ev.clientY - rc.top + 10) + 'px';
       });
       el.addEventListener('pointerleave', function () { $('ctip').style.display = 'none'; });
-      el.addEventListener('click', function (ev) { player.idx = idxAt(ev); $('seek').value = player.idx; renderFrame(0, true); document.getElementById('stagewrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+      el.addEventListener('click', function (ev) { player.idx = idxAt(ev); setLive(false); $('seek').value = player.idx; renderFrame(0, true); document.getElementById('stagewrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
     })(svgs[i]);
   }
 
@@ -1011,13 +1030,24 @@
   // ---------- 시작 ----------
   function init() {
     buildForms(); initCal();
-    $('play').onclick = function () { if (!result) return; if (player.idx >= result.frames.length - 1) player.idx = 0; player.playing = !player.playing; this.textContent = player.playing ? '⏸ 멈춤' : '▶ 재생'; };
-    $('seek').oninput = function () { player.idx = +this.value; player.playing = false; $('play').textContent = '▶ 재생'; renderFrame(0, true); };
+    $('play').onclick = function () { if (!result) return; if (player.idx >= result.frames.length - 1) player.idx = 0; player.playing = !player.playing; setLive(false); this.textContent = player.playing ? '⏸ 정지' : '▶ 재생'; };
+    $('seek').oninput = function () { player.idx = +this.value; player.playing = false; setLive(false); $('play').textContent = '▶ 재생'; renderFrame(0, true); };
+    $('now').onclick = function () { player.playing = false; $('play').textContent = '▶ 재생'; setLive(true); if (!goNow()) { var dd = $('d_date'); if (dd && dd.value !== ymd(Date.now())) { dd.value = ymd(Date.now()); dd.dispatchEvent(new Event('change', { bubbles: true })); } } };
+    setLive(true);
+    // 날씨 자료가 갱신되면(기상청 발표 후 자동 반영) 다시 계산 — 5분마다, 그리고 탭이 다시 보일 때
+    function refreshWeather() {
+      if (!weather || (S.virt && S.virt.on)) return;
+      fetch(BASE + 'data/weather/' + S.region + '.json', { cache: 'no-store' }).then(function (x) { return x.ok ? x.json() : null; }).then(function (w) {
+        if (w && w.code === S.region && w.updated && w.updated !== weather.updated) { weather = w; obsCache = {}; simulate(); }
+      }).catch(function () {});
+    }
+    setInterval(refreshWeather, 5 * 60000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshWeather(); });
     $('speed').onchange = function () { player.speed = +this.value; };
     $('reset').onclick = function () { S.ctrl = F.defaults(S.crop); buildForms(); changed(); };
     $('jump').onchange = function () { if (!result) return; var v = this.value, fr = result.frames; for (var i = 0; i < fr.length; i++) { var d = kst(fr[i].t), dd = d.getUTCDate(), hh = d.getUTCHours();
       if (v === 'now') { player.idx = 0; break; } var parts2 = v.split('-'); if (+parts2[0] === dd && +parts2[1] === hh && d.getUTCMinutes() === 0) { player.idx = i; break; } }
-      $('seek').value = player.idx; renderFrame(0, true); this.value = ''; };
+      setLive(false); $('seek').value = player.idx; renderFrame(0, true); this.value = ''; };
     fetch(BASE + 'data/regions.json').then(function (r) { return r.json(); }).then(function (d) {
       regions = d.regions; sido = d.sido; if (!find(S.region)) S.region = '3406'; buildRegion(); buildVirt(); if (S.virt.on) simulate(); loadWeather();
     });
