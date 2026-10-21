@@ -50,10 +50,11 @@
     };
   }
   function houseDefaults(type) {
-    if (type === 'multi') return { type: 'multi', spans: 3, width: 8, length: 50, sideH: 3.5, ridgeH: 5.5, axis: 0,
-      cover: 'po2', curtain: 'multi', shade: 1, shadePct: 50, ventH: 1.5, roofVent: 1, roofW: 0.9, net: 1, heater: 150000, plants: 0 };
-    return { type: 'single', spans: 1, width: 7, length: 60, sideH: 1.6, ridgeH: 3.2, axis: 0,
-      cover: 'po1', curtain: 'single', shade: 0, shadePct: 50, ventH: 1.2, roofVent: 0, roofW: 0.6, net: 1, heater: 60000, plants: 0 };
+    // 기본은 벤로형 유리온실(동고 7m): 측고(물받이) 6m + 지붕 1m, 칸 폭 4m
+    if (type === 'multi') return { type: 'multi', spans: 3, width: 8, length: 50, sideH: 6, ridgeH: 7, axis: 0,
+      cover: 'glass', curtain: 'multi', shade: 1, shadePct: 50, ventH: 1.5, roofVent: 1, roofW: 1.0, net: 1, heater: 150000, plants: 0 };
+    return { type: 'single', spans: 1, width: 8, length: 60, sideH: 6, ridgeH: 7, axis: 0,
+      cover: 'glass', curtain: 'multi', shade: 1, shadePct: 50, ventH: 1.5, roofVent: 1, roofW: 1.0, net: 1, heater: 100000, plants: 0 };
   }
   var COVERS = {
     po1: { name: 'PO필름 1겹', U: 6.2, tau: 0.82, sky: 1.0 },
