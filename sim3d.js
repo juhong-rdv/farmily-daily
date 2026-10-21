@@ -1,6 +1,7 @@
 /* farmily-daily : 우리 하우스 시뮬레이션 3D 화면 (three.js r128)
    sim.js 가 프레임마다 FSIM3D.draw(f, ctx) 를 부릅니다. WebGL 이 안 되면 기존 단면 그림을 씁니다.
-   실제 하우스처럼: 아치 파이프·도리·물받이·기초, 측창 감기 축과 개폐기, 방충망, 출입문과 FARMILY 간판(밤에 불 켜짐), 온풍기·비닐 덕트·연통, 유동팬,
+   벤로형(Venlo) 유리온실로 그림: 칸(3.2~4.8m)마다 박공 유리 지붕·용마루 힌지 천창(좌우 번갈아), 칸 사이 물받이, 알루미늄 글레이징 바, 백색 철골 기둥·격자 트러스,
+   콘크리트 턱 위 힌지식 유리 측창, 알루미늄 유리 출입문과 FARMILY 간판(밤에 불 켜짐), 에너지 스크린·외부 차광 스크린, 온풍기·비닐 덕트·연통, 유동팬,
    두둑·멀칭·점적, 유인줄로 키우는 토마토(잎·화방·열매), 주변 농로·배수로·이웃 하우스·관리사·전봇대·먼 산,
    시간대별 하늘색·햇빛 색·안개·서리·눈·비 젖음까지 그립니다. */
 (function (root) {
@@ -396,14 +397,28 @@
     if (G.house) { G.scene.remove(G.house); dispose(G.house); }
     var X = G.X;
     var axis = (h.axis || 0) % 180, grp = new T.Group(); grp.rotation.y = -axis * D2R;
-    var n = g.n, W = g.W, L = g.L, hs = g.hs, hr = g.hr, NW = n * W, x0 = -NW / 2, multi = n > 1;
-    var vh = Math.max(0.1, Math.min(h.ventH, hs - 0.3)), du = Math.min(0.35, (h.roofW || 0.6) / W), rl = L * 0.85;
+    var n = g.n, W = g.W, L = g.L, hs = g.hs, NW = n * W, x0 = -NW / 2, multi = n > 1;
+    // 벤로형(Venlo) 유리온실: 한 동(W)을 폭 3.2~4.8m 의 지붕 칸(bay)으로 나누고, 칸마다 박공 지붕·용마루, 칸 사이마다 물받이(gutter)
+    var m = Math.max(1, Math.round(W / 4)), Wb = W / m, nb = n * m;
+    var pitch = Math.min(g.hr - hs, Wb / 2 * Math.tan(26 * D2R)), hr = hs + Math.max(0.35, pitch), rise = hr - hs;   // 지붕 물매 약 22~26°
+    var kerb = 0.5, vh = Math.max(0.1, Math.min(h.ventH, hs - kerb - 0.4));   // 측창(힌지식 유리 환기창)은 기초 콘크리트 턱(0.5m) 위에서 시작
+    var vw = Math.min(Wb / 2 * 0.95, Math.max(0.6, h.roofW || 1.0)), dvw = vw / Wb, du = vw / W, rl = L * 0.85;   // 천창(용마루 힌지 유리창) 폭
     var es = Math.cos(axis * D2R) >= 0 ? -1 : 1, zN = es * L / 2;   // 가까이 보는 쪽 끝(출입문·난방기·양액기 자리)
-    var baseOp = h.cover === 'glass' ? 0.12 : h.cover === 'po2' ? 0.3 : 0.2;
-    var film = new T.MeshPhongMaterial({ color: h.cover === 'glass' ? 0xe9f3fb : 0xf2f7fb, map: h.cover === 'glass' ? null : X.film, transparent: true, opacity: baseOp, side: T.DoubleSide, depthWrite: false, shininess: h.cover === 'glass' ? 120 : 70, specular: 0x888888 });
-    function yAt(u) { return hs + (hr - hs) * 4 * u * (1 - u); }
+    var glass = h.cover === 'glass';
+    var baseOp = glass ? 0.16 : h.cover === 'po2' ? 0.3 : 0.22;
+    var film = new T.MeshPhongMaterial({ color: glass ? 0xd6e9f7 : 0xeaf2f8, map: glass ? null : X.film, transparent: true, opacity: baseOp, side: T.DoubleSide, depthWrite: false, shininess: glass ? 200 : 70, specular: glass ? 0xc8d8e4 : 0x888888 });
+    // 지붕 높이: 한 동 안의 위치 u(0~1) → 칸마다 삼각 박공
+    function yAt(u) { var ub = (u * m) % 1; if (u >= 1) ub = 1; return hs + rise * (1 - Math.abs(2 * ub - 1)); }
+    function yAtX(x) { var ub = ((x - x0) / Wb) % 1; return hs + rise * (1 - Math.abs(2 * ub - 1)); }
+    function yb(v) { return hs + rise * (1 - Math.abs(2 * v - 1)); }   // 칸 안 위치 v(0~1) → 높이
+    // 지붕 유리 한 면(평면, 칸 xb 에서 v0~v1 구간)
+    function patchB(xb, v0, v1, z0, z1, off) {
+      var x0_ = xb + v0 * Wb, x1_ = xb + v1 * Wb, y0_ = yb(v0) + (off || 0), y1_ = yb(v1) + (off || 0), s1 = Math.hypot(x1_ - x0_, y1_ - y0_);
+      var pos = [x0_, y0_, z0, x0_, y0_, z1, x1_, y1_, z0, x1_, y1_, z1], uv = [0, z0, 0, z1, s1, z0, s1, z1];
+      var geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); geo.setIndex([0, 1, 2, 1, 3, 2]); geo.computeVertexNormals(); return geo;
+    }
     function patch(xs, u0, u1, z0, z1, off) {
-      var seg = 18, pos = [], idx = [], uv = [], s = 0, px = null, py = null;
+      var seg = 8 * m, pos = [], idx = [], uv = [], s = 0, px = null, py = null;
       for (var k = 0; k <= seg; k++) {
         var u = u0 + (u1 - u0) * k / seg, x = xs + u * W, y = yAt(u) + (off || 0);
         if (px != null) s += Math.hypot(x - px, y - py); px = x; py = y;
@@ -422,7 +437,8 @@
     var conc = new T.MeshLambertMaterial({ color: 0xffffff, map: X.concrete });
     // 단면 모양
     var sh = new T.Shape(); sh.moveTo(x0, 0); sh.lineTo(x0, hs);
-    for (var i = 0; i < n; i++) for (var k = 1; k <= 16; k++) { var u = k / 16; sh.lineTo(x0 + i * W + u * W, yAt(u)); }
+    for (var i = 0; i < nb; i++) { sh.lineTo(x0 + i * Wb + Wb / 2, hr); sh.lineTo(x0 + (i + 1) * Wb, hs); }
+    var u, k;
     sh.lineTo(x0 + NW, 0); sh.lineTo(x0, 0);
 
     // ── 주변: 마당(자갈)·배수로·농로·이웃 하우스·관리사·전봇대·나무 ──
@@ -444,15 +460,17 @@
     for (var pq = 0; pq < 5; pq++) { var pd = add(new T.Mesh(new T.CircleGeometry(0.6 + (pq % 3) * 0.4, 16), new T.MeshPhongMaterial({ color: 0x6f7a86, shininess: 120, specular: 0xbbbbbb, transparent: true, opacity: 0.75 })), env); pd.rotation.x = -Math.PI / 2; pd.scale.y = 0.55; pd.position.set(-14 + pq * 7.5, 0.03, roadZ + ((pq % 2) - 0.5) * 1.6); pd.visible = false; puddles.push(pd); }
     // 이웃 하우스 (양 옆으로 두 동씩, 단순하게)
     var nbMat = new T.MeshPhongMaterial({ color: 0xe9eef2, transparent: true, opacity: 0.38, shininess: 60, side: T.DoubleSide, depthWrite: false });
-    var nbW = Math.min(8, Math.max(6, W)), nbHs = 1.7, nbHr = 3.3, nbL = Math.max(40, L * 0.9);
-    var nbSh = new T.Shape(); nbSh.moveTo(-nbW / 2, 0); nbSh.lineTo(-nbW / 2, nbHs); for (k = 1; k <= 14; k++) { u = k / 14; nbSh.lineTo(-nbW / 2 + u * nbW, nbHs + (nbHr - nbHs) * 4 * u * (1 - u)); } nbSh.lineTo(nbW / 2, 0); nbSh.lineTo(-nbW / 2, 0);
+    // 이웃 온실도 벤로형(칸 4m, 측고 4m)으로 단순하게
+    var nbB = 4, nbW = nbB * 2, nbHs = 4.0, nbHr = 4.9, nbL = Math.max(40, L * 0.9);
+    var nbSh = new T.Shape(); nbSh.moveTo(-nbW / 2, 0); nbSh.lineTo(-nbW / 2, nbHs); for (k = 0; k < 2; k++) { nbSh.lineTo(-nbW / 2 + k * nbB + nbB / 2, nbHr); nbSh.lineTo(-nbW / 2 + (k + 1) * nbB, nbHs); } nbSh.lineTo(nbW / 2, 0); nbSh.lineTo(-nbW / 2, 0);
     var nbGeo = new T.ExtrudeGeometry(nbSh, { depth: nbL, bevelEnabled: false }); nbGeo.translate(0, 0, -nbL / 2);
-    var nbArch = []; for (k = 0; k <= 14; k++) { u = k / 14; nbArch.push(new T.Vector3(-nbW / 2 + u * nbW, nbHs + (nbHr - nbHs) * 4 * u * (1 - u), 0)); }
-    var nbArchGeo = new T.BufferGeometry().setFromPoints(nbArch), nbLineM = new T.LineBasicMaterial({ color: 0xc8d2dc, transparent: true, opacity: 0.4 });
+    var nbArch = [new T.Vector3(-nbW / 2, 0, 0), new T.Vector3(-nbW / 2, nbHs, 0), new T.Vector3(-nbW / 2 + nbB / 2, nbHr, 0), new T.Vector3(0, nbHs, 0), new T.Vector3(nbB / 2, nbHr, 0), new T.Vector3(nbW / 2, nbHs, 0), new T.Vector3(nbW / 2, 0, 0)];
+    var nbArchGeo = new T.BufferGeometry().setFromPoints(nbArch), nbLineM = new T.LineBasicMaterial({ color: 0xc8d2dc, transparent: true, opacity: 0.45 });
     [-2, -1, 1, 2].forEach(function (q) {
       var xo = Math.sign(q) * (NW / 2 + 4 + nbW / 2) + Math.sign(q) * (Math.abs(q) - 1) * (nbW + 2.5);
-      var m = add(new T.Mesh(nbGeo, nbMat), env); m.position.set(xo, 0, es * 3 + (q % 2) * 4);
-      for (var a2 = 0; a2 <= 8; a2++) { var ln2 = add(new T.Line(nbArchGeo, nbLineM), env); ln2.position.set(xo, 0, m.position.z - nbL / 2 + a2 * nbL / 8); }
+      var m2 = add(new T.Mesh(nbGeo, nbMat), env); m2.position.set(xo, 0, es * 3 + (q % 2) * 4);
+      for (var a2 = 0; a2 <= 10; a2++) { var ln2 = add(new T.Line(nbArchGeo, nbLineM), env); ln2.position.set(xo, 0, m2.position.z - nbL / 2 + a2 * nbL / 10); }
+      [-1, 0, 1].forEach(function (gx2) { var gt = add(new T.Mesh(new T.BoxGeometry(0.2, 0.12, nbL), new T.MeshLambertMaterial({ color: 0xb8c1c8 })), env); gt.position.set(xo + gx2 * nbB, nbHs, m2.position.z); });
     });
     // 관리사(컨테이너) + 물탱크 + 마당 가로등
     var shedX = x0 - 4.5 - 3, shedZ = zN + es * 3.6;
@@ -494,95 +512,123 @@
     var floor = add(new T.Mesh(uvM(new T.PlaneGeometry(NW, L), NW, L), new T.MeshLambertMaterial({ color: 0xffffff, map: X.soil }))); floor.rotation.x = -Math.PI / 2; floor.position.y = 0.015; floor.receiveShadow = true;
     [-1, 1].forEach(function (sg) { box(0.22, 0.18, L + 0.2, conc, sg * (NW / 2 + 0.02), 0.09, 0); box(NW + 0.4, 0.18, 0.22, conc, 0, 0.09, sg * (L / 2 + 0.02)); });
 
-    // ── 지붕 피복 (천창 자리는 비워 둠) ──
-    var flaps = [], flapMat = new T.MeshPhongMaterial({ color: 0xe6f0fa, map: X.film, transparent: true, opacity: 0.4, side: T.DoubleSide, depthWrite: false, shininess: 70 });
-    for (i = 0; i < n; i++) {
-      var xs = x0 + i * W, xc = xs + W / 2;
-      if (h.roofVent) {
-        add(new T.Mesh(patch(xs, 0, 0.5, -L / 2, L / 2), film));
-        add(new T.Mesh(patch(xs, 0.5, 0.5 + du, -L / 2, -rl / 2), film));
-        add(new T.Mesh(patch(xs, 0.5, 0.5 + du, rl / 2, L / 2), film));
-        add(new T.Mesh(patch(xs, 0.5 + du, 1, -L / 2, L / 2), film));
-        var px = xs + (0.5 + du) * W, py = yAt(0.5 + du), len = Math.hypot(px - xc, py - hr), slope = Math.atan2(py - hr, px - xc);
-        var pv = new T.Group(); pv.position.set(xc, hr, 0); pv.userData.slope = slope;
-        var fm = new T.Mesh(new T.BoxGeometry(len, 0.03, rl), flapMat); fm.position.x = len / 2; pv.add(fm);
-        var fframe = new T.Mesh(new T.BoxGeometry(0.05, 0.05, rl), steel); fframe.position.set(len, 0, 0); pv.add(fframe);
-        // 천창 개폐 랙(밀대) — 몇 군데
-        for (var ra = 0; ra < Math.max(2, Math.round(rl / 6)); ra++) { var rk = new T.Mesh(new T.BoxGeometry(0.03, 0.03, 0.03), steelD); rk.position.set(len * 0.8, -0.03, -rl / 2 + (ra + 0.5) * rl / Math.max(2, Math.round(rl / 6))); pv.add(rk); }
-        if (h.net) { var rn = new T.Mesh(patch(xs, 0.5, 0.5 + du, -rl / 2, rl / 2, -0.06), new T.MeshBasicMaterial({ map: X.net, transparent: true, opacity: 0.6, side: T.DoubleSide, depthWrite: false })); add(rn); }
-        add(pv); flaps.push(pv);
-      } else add(new T.Mesh(patch(xs, 0, 1, -L / 2, L / 2), film));
+    // ── 재질: 알루미늄 유리 틀(글레이징 바)·백색 철골 기둥·트러스·물받이 ──
+    var alu = new T.MeshPhongMaterial({ color: 0xd9dee3, shininess: 90, specular: 0x9aa4ad });
+    var paneW = 1.0, nzp = Math.max(2, Math.round(L / paneW));   // 유리 한 장 폭 ≈ 1.0m
+    var dm = new T.Object3D(), q = 0, a;
+
+    // ── 지붕 유리 + 천창 (칸마다 용마루 힌지식 유리창, 좌·우 지붕면에 번갈아 가며) ──
+    var flaps = [], flapMat = new T.MeshPhongMaterial({ color: glass ? 0xdbeaf6 : 0xe6f0fa, map: glass ? null : X.film, transparent: true, opacity: Math.min(0.55, baseOp + 0.22), side: T.DoubleSide, depthWrite: false, shininess: glass ? 200 : 70, specular: 0xc8d8e4 });
+    var segL = Math.max(2.0, paneW * 3), nSeg = Math.max(1, Math.round(rl / segL)); segL = rl / nSeg;
+    var slopeLen = Math.hypot(Wb / 2, rise), ventLen = vw / (Wb / 2) * slopeLen;
+    for (i = 0; i < nb; i++) {
+      var xb = x0 + i * Wb, xc = xb + Wb / 2;
+      [[-1, 0, 0.5], [1, 0.5, 1]].forEach(function (sd) {
+        var dir = sd[0], vA = dir < 0 ? 0 : 0.5 + dvw, vB = dir < 0 ? 0.5 - dvw : 1;
+        if (!h.roofVent) { add(new T.Mesh(patchB(xb, sd[1], sd[2], -L / 2, L / 2), film)); return; }
+        // 천창 띠 아래쪽은 고정 유리(전체 길이), 천창 띠는 양 끝 고정 + 가운데는 구간마다 창/고정 번갈아
+        add(new T.Mesh(patchB(xb, vA, vB, -L / 2, L / 2), film));
+        var vV0 = dir < 0 ? 0.5 - dvw : 0.5, vV1 = dir < 0 ? 0.5 : 0.5 + dvw;
+        add(new T.Mesh(patchB(xb, vV0, vV1, -L / 2, -rl / 2), film)); add(new T.Mesh(patchB(xb, vV0, vV1, rl / 2, L / 2), film));
+        for (var sgk = 0; sgk < nSeg; sgk++) {
+          var zA = -rl / 2 + sgk * segL, zB = zA + segL, isVent = (sgk + (dir < 0 ? 0 : 1) + i) % 2 === 0;
+          if (!isVent) { add(new T.Mesh(patchB(xb, vV0, vV1, zA, zB), film)); continue; }
+          var pv = new T.Group(); pv.position.set(xc, hr, (zA + zB) / 2); pv.userData.slope = Math.atan2(-rise, Wb / 2) * dir; pv.userData.dir = dir;
+          if (dir < 0) pv.userData.slope = Math.PI - Math.atan2(-rise, Wb / 2);   // 왼쪽 지붕면: 창이 -x 쪽으로 내려감
+          var fm = new T.Mesh(new T.BoxGeometry(ventLen, 0.025, segL - 0.06), flapMat); fm.position.x = ventLen / 2 + 0.03; pv.add(fm);
+          var fr1 = new T.Mesh(new T.BoxGeometry(ventLen + 0.04, 0.05, 0.05), alu); fr1.position.set(ventLen / 2 + 0.03, 0, (segL - 0.06) / 2); pv.add(fr1);
+          var fr2 = fr1.clone(); fr2.position.z = -(segL - 0.06) / 2; pv.add(fr2);
+          var fr3 = new T.Mesh(new T.BoxGeometry(0.05, 0.05, segL - 0.06), alu); fr3.position.set(ventLen + 0.03, 0, 0); pv.add(fr3);
+          if (h.net) { var rn = new T.Mesh(patchB(xb, vV0, vV1, zA + 0.05, zB - 0.05, -0.05), new T.MeshBasicMaterial({ map: X.net, transparent: true, opacity: 0.6, side: T.DoubleSide, depthWrite: false })); add(rn); }
+          add(pv); flaps.push(pv);
+          // 창 밀어 올리는 랙(push rod) — 창 가운데 아래
+          var rod = add(new T.Mesh(new T.CylinderGeometry(0.015, 0.015, 0.35, 6), steelD)); rod.position.set(xc + dir * vw * 0.55, hr - 2 * rise * dvw * 0.55 - 0.2, (zA + zB) / 2);
+        }
+      });
+      // 용마루 캡 · 지붕면 글레이징 바(서까래) 1m 간격
+      var cap = add(new T.Mesh(new T.BoxGeometry(0.09, 0.07, L + 0.1), alu)); cap.position.set(xc, hr + 0.02, 0); cap.castShadow = true;
     }
-    // 양쪽 박공 (막음 피복) + 박공 샛기둥
-    [-1, 1].forEach(function (s) { var gm = add(new T.Mesh(new T.ShapeGeometry(sh), film)); gm.position.z = s * L / 2; });
+    var barGeo = new T.BoxGeometry(0.045, 0.045, slopeLen), bars = add(new T.InstancedMesh(barGeo, alu, nb * 2 * (nzp + 1))); q = 0;
+    for (i = 0; i < nb; i++) for (var sdk = -1; sdk <= 1; sdk += 2) for (a = 0; a <= nzp; a++) {
+      var bx0 = x0 + i * Wb + Wb / 2 + sdk * Wb / 4, by0 = hs + rise / 2 + 0.03, bz0 = -L / 2 + a * L / nzp;
+      // 바의 긴 축(z)을 x 축으로 돌린 뒤 지붕 물매만큼 기울임
+      var qa = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), Math.PI / 2), qb = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 0, 1), Math.atan2(rise, Wb / 2) * -sdk);
+      dm.position.set(bx0, by0, bz0); dm.scale.set(1, 1, 1); dm.quaternion.copy(qb).multiply(qa); dm.updateMatrix(); bars.setMatrixAt(q++, dm.matrix);
+    }
+    bars.instanceMatrix.needsUpdate = true; bars.castShadow = true;
+    // 양쪽 박공: 유리 + 수직 멀리언(1m 간격) + 가로 트랜섬
+    [-1, 1].forEach(function (s) {
+      var gm = add(new T.Mesh(new T.ShapeGeometry(sh), film)); gm.position.z = s * L / 2;
+      for (var mx = x0 + paneW; mx < x0 + NW - 0.01; mx += paneW) { var hy = yAtX(mx); var mul = add(new T.Mesh(new T.BoxGeometry(0.05, hy, 0.05), alu)); mul.position.set(mx, hy / 2, s * L / 2); }
+      [kerb, kerb + vh, hs].forEach(function (ty) { var tr2 = add(new T.Mesh(new T.BoxGeometry(NW + 0.05, 0.05, 0.05), alu)); tr2.position.set(0, ty, s * L / 2); });
+      var sill = add(new T.Mesh(new T.BoxGeometry(NW + 0.3, kerb, 0.22), conc)); sill.position.set(0, kerb / 2, s * (L / 2 + 0.02)); sill.receiveShadow = true;
+    });
     // 눈 덮인 지붕 (눈 올 때만)
     var snowMat = new T.MeshLambertMaterial({ color: 0xf7f9fb }), snowRoof = [];
-    for (i = 0; i < n; i++) { var sr = add(new T.Mesh(patch(x0 + i * W, 0.16, 0.84, -L / 2, L / 2, 0.04), snowMat)); sr.visible = false; sr.castShadow = true; snowRoof.push(sr); }
+    for (i = 0; i < nb; i++) { var sr = add(new T.Mesh(patchB(x0 + i * Wb, 0.1, 0.9, -L / 2, L / 2, 0.05), snowMat)); sr.visible = false; sr.castShadow = true; snowRoof.push(sr); }
 
-    // ── 측창 (아래 0.3m 고정, 그 위로 감아 올림) + 감기 축 + 개폐기 ──
+    // ── 측벽: 콘크리트 턱 → 힌지식 환기창(위 힌지, 바깥으로 열림) → 고정 유리, 멀리언 1m 간격 ──
     var pg = new T.PlaneGeometry(1, 1); pg.rotateY(Math.PI / 2);
-    var cg = new T.CylinderGeometry(0.035, 0.035, 1, 10); cg.rotateX(Math.PI / 2);
-    var rollMat = new T.MeshLambertMaterial({ color: 0xe8edf1 }), netMat = new T.MeshBasicMaterial({ map: X.net, transparent: true, opacity: 0.85, side: T.DoubleSide, depthWrite: false });
+    var netMat = new T.MeshBasicMaterial({ map: X.net, transparent: true, opacity: 0.85, side: T.DoubleSide, depthWrite: false });
     var motorMat = new T.MeshLambertMaterial({ color: 0x2f3b46 });
     function sideSet(sg) {
-      var x = sg * NW / 2, b = add(new T.Mesh(pg, film)); b.scale.set(1, 0.3, L); b.position.set(x, 0.15, 0);
-      var top = add(new T.Mesh(pg, film)); top.position.x = x;
-      var roll = add(new T.Mesh(cg, rollMat)); roll.position.x = x + sg * 0.06; roll.scale.z = L; roll.castShadow = true;
-      var rollFilm = add(new T.Mesh(new T.CylinderGeometry(0.06, 0.06, L - 0.2, 12, 1, true), new T.MeshLambertMaterial({ color: 0xdfe8ee, transparent: true, opacity: 0.85 }))); rollFilm.rotation.x = Math.PI / 2; rollFilm.position.x = x + sg * 0.06;
+      var x = sg * NW / 2;
+      var kb = add(new T.Mesh(new T.BoxGeometry(0.22, kerb, L + 0.3), conc)); kb.position.set(x + sg * 0.02, kerb / 2, 0); kb.receiveShadow = true;
+      var fixed = add(new T.Mesh(pg, film)); fixed.scale.set(1, Math.max(0.01, hs - kerb - vh), L); fixed.position.set(x, kerb + vh + (hs - kerb - vh) / 2, 0);
+      // 환기창: 윗변(힌지)을 축으로 아래가 바깥쪽으로 벌어짐
+      var hinge = add(new T.Group()); hinge.position.set(x, kerb + vh, 0);
+      var pane = new T.Mesh(pg, film); pane.scale.set(1, vh, L); pane.position.y = -vh / 2; hinge.add(pane);
+      var pf1 = new T.Mesh(new T.BoxGeometry(0.05, 0.05, L), alu); pf1.position.y = -vh; hinge.add(pf1);
+      for (var mz = -L / 2; mz <= L / 2 + 0.01; mz += paneW * 2) { var pm = new T.Mesh(new T.BoxGeometry(0.04, vh, 0.04), alu); pm.position.set(0, -vh / 2, mz); hinge.add(pm); }
+      // 측벽 멀리언(고정 부분) · 물받이 높이 가로대
+      for (mz = -L / 2; mz <= L / 2 + 0.01; mz += paneW) { var mm = add(new T.Mesh(new T.BoxGeometry(0.05, hs - kerb - vh + 0.02, 0.05), alu)); mm.position.set(x, kerb + vh + (hs - kerb - vh) / 2, mz); }
+      var rail1 = add(new T.Mesh(new T.BoxGeometry(0.06, 0.06, L + 0.1), alu)); rail1.position.set(x, kerb + vh + 0.02, 0);
       var net = h.net ? add(new T.Mesh(new T.PlaneGeometry(1, 1), netMat)) : null;
-      if (net) { net.rotation.y = Math.PI / 2; net.position.x = x - sg * 0.02; net.scale.x = L; }
-      // 개폐기: 감기 축 끝(출입문 쪽)에 붙은 모터 + 손잡이 지지대
-      var motor = add(new T.Group()); motor.position.set(x + sg * 0.12, 0, zN - es * 0.25);
-      var mb = new T.Mesh(new T.BoxGeometry(0.16, 0.22, 0.3), motorMat); mb.castShadow = true; motor.add(mb);
+      if (net) { net.rotation.y = Math.PI / 2; net.position.x = x - sg * 0.03; net.scale.x = L; }
+      // 개폐기: 랙·피니언 모터(물받이 쪽) + 밀대 몇 개
+      var motor = add(new T.Group()); motor.position.set(x + sg * 0.12, kerb + vh + 0.25, zN - es * 0.25);
+      var mb = new T.Mesh(new T.BoxGeometry(0.18, 0.24, 0.3), motorMat); mb.castShadow = true; motor.add(mb);
       var mg = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 0.1, 12), new T.MeshLambertMaterial({ color: 0x4b5563 })); mg.rotation.x = Math.PI / 2; mg.position.z = -es * 0.18; motor.add(mg);
-      var guide = add(cyl(0.022, hs, steelD)); guide.position.set(x + sg * 0.12, hs / 2, zN - es * 0.25);
-      top.scale.z = L;
-      return { x: x, sg: sg, top: top, roll: roll, rollFilm: rollFilm, net: net, motor: motor };
+      var rods = [];
+      for (var rz = -L / 2 + 3; rz < L / 2 - 2; rz += Math.max(4, L / 8)) { var rd = add(new T.Mesh(new T.CylinderGeometry(0.014, 0.014, vh * 0.9, 6), steelD)); rd.position.set(x, kerb + vh / 2, rz); rods.push(rd); }
+      return { x: x, sg: sg, hinge: hinge, net: net, motor: motor, rods: rods };
     }
     var sides = { A: sideSet(-1), B: sideSet(1) };
 
-    // ── 뼈대: 아치 파이프(0.6~0.9m 간격) · 도리 · 물받이 · 기둥 · 박공 샛기둥 ──
-    var archSp = multi ? 0.9 : 0.6, nz = Math.max(2, Math.round(L / archSp)), archPts = [];
-    if (!multi) { archPts.push(new T.Vector3(x0, 0, 0)); archPts.push(new T.Vector3(x0, hs * 0.5, 0)); }
-    for (k = 0; k <= 20; k++) { u = k / 20; archPts.push(new T.Vector3((multi ? 0 : x0) + u * W, yAt(u), 0)); }
-    if (!multi) { archPts.push(new T.Vector3(x0 + W, hs * 0.5, 0)); archPts.push(new T.Vector3(x0 + W, 0, 0)); }
-    var archPath = new T.CurvePath(); for (k = 0; k < archPts.length - 1; k++) archPath.add(new T.LineCurve3(archPts[k], archPts[k + 1]));
-    var archGeo = new T.TubeGeometry(archPath, archPts.length * 2, multi ? 0.022 : 0.016, 5, false);
-    var cnt = (nz + 1) * n, arches = add(new T.InstancedMesh(archGeo, steel, cnt)), dm = new T.Object3D(), q = 0;
-    for (var a = 0; a <= nz; a++) for (i = 0; i < n; i++) { dm.position.set(multi ? x0 + i * W : 0, 0, -L / 2 + a * L / nz); dm.rotation.set(0, 0, 0); dm.scale.set(1, 1, 1); dm.updateMatrix(); arches.setMatrixAt(q++, dm.matrix); }
-    arches.instanceMatrix.needsUpdate = true; arches.castShadow = true;
-    // 도리(길이 방향 파이프): 용마루·중간·어깨, 측창 아래 고정대
-    var purl = [0.5, 0.22, 0.78]; if (W > 6) purl.push(0.36, 0.64);
-    for (i = 0; i < n; i++) purl.forEach(function (pu) { pipeZ(x0 + i * W + pu * W, yAt(pu) - 0.03, -L / 2, L / 2, 0.016, steel).castShadow = true; });
-    [x0, x0 + NW].forEach(function (xx) { pipeZ(xx, hs, -L / 2, L / 2, 0.02, steel); pipeZ(xx, 0.3, -L / 2, L / 2, 0.018, steel); });
-    if (multi) {
-      var gutM = new T.MeshPhongMaterial({ color: 0xb8c1c8, shininess: 40 });
-      for (i = 1; i < n; i++) { var gx = x0 + i * W; box(0.3, 0.16, L + 0.4, gutM, gx, hs + 0.02, 0, true); }
-      var postGeo = new T.BoxGeometry(0.075, hs, 0.075), npz = Math.max(2, Math.round(L / 3)), posts = add(new T.InstancedMesh(postGeo, steel, (n + 1) * (npz + 1))); q = 0;
-      for (i = 0; i <= n; i++) for (a = 0; a <= npz; a++) { dm.position.set(x0 + i * W, hs / 2, -L / 2 + a * L / npz); dm.rotation.set(0, 0, 0); dm.updateMatrix(); posts.setMatrixAt(q++, dm.matrix); }
-      posts.instanceMatrix.needsUpdate = true; posts.castShadow = true;
-      // 트러스 보 (기둥 위 가로 보)
-      for (a = 0; a <= npz; a += 2) pipeX(x0, x0 + NW, hs - 0.12, -L / 2 + a * L / npz, 0.025, steelD);
+    // ── 철골: 기둥(동 경계마다 4m 간격) · 물받이(칸 경계마다) · 격자 트러스 · 박공 보강 ──
+    var gutM = new T.MeshPhongMaterial({ color: 0xc4ccd3, shininess: 50 });
+    for (i = 0; i <= nb; i++) { var gx = x0 + i * Wb; var gt2 = box(i === 0 || i === nb ? 0.16 : 0.26, 0.15, L + 0.4, gutM, gx + (i === 0 ? 0.04 : i === nb ? -0.04 : 0), hs + 0.03, 0, true); gt2.userData.g = 1; }
+    var postSp = 4.0, npz = Math.max(2, Math.round(L / postSp)), postGeo = new T.BoxGeometry(0.12, hs, 0.12), posts = add(new T.InstancedMesh(postGeo, steel, (n + 1) * (npz + 1))); q = 0;
+    for (i = 0; i <= n; i++) for (a = 0; a <= npz; a++) { dm.position.set(x0 + i * W + (i === 0 ? 0.08 : i === n ? -0.08 : 0), hs / 2, -L / 2 + a * L / npz); dm.rotation.set(0, 0, 0); dm.quaternion.setFromEuler(new T.Euler(0, 0, 0)); dm.scale.set(1, 1, 1); dm.updateMatrix(); posts.setMatrixAt(q++, dm.matrix); }
+    posts.instanceMatrix.needsUpdate = true; posts.castShadow = true;
+    // 안쪽 칸 경계(물받이 아래)는 기둥 없이 트러스가 받침 → 기둥 열마다 동 폭(W) 격자 트러스
+    var trH = Math.min(0.7, hs * 0.18);
+    for (a = 0; a <= npz; a++) {
+      var tz = -L / 2 + a * L / npz;
+      pipeX(x0, x0 + NW, hs - 0.1, tz, 0.028, steel); pipeX(x0, x0 + NW, hs - 0.1 - trH, tz, 0.028, steel);
+      for (var tk = 0; tk <= nb * 4; tk++) {
+        var tx0 = x0 + tk * Wb / 4; var vt = add(cyl(0.016, trH, steelD)); vt.position.set(tx0, hs - 0.1 - trH / 2, tz);
+        if (tk < nb * 4) { var dgL = Math.hypot(Wb / 4, trH), dg = add(cyl(0.014, dgL, steelD)); dg.position.set(tx0 + Wb / 8, hs - 0.1 - trH / 2, tz); dg.rotation.z = (tk % 2 ? 1 : -1) * Math.atan2(Wb / 4, trH); }
+      }
+      // 물받이 받침(칸 경계 위 작은 기둥)과 용마루 받침
+      for (i = 1; i < nb; i++) if (i % m !== 0) { var gp = add(cyl(0.025, 0.1, steelD)); gp.position.set(x0 + i * Wb, hs - 0.04, tz); }
     }
-    // 박공 샛기둥·가로대
-    [-L / 2, L / 2].forEach(function (z) {
-      for (i = 0; i < n; i++) for (var st = 1; st < Math.max(3, Math.round(W / 1.2)); st++) { var su = st / Math.max(3, Math.round(W / 1.2)), sx = x0 + i * W + su * W, hy = yAt(su); var stud = add(cyl(0.017, hy, steel)); stud.position.set(sx, hy / 2, z); }
-      pipeX(x0, x0 + NW, Math.min(2.2, hs + 0.3), z, 0.018, steel);
-    });
-    // 출입문 (가까운 쪽 박공, 가운데 동) — 미닫이 문틀 + 피복 문짝
-    var dSpan = Math.floor(n / 2), dxc = x0 + dSpan * W + W / 2, dw = Math.min(2.0, W * 0.32), dhh = Math.min(2.1, yAt(0.5 - dw / W / 2) - 0.1);
-    var doorFrame = new T.MeshLambertMaterial({ color: 0x7c8790 });
+    // 측벽 기둥 사이 가로 보(물받이 높이) 및 세로 방향 보강재
+    [x0, x0 + NW].forEach(function (xx) { pipeZ(xx, hs - 0.08, -L / 2, L / 2, 0.025, steel); });
+    // 출입문 (가까운 쪽 박공, 가운데 칸 용마루 아래) — 알루미늄 미닫이 유리문
+    var dBay = Math.floor(nb / 2), dxc = x0 + dBay * Wb + Wb / 2, dw = Math.min(2.0, Wb * 0.5), dhh = Math.min(2.2, yAtX(dxc - dw / 2) - 0.15);
+    var doorFrame = new T.MeshLambertMaterial({ color: 0xb6bec5 });
     [-1, 1].forEach(function (s) { var jb = add(new T.Mesh(new T.BoxGeometry(0.06, dhh, 0.06), doorFrame)); jb.position.set(dxc + s * dw / 2, dhh / 2, zN); });
     var lint = add(new T.Mesh(new T.BoxGeometry(dw * 2 + 0.1, 0.06, 0.06), doorFrame)); lint.position.set(dxc + dw / 2, dhh, zN + es * 0.03);
     var rail = add(new T.Mesh(new T.BoxGeometry(dw * 2 + 0.1, 0.05, 0.05), doorFrame)); rail.position.set(dxc + dw / 2, 0.04, zN + es * 0.03);
     var leaf = add(new T.Group()); leaf.position.set(dxc + dw * 0.55, 0, zN + es * 0.07);
-    var lf = new T.Mesh(new T.PlaneGeometry(dw, dhh - 0.08), new T.MeshPhongMaterial({ color: 0xeef4f8, transparent: true, opacity: 0.45, side: T.DoubleSide, depthWrite: false })); lf.position.y = dhh / 2; leaf.add(lf);
+    var lf = new T.Mesh(new T.PlaneGeometry(dw, dhh - 0.08), new T.MeshPhongMaterial({ color: 0xd6e9f7, transparent: true, opacity: 0.35, side: T.DoubleSide, depthWrite: false, shininess: 160, specular: 0xc8d8e4 })); lf.position.y = dhh / 2; leaf.add(lf);
     var lfF = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(dw, dhh - 0.08, 0.02)), new T.LineBasicMaterial({ color: 0x6b7680 })); lfF.position.y = dhh / 2; leaf.add(lfF);
     var handle = new T.Mesh(new T.BoxGeometry(0.03, 0.18, 0.04), doorFrame); handle.position.set(-dw / 2 + 0.1, 1.0, 0.03 * es); leaf.add(handle);
     var apron = add(new T.Mesh(uvM(new T.PlaneGeometry(dw * 2.2, 2.4), dw * 2.2, 2.4), conc)); apron.rotation.x = -Math.PI / 2; apron.position.set(dxc + dw * 0.4, 0.03, zN + es * 1.2); apron.receiveShadow = true;
     // ── FARMILY 간판: 출입문 위 박공 바깥쪽 (밤에는 불이 들어오는 라이트박스) ──
-    var sgW = Math.min(W * 0.55, 4.0), sgH, sgY;
-    for (var sgi = 0; sgi < 12; sgi++) { sgH = sgW / 5; sgY = dhh + 0.14 + sgH / 2; if (sgY + sgH / 2 <= yAt(0.5 - sgW / W / 2) - 0.1 || sgW < 1.3) break; sgW *= 0.9; }
+    var sgW = Math.min(Wb * 0.7, 4.0), sgH, sgY;
+    for (var sgi = 0; sgi < 12; sgi++) { sgH = sgW / 5; sgY = dhh + 0.14 + sgH / 2; if (sgY + sgH / 2 <= yAtX(dxc - sgW / 2) - 0.1 || sgW < 1.3) break; sgW *= 0.9; }
     var sgTex = signTexture(), sgOut = es * 0.16;
     var signMat = new T.MeshLambertMaterial({ color: 0xffffff, map: sgTex, emissive: 0x000000, emissiveMap: sgTex });
     var sgFrameMat = new T.MeshPhongMaterial({ color: 0x2b2f34, shininess: 40, specular: 0x444444 });
@@ -593,32 +639,26 @@
     var sgGlow = add(new T.Mesh(new T.PlaneGeometry(sgW * 1.7, sgH * 3.2), sgGlowMat)); sgGlow.position.set(dxc, sgY, zN + es * 0.02); sgGlow.rotation.y = sgFace.rotation.y; sgGlow.renderOrder = 3;
     var signLight = new T.PointLight(0xfff4e0, 0, 9, 1.8); signLight.position.set(dxc, sgY - 0.1, zN + es * 1.4); grp.add(signLight);
 
-    // ── 보온커튼: 단동은 아치를 따라 안쪽에(양옆 감기), 연동은 물받이 높이에 수평 ──
+    // ── 보온커튼(에너지 스크린): 물받이 바로 아래 수평으로 펼침, 걷으면 칸마다 뭉치로 ──
     var curC = [], curO = [];
     if (h.curtain !== 'none') {
       var cm = new T.MeshLambertMaterial({ color: 0xffffff, map: h.curtain === 'multi' ? X.quilt : X.fleece, transparent: true, opacity: h.curtain === 'multi' ? 0.97 : 0.85, side: T.DoubleSide });
-      if (!multi) {
-        curC.push(add(new T.Mesh(patch(x0, 0.02, 0.98, -L / 2 + 0.2, L / 2 - 0.2, -0.28), cm)));
-        [-1, 1].forEach(function (s) { var sc = add(new T.Mesh(new T.PlaneGeometry(L - 0.4, hs - 0.15), cm)); sc.rotation.y = Math.PI / 2; sc.position.set(s * (NW / 2 - 0.2), 0.15 + (hs - 0.15) / 2, 0); curC.push(sc); });
-        [-1, 1].forEach(function (s) { var ro = add(cyl(h.curtain === 'multi' ? 0.13 : 0.08, L - 0.4, cm, 12)); ro.rotation.x = Math.PI / 2; ro.position.set(s * (NW / 2 - 0.3), hs - 0.05, 0); ro.castShadow = true; curO.push(ro); });
-      } else {
-        var cc = add(new T.Mesh(uvM(new T.PlaneGeometry(NW - 0.1, L - 0.1), NW, L), cm)); cc.rotation.x = -Math.PI / 2; cc.position.y = hs - 0.18; curC.push(cc);
-        for (i = 0; i < n; i++) { var bo = add(new T.Mesh(new T.BoxGeometry(0.3, 0.22, L - 0.2), cm)); bo.position.set(x0 + i * W + 0.3, hs - 0.25, 0); bo.castShadow = true; curO.push(bo); }
-      }
-      // 커튼 줄(지지선)
-      var cwP = []; for (i = 0; i < n; i++) for (k = 1; k < 6; k++) { var cxw = x0 + i * W + k * W / 6; cwP.push(cxw, multi ? hs - 0.16 : yAt(k / 6) - 0.3, -L / 2, cxw, multi ? hs - 0.16 : yAt(k / 6) - 0.3, L / 2); }
+      var cc = add(new T.Mesh(uvM(new T.PlaneGeometry(NW - 0.1, L - 0.1), NW, L), cm)); cc.rotation.x = -Math.PI / 2; cc.position.y = hs - 0.28; curC.push(cc);
+      for (i = 0; i < nb; i++) { var bo = add(new T.Mesh(new T.BoxGeometry(0.26, 0.2, L - 0.2), cm)); bo.position.set(x0 + i * Wb + 0.28, hs - 0.34, 0); bo.castShadow = true; curO.push(bo); }
+      // 스크린 지지선
+      var cwP = []; for (i = 0; i < nb; i++) for (k = 1; k < 4; k++) { var cxw = x0 + i * Wb + k * Wb / 4; cwP.push(cxw, hs - 0.26, -L / 2, cxw, hs - 0.26, L / 2); }
       var cwg = new T.BufferGeometry(); cwg.setAttribute('position', new T.Float32BufferAttribute(cwP, 3)); add(new T.LineSegments(cwg, new T.LineBasicMaterial({ color: 0x9aa3ab, transparent: true, opacity: 0.6 })));
     }
-    // ── 차광막 (지붕 바깥, 검은 망) ──
+    // ── 차광 스크린: 지붕 위 지지 와이어에 펼치는 외부 차광망(검은 망) ──
     var shOn = [], shOff = [];
     if (h.shade) {
       var sm = new T.MeshLambertMaterial({ color: 0xffffff, map: X.shade, transparent: true, opacity: clamp(0.35 + (h.shadePct || 50) / 120, 0.4, 0.95), side: T.DoubleSide, depthWrite: false });
-      for (i = 0; i < n; i++) {
-        var spm = add(new T.Mesh(patch(x0 + i * W, 0, 1, -L / 2, L / 2, 0.32), sm)); spm.castShadow = true; shOn.push(spm);
-        var so = add(cyl(0.08, L, new T.MeshLambertMaterial({ color: 0x1f2328 }), 10)); so.rotation.x = Math.PI / 2; so.position.set(x0 + i * W + 0.12, hs + 0.36, 0); shOff.push(so);
-      }
-      // 차광 지지 파이프
-      for (a = 0; a <= nz; a += 6) for (i = 0; i < n; i++) { var sp2 = add(cyl(0.012, 0.32, steelD)); sp2.position.set(x0 + i * W + W / 2, hr + 0.16, -L / 2 + a * L / nz); }
+      var spm = add(new T.Mesh(uvM(new T.PlaneGeometry(NW, L), NW, L), sm)); spm.rotation.x = -Math.PI / 2; spm.position.y = hr + 0.55; spm.castShadow = true; shOn.push(spm);
+      for (i = 0; i < nb; i++) { var so = add(cyl(0.09, L, new T.MeshLambertMaterial({ color: 0x1f2328 }), 10)); so.rotation.x = Math.PI / 2; so.position.set(x0 + i * Wb + 0.15, hr + 0.5, 0); shOff.push(so); }
+      // 차광 지지대: 용마루 위 짧은 기둥 + 와이어
+      var swP = [];
+      for (i = 0; i < nb; i++) { for (a = 0; a <= npz; a++) { var sp2 = add(cyl(0.02, 0.55, steelD)); sp2.position.set(x0 + i * Wb + Wb / 2, hr + 0.27, -L / 2 + a * L / npz); } swP.push(x0 + i * Wb + Wb / 2, hr + 0.54, -L / 2, x0 + i * Wb + Wb / 2, hr + 0.54, L / 2); }
+      var swg = new T.BufferGeometry(); swg.setAttribute('position', new T.Float32BufferAttribute(swP, 3)); add(new T.LineSegments(swg, new T.LineBasicMaterial({ color: 0x9aa3ab, transparent: true, opacity: 0.6 })));
     }
 
     // ── 하우스 안 공기 (온도 색) ──
@@ -736,10 +776,10 @@
     var fans = [], fanM = new T.MeshLambertMaterial({ color: 0x9ea7ad }), bladeM = new T.MeshLambertMaterial({ color: 0x5f6870 });
     var nf = Math.max(1, Math.round(L / 16));
     for (i = 0; i < n; i++) for (k = 0; k < nf; k++) {
-      var fg = add(new T.Group()), fy = Math.min(yAt(0.5) - 0.55, multi ? hs - 0.45 : 9);
-      fg.position.set(x0 + i * W + W / 2, fy, -L / 2 + (k + 0.5) * L / nf);
+      var fg = add(new T.Group()), fy = hs - 0.5;
+      fg.position.set(x0 + i * W + W / 2 - (m % 2 ? 0 : Wb / 2), fy, -L / 2 + (k + 0.5) * L / nf);
       var rgf = new T.Mesh(new T.TorusGeometry(0.28, 0.03, 6, 18), fanM); fg.add(rgf);
-      var hang = new T.Mesh(new T.CylinderGeometry(0.008, 0.008, yAt(0.5) - fy, 4), fanM); hang.position.y = (yAt(0.5) - fy) / 2; fg.add(hang);
+      var hang = new T.Mesh(new T.CylinderGeometry(0.008, 0.008, hr - fy, 4), fanM); hang.position.y = (hr - fy) / 2; fg.add(hang);
       var hub = new T.Group(); for (var bb = 0; bb < 4; bb++) { var bl2 = new T.Mesh(new T.BoxGeometry(0.06, 0.24, 0.015), bladeM); bl2.position.y = 0.13; bl2.rotation.y = 0.4; var bw = new T.Group(); bw.rotation.z = bb * Math.PI / 2; bw.add(bl2); hub.add(bw); }
       fg.add(hub); fans.push(hub);
     }
@@ -750,10 +790,10 @@
     // 바람 흐름 화살표
     function arrow(c) { var a3 = new T.ArrowHelper(new T.Vector3(1, 0, 0), new T.Vector3(), 1.6, c, 0.55, 0.38); a3.visible = false; add(a3); return a3; }
     var arA = [arrow(0x38bdf8), arrow(0x38bdf8), arrow(0x38bdf8)], arB = [arrow(0x38bdf8), arrow(0x38bdf8), arrow(0x38bdf8)], arR = [];
-    if (h.roofVent) for (i = 0; i < n; i++) arR.push(arrow(0xfb923c), arrow(0xfb923c));
+    if (h.roofVent) for (i = 0; i < nb; i++) arR.push(arrow(0xfb923c), arrow(0xfb923c));
     G.scene.add(grp); grp.updateMatrixWorld(true);
     G.house = grp;
-    G.dims = { n: n, W: W, L: L, hs: hs, hr: hr, NW: NW, x0: x0, vh: vh, du: du, axis: axis, baseOp: baseOp };
+    G.dims = { n: n, W: W, L: L, hs: hs, hr: hr, NW: NW, x0: x0, vh: vh, du: du, axis: axis, baseOp: baseOp, m: m, Wb: Wb, nb: nb, kerb: kerb };
     G.parts = { film: film, flapMat: flapMat, sides: sides, flaps: flaps, curC: curC, curO: curO, shOn: shOn, shOff: shOff, air: air, airMat: airMat, dripMat: dripMat, heat: heat, arA: arA, arB: arB, arR: arR,
       fans: fans, snowRoof: snowRoof, puddles: puddles, ditches: [env.userData['ditch-1'], env.userData.ditch1], lamp: lamp, bulbMat: bulbMat, winMat: winMat, signMat: signMat, signLight: signLight, signGlow: sgGlowMat, irrLed: irrLed, road: road, filmMap: 'film' };
     // 바람 입자 범위
@@ -874,15 +914,13 @@
     var droop = (1 - Math.min(1, f.ws / 7)) * 70 * D2R; G.sockPitch.rotation.z = -droop + Math.sin(now / 300) * 0.04 * Math.min(1, f.ws / 3);
     // ── 측창·천창·커튼·차광 ──
     function side(s, o) {
-      var top = 0.3 + d.vh * o, hh = Math.max(0.001, d.hs - top);
-      s.top.scale.y = hh; s.top.position.y = top + hh / 2;
-      s.roll.position.y = top; var rr = 1 + o * 1.8; s.roll.scale.x = rr; s.roll.scale.y = rr;
-      s.rollFilm.position.y = top; s.rollFilm.scale.set(rr * 1.1, 1, rr * 1.1);
-      s.motor.position.y = top;
-      if (s.net) { s.net.visible = o > 0.01; s.net.scale.y = Math.max(0.001, d.vh * o); s.net.position.y = 0.3 + d.vh * o / 2; }
+      // 힌지식 환기창: 위 힌지를 축으로 아래가 바깥쪽으로 최대 약 50° 벌어짐
+      var ang = o * 0.88; s.hinge.rotation.z = s.sg * ang;
+      s.rods.forEach(function (rd) { rd.rotation.z = s.sg * ang * 0.5; rd.position.x = s.x + s.sg * Math.sin(ang) * d.vh * 0.45; rd.position.y = d.kerb + d.vh - Math.cos(ang) * d.vh * 0.5; });
+      if (s.net) { s.net.visible = o > 0.01; s.net.scale.y = Math.max(0.001, d.vh); s.net.position.y = d.kerb + d.vh / 2; s.net.material.opacity = 0.85 * Math.min(1, o * 3); }
     }
     side(P.sides.A, f.A); side(P.sides.B, f.B);
-    P.flaps.forEach(function (pv) { pv.rotation.z = pv.userData.slope + f.R * 0.95; });
+    P.flaps.forEach(function (pv) { pv.rotation.z = pv.userData.slope + pv.userData.dir * f.R * 0.95; });
     P.curC.forEach(function (m) { m.visible = !!f.cur; }); P.curO.forEach(function (m) { m.visible = !f.cur; });
     P.shOn.forEach(function (m) { m.visible = !!f.sh; }); P.shOff.forEach(function (m) { m.visible = !f.sh; });
     // 하우스 안 공기색(온도), 습도 높으면 필름에 물방울(결로)
@@ -911,12 +949,12 @@
       s[2].forEach(function (ar, k) {
         ar.visible = flowOn && o > 0.02; if (!ar.visible) return;
         var z = clamp(zc + (k - 1) * Math.min(5, d.L / 4), -d.L / 2 + 1, d.L / 2 - 1);
-        ar.position.set(sd2.x - dirX * 0.9, 0.3 + d.vh * o / 2, z); ar.setDirection(new T.Vector3(dirX, 0, 0));
+        ar.position.set(sd2.x - dirX * 0.9, d.kerb + d.vh * 0.5, z); ar.setDirection(new T.Vector3(dirX, 0, 0));
       });
     });
     P.arR.forEach(function (ar, k) {
       ar.visible = flowOn && f.R > 0.02; if (!ar.visible) return;
-      var span = Math.floor(k / 2), xc = d.x0 + span * d.W + d.W / 2 + d.du * d.W * 0.5;
+      var span = Math.floor(k / 2), xc = d.x0 + span * d.Wb + d.Wb / 2 + (k % 2 ? 1 : -1) * d.du * d.W * 0.5;
       ar.position.set(xc, d.hr - 0.4, clamp(zc + (k % 2 ? 3 : -3), -d.L / 2 + 1, d.L / 2 - 1)); ar.setDirection(new T.Vector3(0, 1, 0));
     });
     // 바람 입자
@@ -960,9 +998,9 @@
     var nA = (d.axis + 270) % 360, nB = (d.axis + 90) % 360, L = G.lbs, H = G.house;
     function lw(x, y, z) { return H.localToWorld(new T.Vector3(x, y, z)); }
     place(L['in'], lw(0, d.hs * 0.55, zc), '안 <b>' + f1(f.Ti) + '℃</b><br>습도 ' + Math.round(f.RHi) + '%' + (f.RHi >= 90 ? ' ⚠' : ''));
-    place(L.A, lw(-d.NW / 2 - 0.4, 0.3 + d.vh * 0.5, zc), dir8(nA) + ' 측창 ' + Math.round(f.A * 100) + '%');
-    place(L.B, lw(d.NW / 2 + 0.4, 0.3 + d.vh * 0.5, zc), dir8(nB) + ' 측창 ' + Math.round(f.B * 100) + '%');
-    if (c.house.roofVent) place(L.R, lw(d.x0 + d.W / 2, d.hr + 0.9, zc), '천창 ' + Math.round(f.R * 100) + '%'); else L.R.style.display = 'none';
+    place(L.A, lw(-d.NW / 2 - 0.4, d.kerb + d.vh * 0.5, zc), dir8(nA) + ' 측창 ' + Math.round(f.A * 100) + '%');
+    place(L.B, lw(d.NW / 2 + 0.4, d.kerb + d.vh * 0.5, zc), dir8(nB) + ' 측창 ' + Math.round(f.B * 100) + '%');
+    if (c.house.roofVent) place(L.R, lw(d.x0 + d.Wb / 2, d.hr + 0.9, zc), '천창 ' + Math.round(f.R * 100) + '%'); else L.R.style.display = 'none';
     if (G.sunBall.visible) place(L.sun, G.sunBall.position.clone().add(new T.Vector3(0, -13, 0)), '☀ 해 ' + dir8(f.az) + ' ' + Math.round(el) + '°'); else L.sun.style.display = 'none';
     if (G.moonSpr.visible) place(L.mo, G.moonSpr.position.clone().add(new T.Vector3(0, -15, 0)), '🌙 ' + G.sky.mp.name + ' ' + Math.round(G.sky.mp.el) + '°'); else L.mo.style.display = 'none';
     place(L.ws, G.sensTop, '💨 ' + dir16(f.wd) + '풍 ' + f1(f.ws) + 'm/s');
