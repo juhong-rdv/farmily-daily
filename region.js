@@ -3,14 +3,20 @@
    <div class="card" id="local-card"><h2>📍 우리 지역 농업 날씨</h2><div id="local-app">...대체 문구...</div></div>
    <script src="/farmily-daily/region.js"></script>                                                       */
 (function () {
+  if (window.self !== window.top) document.documentElement.classList.add('farmily-embedded');
   // Keep the shared typography when an automated daily publish replaces index.html.
   if (!document.getElementById('farmily-readability')) {
     var theme = document.createElement('link');
     theme.id = 'farmily-readability';
     theme.rel = 'stylesheet';
-    theme.href = '/farmily-daily/readability.css?v=20261022';
+    theme.href = '/farmily-daily/readability.css?v=20261023';
     theme.onload = function () { if (window.postHeight) window.postHeight(); };
     document.head.appendChild(theme);
+  }
+  var activeTheme = document.getElementById('farmily-readability');
+  if (activeTheme && activeTheme.getAttribute('href').indexOf('v=20261023') === -1) {
+    activeTheme.href = '/farmily-daily/readability.css?v=20261023';
+    activeTheme.onload = function () { if (window.postHeight) window.postHeight(); };
   }
   var app = document.getElementById('local-app');
   if (!app) return;
