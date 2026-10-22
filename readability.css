@@ -1,0 +1,79 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css');
+
+/* Shared by the daily briefing and greenhouse simulator, including embeds. */
+:root { --fm-ink: #26392e; --fm-muted: #58675d; --fm-line: #dce5dd; }
+body { font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: var(--fm-ink); letter-spacing: -.015em; -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: break-word; }
+button, input, select, textarea { font-family: inherit; font-size: 16px; letter-spacing: inherit; }
+button, select, input:not([type=range]):not([type=checkbox]):not([type=radio]) { min-height: 44px; }
+a { text-underline-offset: .2em; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid #387244; outline-offset: 3px; }
+h1, h2, summary { letter-spacing: -.03em; text-wrap: balance; }
+p, li { line-height: 1.85; }
+strong, b { font-weight: 650; }
+
+body:has(.page-head) { max-width: 1060px; margin: 0 auto; padding: 24px 20px; font-size: 18px; line-height: 1.85; }
+.page-head { padding: 0 0 28px; }
+.page-head h1 { font-size: clamp(26px, 3.2vw, 36px); line-height: 1.35; font-weight: 750; margin-bottom: 12px; }
+.page-head .date { color: var(--fm-muted); font-size: 15px; }
+.lead { font-size: 18px; color: var(--fm-ink); padding: 24px 28px; line-height: 1.85; background: #f0f5ee; border-color: #3e633b; margin-bottom: 28px; }
+.page-head ~ .card { border-color: var(--fm-line); padding: 28px 32px; margin-bottom: 28px; }
+.page-head ~ .card h2 { font-size: 24px; line-height: 1.45; margin-bottom: 22px; color: #173e29; }
+.page-head ~ .card p, .page-head ~ .card > ul { max-width: 72ch; }
+.page-head ~ .card p { margin-bottom: 20px; }
+.page-head ~ .card li { margin-bottom: 12px; }
+.subhead { margin: 26px 0 12px; font-size: 19px; color: #173e29; }
+.alert, .tip { font-size: 16px; line-height: 1.85; padding: 18px 20px; }
+.src, .trend-note, .tab-sub, .footer-note { color: var(--fm-muted); font-size: 14px; line-height: 1.8; }
+.src { margin-top: 16px; }
+.page-head ~ .card table { font-size: 16px; line-height: 1.65; }
+.page-head ~ .card :is(th,td) { padding: 12px 10px; }
+.page-head ~ .card td:nth-child(n+2) { font-variant-numeric: tabular-nums; }
+.chart-title { font-size: 17px; line-height: 1.6; margin-bottom: 12px; }
+.chart-axis-label, .crow, .cval { font-size: 14px; }
+.tab-btn { font-size: 15px; padding: 8px 16px; }
+#local-app .lc-s, #local-app .lc-foot { font-size: 15px !important; line-height: 1.8 !important; color: var(--fm-muted) !important; }
+#local-app .lc-k { font-size: 15px !important; color: #455b4a !important; }
+#local-app :is(select,input) { font-size: 16px !important; }
+
+/* Keep settings legible without reducing the simulation's drawing area. */
+.wrap { padding: 28px 20px; font-size: 16px; line-height: 1.75; }
+.wrap header { margin-bottom: 24px; }
+.wrap header h1 { font-size: clamp(26px, 3vw, 34px); line-height: 1.4; margin-bottom: 14px; }
+.wrap header p { font-size: 17px; color: #455b4a; max-width: 76ch; line-height: 1.85; }
+.wrap .top { gap: 12px; margin-bottom: 24px; }
+.wrap .grid { grid-template-columns: 360px minmax(0, 1fr); gap: 24px; }
+.wrap .main, .wrap .side { min-width: 0; }
+.wrap .card { border-color: var(--fm-line); padding: 20px; margin-bottom: 20px; }
+.wrap .card h2 { font-size: 20px; line-height: 1.55; margin-bottom: 18px; }
+.wrap details > summary { font-size: 18px; line-height: 1.6; margin-bottom: 16px; }
+.wrap .fld { font-size: 16px; padding: 10px 0; gap: 12px; }
+.wrap .fld :is(select,input[type=number]) { font-size: 16px; padding: 8px; max-width: 100%; }
+.wrap .fld .fl { min-width: 0; }
+.wrap .fl i, .wrap .numw em, .wrap .axisw b, .wrap .note, .wrap #status { font-size: 14px; color: var(--fm-muted); line-height: 1.75; }
+.wrap .axisw { max-width: 180px; }
+.wrap .axisw select { max-width: 180px; }
+.wrap .btn, .wrap .ctl select, .wrap .top select { font-size: 16px; padding: 9px 12px; }
+.wrap .btn.sm { font-size: 14px; }
+.wrap .about, .wrap .tips li, .wrap .sumt, .wrap #calout p { font-size: 16px; line-height: 1.85; }
+.wrap .sumt :is(th,td) { padding: 12px 10px; }
+.wrap .note, .wrap .leg, .wrap #chips span { font-size: 14px; }
+.wrap small[style*="color:#888"] { color: var(--fm-muted) !important; font-size: 14px !important; }
+.wrap #calcard > p[style] { font-size: 16px !important; line-height: 1.85; }
+
+@media (max-width: 1050px) { .wrap .grid { grid-template-columns: 1fr; } .wrap .side { position: static; max-height: none; overflow: visible; } }
+@media (max-width: 600px) {
+  body:has(.page-head) { padding: 20px 12px; font-size: 17px; }
+  .lead { padding: 20px; font-size: 17px; }
+  .page-head ~ .card { padding: 22px 18px; margin-bottom: 20px; }
+  .page-head ~ .card h2 { font-size: 22px; }
+  .page-head ~ .card table { font-size: 14px; }
+  .page-head ~ .card :is(th,td) { padding: 10px 6px; }
+  .page-head ~ .card th:nth-child(2), .page-head ~ .card td:nth-child(2) { overflow-wrap: anywhere; }
+  .wrap { padding: 20px 12px; }
+  .wrap .card { padding: 18px 16px; }
+  .wrap header h1 small { display: block; margin-top: 8px; }
+  .wrap .sumt th:first-child { width: auto; min-width: 90px; }
+  .wrap .fld .axisw { max-width: 170px; }
+  .wrap .fld .axisw select { max-width: 170px; }
+  .wrap .ctl input[type=range] { flex-basis: 100%; }
+}
