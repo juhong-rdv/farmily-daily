@@ -1,5 +1,5 @@
 {
- "started": "2026-11-13T18:39+09:00",
+ "started": "2026-11-14T01:32+09:00",
  "errors": [],
  "mid_invalid": [],
  "counts": {
@@ -10,41 +10,46 @@
  "base": "https://apis.data.go.kr/1360000",
  "samples": [
   {
-   "path": "/VilageFcstInfoService_2.0/getVilageFcst",
+   "path": "/AsosDalyInfoService/getWthrDataList",
    "params": {
     "pageNo": 1,
-    "numOfRows": 1000,
-    "base_date": "20261113",
-    "base_time": "1700",
-    "nx": 60,
-    "ny": 127
+    "numOfRows": 400,
+    "dataCd": "ASOS",
+    "dateCd": "DAY",
+    "startDt": "20261108",
+    "endDt": "20261113",
+    "stnIds": 108
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261113\",\"fcstTime\":\"1800\",\"fcstValue\":\"13\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"UUU\",\"fcstDate\":\"20261113\",\"fcstTime\":\"1800\",\"fcstValue\":\"0\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"VVV\",\"fcstDate\":\"20261113\",\"fcstTime\":\"1800\",\"fcstValue\":\"0.3\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"VEC\",\"fcstDate\":\"20261113\",\"fcstTi"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"108\",\"stnNm\":\"서울\",\"tm\":\"2026-11-08\",\"avgTa\":\"5.2\",\"minTa\":\"2.7\",\"minTaHrmt\":\"0113\",\"maxTa\":\"6.7\",\"maxTaHrmt\":\"1616\",\"mi10MaxRn\":\"\",\"mi10MaxRnHrmt\":\"\",\"hr1MaxRn\":\"\",\"hr1MaxRnHrmt\":\"\",\"sumRnDur\":\"14.25\",\"sumRn\":\"2.6\",\"maxInsWs\":\"6.3\",\"maxInsWsWd\":\"50\",\"maxInsWsHrmt\":\"1719\",\"maxWs\":\"3.8\",\"maxWsWd\":\"70\",\"maxWsHrmt\":\"1708\",\"avgWs\":\"2.2\",\"hr24SumRws\":\"1874\",\"maxWd\":\"50\",\"avgTd\":\"-2.5\",\"minRhm\":\"33\",\"minRhmHrmt\":\"0001\",\"avgRhm\":\"60.9\",\"avgPv\":\"5.5\",\"avgPa\":\"1023.1\",\"maxPs\":\"1035"
   },
   {
-   "path": "/VilageFcstInfoService_2.0/getVilageFcst",
-   "params": {
-    "pageNo": 2,
-    "numOfRows": 1000,
-    "base_date": "20261113",
-    "base_time": "1700",
-    "nx": 60,
-    "ny": 127
-   },
-   "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"PCP\",\"fcstDate\":\"20261117\",\"fcstTime\":\"1200\",\"fcstValue\":\"0\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"REH\",\"fcstDate\":\"20261117\",\"fcstTime\":\"1200\",\"fcstValue\":\"70\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"SNO\",\"fcstDate\":\"20261117\",\"fcstTime\":\"1200\",\"fcstValue\":\"0\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261117\",\"fcstTime"
-  },
-  {
-   "path": "/MidFcstInfoService/getMidTa",
+   "path": "/AsosDalyInfoService/getWthrDataList",
    "params": {
     "pageNo": 1,
-    "numOfRows": 10,
-    "regId": "11B10101",
-    "tmFc": "202611131800"
+    "numOfRows": 400,
+    "dataCd": "ASOS",
+    "dateCd": "DAY",
+    "startDt": "20261108",
+    "endDt": "20261113",
+    "stnIds": 159
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"regId\":\"11B10101\",\"taMin5\":6,\"taMin5Low\":2,\"taMin5High\":1,\"taMax5\":8,\"taMax5Low\":2,\"taMax5High\":2,\"taMin6\":0,\"taMin6Low\":1,\"taMin6High\":1,\"taMax6\":5,\"taMax6Low\":1,\"taMax6High\":1,\"taMin7\":0,\"taMin7Low\":2,\"taMin7High\":1,\"taMax7\":7,\"taMax7Low\":1,\"taMax7High\":2,\"taMin8\":-1,\"taMin8Low\":0,\"taMin8High\":2,\"taMax8\":7,\"taMax8Low\":0,\"taMax8High\":2,\"taMin9\":-2,\"taMin9Low\":0,\"taMin9High\":2,\"taMax9\":6,\"taMax9Low\":0,\"taMax9High\":3,\"taMin10\":-1,\"taMin10Low\":0,\"taMin10High\":3,\"taMax10\":9,\"taMax10"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"159\",\"stnNm\":\"부산\",\"tm\":\"2026-11-08\",\"avgTa\":\"12.0\",\"minTa\":\"6.9\",\"minTaHrmt\":\"0538\",\"maxTa\":\"17.1\",\"maxTaHrmt\":\"1308\",\"mi10MaxRn\":\"\",\"mi10MaxRnHrmt\":\"\",\"hr1MaxRn\":\"\",\"hr1MaxRnHrmt\":\"\",\"sumRnDur\":\"0.13\",\"sumRn\":\"0.0\",\"maxInsWs\":\"8.4\",\"maxInsWsWd\":\"90\",\"maxInsWsHrmt\":\"1344\",\"maxWs\":\"3.8\",\"maxWsWd\":\"70\",\"maxWsHrmt\":\"2207\",\"avgWs\":\"1.8\",\"hr24SumRws\":\"1585\",\"maxWd\":\"70\",\"avgTd\":\"1.6\",\"minRhm\":\"25\",\"minRhmHrmt\":\"0001\",\"avgRhm\":\"50.0\",\"avgPv\":\"7.3\",\"avgPa\":\"1022.4\",\"maxPs\":\"1032"
+  },
+  {
+   "path": "/AsosDalyInfoService/getWthrDataList",
+   "params": {
+    "pageNo": 1,
+    "numOfRows": 400,
+    "dataCd": "ASOS",
+    "dateCd": "DAY",
+    "startDt": "20261108",
+    "endDt": "20261113",
+    "stnIds": 257
+   },
+   "http": 200,
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"257\",\"stnNm\":\"양산시\",\"tm\":\"2026-11-08\",\"avgTa\":\"10.3\",\"minTa\":\"2.0\",\"minTaHrmt\":\"0523\",\"maxTa\":\"15.7\",\"maxTaHrmt\":\"1227\",\"mi10MaxRn\":\"\",\"mi10MaxRnHrmt\":\"\",\"hr1MaxRn\":\"\",\"hr1MaxRnHrmt\":\"\",\"sumRnDur\":\"\",\"sumRn\":\"\",\"maxInsWs\":\"7.3\",\"maxInsWsWd\":\"50\",\"maxInsWsHrmt\":\"1716\",\"maxWs\":\"3.2\",\"maxWsWd\":\"50\",\"maxWsHrmt\":\"1312\",\"avgWs\":\"1.5\",\"hr24SumRws\":\"1264\",\"maxWd\":\"70\",\"avgTd\":\"3.3\",\"minRhm\":\"35\",\"minRhmHrmt\":\"1019\",\"avgRhm\":\"62.9\",\"avgPv\":\"8.0\",\"avgPa\":\"1031.2\",\"maxPs\":\"1034.5\",\"m"
   }
  ],
  "probe": [
@@ -54,38 +59,38 @@
     "pageNo": 1,
     "numOfRows": 10,
     "base_date": "20261113",
-    "base_time": "1700",
+    "base_time": "2300",
     "nx": 60,
     "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"TMP\",\"fcstDate\":\"20261113\",\"fcstTime\":\"1800\",\"fcstValue\":\"13\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\""
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261113\",\"baseTime\":\"2300\",\"category\":\"TMP\",\"fcstDate\":\"20261114\",\"fcstTime\":\"0000\",\"fcstValue\":\"11\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"2300\",\"category\":\""
   },
   {
    "test": "단기예보 어제23시",
    "params": {
     "pageNo": 1,
     "numOfRows": 10,
-    "base_date": "20261112",
+    "base_date": "20261113",
     "base_time": "2300",
     "nx": 60,
     "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261112\",\"baseTime\":\"2300\",\"category\":\"TMP\",\"fcstDate\":\"20261113\",\"fcstTime\":\"0000\",\"fcstValue\":\"10\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261112\",\"baseTime\":\"2300\",\"category\":\""
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261113\",\"baseTime\":\"2300\",\"category\":\"TMP\",\"fcstDate\":\"20261114\",\"fcstTime\":\"0000\",\"fcstValue\":\"11\",\"nx\":60,\"ny\":127},{\"baseDate\":\"20261113\",\"baseTime\":\"2300\",\"category\":\""
   },
   {
    "test": "초단기실황",
    "params": {
     "pageNo": 1,
     "numOfRows": 10,
-    "base_date": "20261113",
-    "base_time": "1700",
+    "base_date": "20261114",
+    "base_time": "0000",
     "nx": 60,
     "ny": 127
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"PTY\",\"nx\":60,\"ny\":127,\"obsrValue\":\"0\"},{\"baseDate\":\"20261113\",\"baseTime\":\"1700\",\"category\":\"REH\",\"nx\":60,\"ny\":127,\"obsrValue\":\"64\"},{"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"baseDate\":\"20261114\",\"baseTime\":\"0000\",\"category\":\"PTY\",\"nx\":60,\"ny\":127,\"obsrValue\":\"0\"},{\"baseDate\":\"20261114\",\"baseTime\":\"0000\",\"category\":\"REH\",\"nx\":60,\"ny\":127,\"obsrValue\":\"73\"},{"
   },
   {
    "test": "예보버전",
@@ -93,10 +98,10 @@
     "pageNo": 1,
     "numOfRows": 10,
     "ftype": "SHRT",
-    "basedatetime": "202611131700"
+    "basedatetime": "202611132300"
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"filetype\":\"SHRT\",\"version\":\"20261113173541\"}]},\"pageNo\":1,\"numOfRows\":10,\"totalCount\":1}}}"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"filetype\":\"SHRT\",\"version\":\"20261113211753\"}]},\"pageNo\":1,\"numOfRows\":10,\"totalCount\":1}}}"
   },
   {
    "test": "중기기온 서울",
@@ -116,17 +121,17 @@
     "numOfRows": 10,
     "dataCd": "ASOS",
     "dateCd": "DAY",
-    "startDt": "20261112",
-    "endDt": "20261112",
+    "startDt": "20261113",
+    "endDt": "20261113",
     "stnIds": 108
    },
    "http": 200,
-   "text": "{\"response\":{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL_SERVICE\"},\"body\":{\"dataType\":\"JSON\",\"items\":{\"item\":[{\"stnId\":\"108\",\"stnNm\":\"서울\",\"tm\":\"2026-11-12\",\"avgTa\":\"10.8\",\"minTa\":\"5.8\",\"minTaHrmt\":\"0405\",\"maxTa\":\"17.3\",\"maxTaHrmt\":\"1351\",\"mi10MaxRn\":\"\",\"mi10MaxRnHrmt\":\"\",\"hr1MaxRn\":\"\",\"hr1MaxRnH"
+   "text": "{\"response\":{\"header\":{\"resultCode\":\"03\",\"resultMsg\":\"NO_DATA\"}}}"
   }
  ],
  "calib": {
-  "first_download": 0,
-  "daily_add": 0,
+  "first_download": 32,
+  "daily_add": 61,
   "have_gsr": 61,
   "no_gsr": 32,
   "pending": 0,
@@ -134,9 +139,9 @@
  },
  "obs": {
   "stations": 87,
-  "rows_added": 0,
+  "rows_added": 2958,
   "fails": 0,
   "error": null
  },
- "finished": "2026-11-13T18:48+09:00"
+ "finished": "2026-11-14T01:43+09:00"
 }
